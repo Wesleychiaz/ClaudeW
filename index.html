@@ -1,15 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investor Morning Dashboard</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        iframe { border: none; width: 100%; height: 100vh; }
-    </style>
-</head>
-<body>
-    <iframe src="https://claude.site/public/artifacts/9d1b6b13-0bae-4ea4-a84e-55058b8b0284/embed" allow="clipboard-write" allowfullscreen></iframe>
-</body>
-</html>
+import { useState, useEffect } from "react";
+
+const W_US_STOCKS = ["ASTS", "AMZN", "CRWD", "GOOG", "MSFT", "PLTR", "ZS", "NOW", "QQQ"];
+
+export default function App() {
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [rawDebug, setRawDebug] = useState("");
+
+  const fetchNews = async () => {
+    setLoading(true);
+    setError(null);
+    setRawDebug("");
+    setNews([]);
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          tools: [{ type: "web_search_20250305", name: "web_search" }],
+          messages: [{
+            role: "user",
+            content: `Search the web for the latest news today on these stocks: ${W_US_STOCKS.join(", ")}. For each stock return a JSON array like:
+[{"ticker":"PLTR","headline":"short headline","impact":"positive","detail":"one sentence context"}]
+Return ONLY the raw JSON array, no markdown, no backticks.`
+          }]
+        })
+      });
+
+      const json = await res.json();
+      const allText = (json.content || []).filter(b => b.type === "text").map(b => b.text).join("");
+      setRawDebug(allText.slice(0, 400));
+
+      const match = allText.match(/\[[\s\S]*\]/);
+      if (!match) throw new Error("No JSON array found. Response: " + allText.slice(0, 300));
+      setNews(JSON.parse(match[0]));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchNews(); }, []);
+
+  const impactColor = { positive: "#22c55e", negative: "#ef4444", neutral: "#94a3b8" };
+  const impactIcon = { positive: "▲", negative: "▼", neutral: "●" };
+
+  return (
+    <div style={{ fontFamily: "sans-serif", background: "#0f172a", color: "#e2e8f0", minHeight: "100vh", padding: 20 }}>
+      <div style={{ maxWidth: 600, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>🇺🇸 W Portfolio — US Stocks</div>
+            <div style={{ fontSize: 12, color: "#64748b" }}>{new Date().toLocaleDateString("en-SG", { weekday:"long", year:"numeric", month:"long", day:"numeric" })}</div>
+          </div>
+          <button onClick={fetchNews} disabled={loading} style={{
+            background: loading ? "#334155" : "#3b82f6", color: "#fff", border: "none",
+            borderRadius: 8, padding: "8px 14px", cursor: loading ? "not-allowed" : "pointer", fontWeight: 600, fontSize: 13
+          }}>
+            {loading ? "Loading…" : "🔄 Refresh"}
+          </button>
+        </div>
+
+        {loading && (
+          <div style={{ textAlign: "center", padding: 40, color: "#64748b" }}>
+            <div style={{ fontSize: 30, marginBottom: 8 }}>🔍</div>
+            <div>Searching latest news for {W_US_STOCKS.join(", ")}…</div>
+          </div>
+        )}
+
+        {error && (
+          <div style={{ background: "#450a0a", border: "1px solid #7f1d1d", borderRadius: 10, padding: 14, marginBottom: 14, fontSize: 12, color: "#fca5a5" }}>
+            <strong>Error:</strong> {error}
+            {rawDebug && <div style={{ marginTop: 8, color: "#f87171", fontFamily: "monospace", wordBreak: "break-all" }}>Raw: {rawDebug}</div>}
+          </div>
+        )}
+
+        {news.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {news.map((item, i) => (
+              <div key={i} style={{ background: "#1e293b", borderRadius: 10, padding: 14, borderLeft: `3px solid ${impactColor[item.impact] || "#64748b"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ fontWeight: 800, color: "#38bdf8", fontSize: 15 }}>{item.ticker}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: impactColor[item.impact] || "#94a3b8" }}>
+                    {impactIcon[item.impact] || "●"} {item.impact}
+                  </span>
+                </div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: "#f1f5f9", marginBottom: 4 }}>{item.headline}</div>
+                <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6 }}>{item.detail}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
