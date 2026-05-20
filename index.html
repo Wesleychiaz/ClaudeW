@@ -180,6 +180,8 @@ var NEWS_DATA = {
    END OF EDIT SECTION — do not change anything below this line
    ============================================================= */
 
+var FINNHUB_KEY = "d86jmmpr01qgiu45ni4gd86jmmpr01qgiu45ni50"; // <-- paste your Finnhub key here
+
 var US_TICKERS  = ["ASTS","AMZN","CRWD","GOOG","MSFT","PLTR","ZS","NOW","QQQ"];
 var SG_TICKERS  = ["D05.SI","O39.SI","AU8U.SI","C38U.SI","YF8.SI","DCRU.SI"];
 var CG_IDS      = { BTC:"bitcoin", ETH:"ethereum", DOT:"polkadot-2" };
@@ -239,9 +241,8 @@ function fetchFearGreed(cb) {
   xhr.send();
 }
 
-function fetchYahoo(tickers, cb) {
-  var syms = tickers.join("%2C");
-  var url = "https://corsproxy.io/?" + encodeURIComponent("https://query1.finance.yahoo.com/v7/finance/quote?symbols=" + syms + "&fields=regularMarketPrice,regularMarketChangePercent");
+function fetchFinnhubQuote(ticker, result, done, onErr) {
+  var url = "https://finnhub.io/api/v1/quote?symbol=" + ticker + "&token=" + FINNHUB_KEY;
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function() {
@@ -249,22 +250,29 @@ function fetchYahoo(tickers, cb) {
       if (xhr.status === 200) {
         try {
           var json = JSON.parse(xhr.responseText);
-          var result = {};
-          var quotes = json.quoteResponse.result;
-          for (var i = 0; i < quotes.length; i++) {
-            var q = quotes[i];
-            result[q.symbol] = {
-              price: q.regularMarketPrice,
-              chg:   q.regularMarketChangePercent
-            };
+          if (json.c && json.c > 0) {
+            var chgPct = ((json.c - json.pc) / json.pc) * 100;
+            result[ticker] = { price: json.c, chg: chgPct };
           }
-          cb(null, result);
-        } catch(e) { cb("parse error"); }
-      } else { cb("status " + xhr.status); }
+        } catch(e) {}
+      }
+      done();
     }
   };
-  xhr.onerror = function() { cb("network error"); };
+  xhr.onerror = function() { done(); };
   xhr.send();
+}
+
+function fetchAllStocks(tickers, cb) {
+  var result = {};
+  var remaining = tickers.length;
+  if (remaining === 0) { cb(null, result); return; }
+  for (var i = 0; i < tickers.length; i++) {
+    fetchFinnhubQuote(tickers[i], result, function() {
+      remaining--;
+      if (remaining === 0) { cb(null, result); }
+    });
+  }
 }
 
 function fetchCrypto(cb) {
@@ -438,7 +446,7 @@ function refreshAll() {
     }
 
     var allTickers = US_TICKERS.concat(SG_TICKERS);
-    fetchYahoo(allTickers, function(err2, prices) {
+    fetchAllStocks(allTickers, function(err2, prices) {
       if (!err2) {
         liveData.prices = prices;
         renderPrices();
