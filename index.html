@@ -1,1 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Morning Market Brief</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+header{background:#1e293b;border-bottom:1px solid #334155;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:17px;font-weight:700}
+.sub{font-size:11px;color:#64748b;margin-top:2px}
+#refresh-btn{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:600;font-size:13px;cursor:pointer}
+nav{display:flex;border-bottom:1px solid #1e293b;overflow-x:auto}
+nav button{background:none;border:none;border-bottom:2px solid transparent;padding:10px 16px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+nav button.active{color:#38bdf8;border-bottom-color:#38bdf8}
+main{padding:16px;max-width:860px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.overview-top{display:grid;grid-template-columns:160px 1fr;gap:14px;margin-bottom:14px}
+.card{background:#1e293b;border-radius:12px;padding:16px}
+#fg-card{text-align:center}
+#fg-value{font-size:48px;font-weight:800}
+#fg-label{font-size:14px;font-weight:700;margin:4px 0 8px}
+#fg-desc{font-size:11px;color:#94a3b8;line-height:1.5;margin-top:8px}
+.gauge-bar{height:6px;border-radius:3px;background:linear-gradient(to right,#ef4444,#f97316,#eab308,#84cc16,#22c55e);position:relative;margin:12px 0 4px}
+.gauge-dot{position:absolute;top:-4px;width:14px;height:14px;border-radius:50%;border:2px solid #0f172a;transform:translateX(-50%)}
+.gauge-labels{display:flex;justify-content:space-between;font-size:10px;color:#475569}
+#sent-overall{font-size:14px;font-weight:700;color:#38bdf8;margin-bottom:6px}
+#sent-summary{font-size:12px;color:#cbd5e1;line-height:1.6;margin-bottom:10px}
+.fund-row{background:#0f172a;border-radius:6px;padding:7px 10px;display:flex;gap:10px;margin-bottom:6px;font-size:11px}
+.fund-name{font-weight:700;color:#f59e0b;min-width:90px}
+.fund-view{font-weight:600;color:#e2e8f0;margin-right:4px}
+.fund-note{color:#64748b}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.mini-card{background:#1e293b;border-radius:10px;padding:12px}
+.mini-title{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.mini-row{display:flex;gap:6px;margin-bottom:5px;font-size:11px;color:#94a3b8}
+.mini-row strong{color:#e2e8f0}
+.news-list{display:flex;flex-direction:column;gap:10px}
+.news-card{background:#1e293b;border-radius:10px;padding:14px;border-left:3px solid #334155;margin-bottom:4px}
+.news-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.news-ticker{font-weight:800;font-size:15px}
+.news-headline{font-weight:600;font-size:13px;color:#f1f5f9;margin-bottom:4px}
+.news-detail{font-size:12px;color:#94a3b8;line-height:1.6}
+.watch-card{background:#1e293b;border-radius:10px;padding:14px;display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.watch-badge{min-width:56px;height:50px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.watch-note{font-size:13px;color:#94a3b8;line-height:1.6}
+.hint{font-size:12px;color:#475569;margin-bottom:12px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Morning Market Brief</h1>
+    <p class="sub" id="date-label"></p>
+  </div>
+  <button id="refresh-btn" onclick="loadAll()">Refresh</button>
+</header>
+<nav>
+  <button class="active" onclick="switchTab('overview',this)">Overview</button>
+  <button onclick="switchTab('us',this)">US Tech</button>
+  <button onclick="switchTab('sg',this)">SG Stocks</button>
+  <button onclick="switchTab('crypto',this)">Crypto</button>
+  <button onclick="switchTab('watchlist',this)">Watchlist</button>
+</nav>
+<main>
+  <div id="tab-overview" class="tab-panel active">
+    <div class="overview-top">
+      <div class="card" id="fg-card">
+        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Fear and Greed</div>
+        <div id="fg-value">--</div>
+        <div id="fg-label">--</div>
+        <div class="gauge-bar"><div class="gauge-dot" id="gauge-dot"></div></div>
+        <div class="gauge-labels"><span>Fear</span><span>Neutral</span><span>Greed</span></div>
+        <div id="fg-desc"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Market Sentiment</div>
+        <div id="sent-overall"></div>
+        <div id="sent-summary"></div>
+        <div id="sent-funds"></div>
+      </div>
+    </div>
+    <div class="mini-grid" id="mini-grid"></div>
+  </div>
+  <div id="tab-us" class="tab-panel">
+    <p class="hint">W Portfolio: ASTS, AMZN, CRWD, GOOG, MSFT, PLTR, ZS, NOW, QQQ</p>
+    <div id="us-list"></div>
+  </div>
+  <div id="tab-sg" class="tab-panel">
+    <p class="hint">W Portfolio: CapLand China TR, CapLand IntlCom, OCBC, DBS | G Portfolio: YZJ Fin, Digital Core REIT</p>
+    <div id="sg-list"></div>
+  </div>
+  <div id="tab-crypto" class="tab-panel">
+    <p class="hint">W Portfolio: BTC (0.2), ETH (8), DOT (1000)</p>
+    <div id="crypto-list"></div>
+  </div>
+  <div id="tab-watchlist" class="tab-panel">
+    <p class="hint">Action items based on current market conditions</p>
+    <div id="watch-list"></div>
+  </div>
+</main>
+<script>
+var iColor = { positive:"#22c55e", negative:"#ef4444", neutral:"#94a3b8" };
+var iIcon  = { positive:"(+)", negative:"(-)", neutral:"(o)" };
+var aColor = { buy:"#22c55e", sell:"#ef4444", hold:"#6366f1", watch:"#f59e0b" };
 
+var DATA = {
+  fearGreed: {
+    value: 72,
+    label: "Greed",
+    description: "Investors are increasingly optimistic driven by strong earnings and AI momentum."
+  },
+  sentiment: {
+    overall: "Cautiously Bullish",
+    summary: "US equities continue their rally led by mega-cap tech. Fed pause expectations are supportive. Singapore banks hold steady while REITs face pressure from elevated rates.",
+    funds: [
+      { name:"FundStrat",      view:"Bullish",           note:"S&P 500 target raised; AI capex cycle intact" },
+      { name:"Goldman Sachs",  view:"Neutral-Bullish",   note:"Soft landing base case; watch CPI print" },
+      { name:"JPMorgan",       view:"Cautious",          note:"High valuations, geopolitical tail-risk flagged" },
+      { name:"Morgan Stanley", view:"Selective Bullish", note:"Prefers quality tech and dividend growers" }
+    ]
+  },
+  usNews: [
+    { ticker:"PLTR", impact:"positive", headline:"Palantir raises FY guidance on AI platform demand surge",           detail:"AIP commercial revenue up 55% YoY; management confident in $1B+ ARR milestone by year-end." },
+    { ticker:"MSFT", impact:"positive", headline:"Microsoft Azure growth re-accelerates to 31% in latest quarter",    detail:"Copilot adoption cited as key driver; cloud margin expansion beat consensus estimates." },
+    { ticker:"AMZN", impact:"positive", headline:"Amazon AWS posts record operating income, ad revenue soars",         detail:"AWS margin hit 38%, while advertising became the fastest-growing segment at $14.7B quarterly." },
+    { ticker:"GOOG", impact:"positive", headline:"Alphabet announces $70B buyback; Search AI Overviews expand",       detail:"Gemini integration boosting search monetisation; YouTube Shorts ad revenue turning profitable." },
+    { ticker:"CRWD", impact:"neutral",  headline:"CrowdStrike extends Falcon platform with new SIEM module",          detail:"Annual recurring revenue grows 33% YoY; slight guidance miss offset by large enterprise wins." },
+    { ticker:"ASTS", impact:"positive", headline:"AST SpaceMobile completes first commercial satellite broadband call",detail:"BlueBird constellation on track; AT&T and Verizon agreements provide near-term revenue visibility." },
+    { ticker:"ZS",   impact:"neutral",  headline:"Zscaler sees steady enterprise demand but billings growth slows",   detail:"Zero-trust adoption remains strong but deal cycles elongating in EMEA market." },
+    { ticker:"NOW",  impact:"positive", headline:"ServiceNow AI Pro SKU drives blowout Q1; raises full-year outlook", detail:"GenAI modules now embedded in 80% of new deals; net new ACV grew 26% YoY." },
+    { ticker:"QQQ",  impact:"positive", headline:"Nasdaq 100 ETF hits new high as tech earnings season impresses",    detail:"QQQ year-to-date gain surpasses 18%; top holdings NVDA, MSFT, AAPL all above 52-week highs." }
+  ],
+  sgNews: [
+    { ticker:"D05",  name:"DBS Group",         impact:"positive", headline:"DBS reports record net profit; raises dividend to S$0.60 per quarter",   detail:"NIM compression slowing; wealth management AUM up 12% with strong inflows from Southeast Asia." },
+    { ticker:"O39",  name:"OCBC",              impact:"positive", headline:"OCBC exceeds earnings forecast on insurance and trading income",           detail:"Great Eastern integration adds fee income; loan growth steady at 4% supported by regional expansion." },
+    { ticker:"AU8U", name:"CapLand China TR",  impact:"negative", headline:"CapLand China Trust NAV dips on weaker RMB and China retail footfall",    detail:"Portfolio occupancy at 93.8% but RMB depreciation weighs on SGD distributions." },
+    { ticker:"C38U", name:"CapLand IntlCom",   impact:"neutral",  headline:"CapLand IntlCom maintains DPU; suburban malls outperform Orchard belt",   detail:"Shopper traffic recovered to pre-COVID levels; positive rental reversion of 6.3% on new leases." },
+    { ticker:"YF8",  name:"YZJ Financial",     impact:"positive", headline:"YZJ Financial grows loan book 8% amid strong SME demand in Singapore",    detail:"NPL ratio stays low at 1.2%; management signals potential special dividend at year-end." },
+    { ticker:"DCRU", name:"Digital Core REIT", impact:"negative", headline:"Digital Core REIT cuts DPU guidance on higher US financing costs",        detail:"Refinancing of USD debt at higher rates compresses distributable income; occupancy remains near 100%." }
+  ],
+  cryptoNews: [
+    { ticker:"BTC", impact:"positive", headline:"Bitcoin breaks $108K as institutional ETF inflows hit weekly record", detail:"BlackRock IBIT sees $900M single-day inflow; derivatives funding rates suggest measured optimism." },
+    { ticker:"ETH", impact:"positive", headline:"Ethereum EIP-7702 upgrade boosts smart-account adoption",             detail:"Gas fees at 6-month lows post-Dencun; staking yield at 3.8% attracting institutional allocators." },
+    { ticker:"DOT", impact:"neutral",  headline:"Polkadot JAM upgrade testnet goes live; community vote passes 91%",   detail:"JAM aims to replace the relay chain with a more scalable architecture; mainnet launch targeted Q4 2025." }
+  ],
+  watchlist: [
+    { ticker:"PLTR", action:"buy",   note:"Strong earnings momentum and AI platform flywheel. Recent pullback could be a re-entry point ahead of next earnings." },
+    { ticker:"DBS",  action:"hold",  note:"Solid fundamentals but NIM likely to compress if MAS follows Fed cuts. Hold for dividend income." },
+    { ticker:"BTC",  action:"hold",  note:"Macro tailwinds intact with ETF inflows. Risk of short-term correction after 40% run -- hold existing position." },
+    { ticker:"DCRU", action:"watch", note:"Occupancy near 100% is compelling but USD rate risk hurts DPU. Watch for rate cut catalysts in H2 before adding." },
+    { ticker:"ZS",   action:"hold",  note:"Long-term zero-trust thesis intact but near-term billings softness warrants patience. Revisit on next earnings call." }
+  ]
+};
+
+function fgColor(v) {
+  if (v <= 25) { return "#ef4444"; }
+  if (v <= 45) { return "#f97316"; }
+  if (v <= 55) { return "#eab308"; }
+  if (v <= 75) { return "#84cc16"; }
+  return "#22c55e";
+}
+
+function ge(id) { return document.getElementById(id); }
+
+function switchTab(id, btn) {
+  var panels = document.querySelectorAll(".tab-panel");
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove("active"); }
+  var btns = document.querySelectorAll("nav button");
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove("active"); }
+  ge("tab-" + id).classList.add("active");
+  btn.classList.add("active");
+}
+
+function makeNewsCard(ticker, tickerColor, impact, headline, detail) {
+  var h = "";
+  h += "<div class='news-card' style='border-left-color:" + iColor[impact] + "'>";
+  h += "<div class='news-top'>";
+  h += "<span class='news-ticker' style='color:" + tickerColor + "'>" + ticker + "</span>";
+  h += "<span style='font-size:11px;font-weight:700;color:" + iColor[impact] + "'>" + iIcon[impact] + " " + impact + "</span>";
+  h += "</div>";
+  h += "<div class='news-headline'>" + headline + "</div>";
+  h += "<div class='news-detail'>" + detail + "</div>";
+  h += "</div>";
+  return h;
+}
+
+function render(d) {
+  var dateStr = new Date().toLocaleDateString("en-SG", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+  ge("date-label").textContent = dateStr;
+
+  var fg = d.fearGreed;
+  ge("fg-value").textContent = fg.value;
+  ge("fg-value").style.color = fgColor(fg.value);
+  ge("fg-label").textContent = fg.label;
+  ge("fg-label").style.color = fgColor(fg.value);
+  ge("fg-desc").textContent  = fg.description;
+  ge("gauge-dot").style.left = Math.min(Math.max(fg.value, 3), 97) + "%";
+  ge("gauge-dot").style.background = fgColor(fg.value);
+
+  ge("sent-overall").textContent = d.sentiment.overall;
+  ge("sent-summary").textContent = d.sentiment.summary;
+
+  var fh = "";
+  for (var i = 0; i < d.sentiment.funds.length; i++) {
+    var f = d.sentiment.funds[i];
+    fh += "<div class='fund-row'>";
+    fh += "<span class='fund-name'>" + f.name + "</span>";
+    fh += "<span class='fund-view'>" + f.view + "</span>";
+    fh += "<span class='fund-note'>-- " + f.note + "</span>";
+    fh += "</div>";
+  }
+  ge("sent-funds").innerHTML = fh;
+
+  var cats = [
+    { label:"US Tech",   items:d.usNews,      key:"ticker" },
+    { label:"SG Stocks", items:d.sgNews,       key:"ticker" },
+    { label:"Crypto",    items:d.cryptoNews,   key:"ticker" }
+  ];
+  var mg = "";
+  for (var c = 0; c < cats.length; c++) {
+    var cat = cats[c];
+    mg += "<div class='mini-card'><div class='mini-title'>" + cat.label + "</div>";
+    var limit = cat.items.length < 4 ? cat.items.length : 4;
+    for (var j = 0; j < limit; j++) {
+      var it = cat.items[j];
+      mg += "<div class='mini-row'>";
+      mg += "<span style='color:" + iColor[it.impact] + ";font-weight:700'>" + iIcon[it.impact] + "</span>";
+      mg += "<span><strong>" + it[cat.key] + "</strong> " + it.headline + "</span>";
+      mg += "</div>";
+    }
+    mg += "</div>";
+  }
+  ge("mini-grid").innerHTML = mg;
+
+  var uh = "";
+  for (var i = 0; i < d.usNews.length; i++) {
+    var n = d.usNews[i];
+    uh += makeNewsCard(n.ticker, "#38bdf8", n.impact, n.headline, n.detail);
+  }
+  ge("us-list").innerHTML = uh;
+
+  var sh = "";
+  for (var i = 0; i < d.sgNews.length; i++) {
+    var n = d.sgNews[i];
+    sh += "<div class='news-card' style='border-left-color:" + iColor[n.impact] + "'>";
+    sh += "<div class='news-top'>";
+    sh += "<span class='news-ticker' style='color:#a78bfa'>" + n.ticker + " <span style='font-size:11px;color:#64748b;font-weight:400'>" + n.name + "</span></span>";
+    sh += "<span style='font-size:11px;font-weight:700;color:" + iColor[n.impact] + "'>" + iIcon[n.impact] + " " + n.impact + "</span>";
+    sh += "</div>";
+    sh += "<div class='news-headline'>" + n.headline + "</div>";
+    sh += "<div class='news-detail'>" + n.detail + "</div>";
+    sh += "</div>";
+  }
+  ge("sg-list").innerHTML = sh;
+
+  var ch = "";
+  for (var i = 0; i < d.cryptoNews.length; i++) {
+    var n = d.cryptoNews[i];
+    ch += makeNewsCard(n.ticker, "#f59e0b", n.impact, n.headline, n.detail);
+  }
+  ge("crypto-list").innerHTML = ch;
+
+  var wh = "";
+  for (var i = 0; i < d.watchlist.length; i++) {
+    var w = d.watchlist[i];
+    var ac = aColor[w.action] || "#64748b";
+    wh += "<div class='watch-card'>";
+    wh += "<div class='watch-badge' style='background:" + ac + "33;border:2px solid " + ac + "'>";
+    wh += "<span style='font-size:11px;font-weight:800;color:" + ac + "'>" + w.ticker + "</span>";
+    wh += "<span style='font-size:9px;font-weight:700;text-transform:uppercase;color:" + ac + "'>" + w.action + "</span>";
+    wh += "</div>";
+    wh += "<div class='watch-note'>" + w.note + "</div>";
+    wh += "</div>";
+  }
+  ge("watch-list").innerHTML = wh;
+}
+
+function loadAll() {
+  ge("refresh-btn").disabled = true;
+  ge("refresh-btn").textContent = "Loading...";
+  setTimeout(function() {
+    render(DATA);
+    ge("refresh-btn").disabled = false;
+    ge("refresh-btn").textContent = "Refresh";
+  }, 400);
+}
+
+loadAll();
+</script>
+</body>
+</html>
