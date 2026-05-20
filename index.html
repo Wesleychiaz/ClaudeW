@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Morning Market Brief</title>
+<title>Morning Market Brief for WESLEYYYYYYY</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
@@ -155,12 +155,9 @@ var NEWS_DATA = {
     { ticker:"QQQ",  impact:"positive", headline:"Nasdaq 100 ETF hits new high as tech earnings season impresses",     detail:"QQQ year-to-date gain surpasses 18%; top holdings NVDA, MSFT, AAPL all above 52-week highs." }
   ],
   sgNews: [
-    { ticker:"D05",  name:"DBS Group",         impact:"positive", headline:"DBS reports record net profit; raises dividend to S$0.60 per quarter",  detail:"NIM compression slowing; wealth management AUM up 12% with strong inflows from Southeast Asia." },
-    { ticker:"O39",  name:"OCBC",              impact:"positive", headline:"OCBC exceeds earnings forecast on insurance and trading income",          detail:"Great Eastern integration adds fee income; loan growth steady at 4%." },
-    { ticker:"AU8U", name:"CapLand China TR",  impact:"negative", headline:"CapLand China Trust NAV dips on weaker RMB and retail footfall",         detail:"Portfolio occupancy at 93.8% but RMB depreciation weighs on SGD distributions." },
-    { ticker:"C38U", name:"CapLand IntlCom",   impact:"neutral",  headline:"CapLand IntlCom maintains DPU; suburban malls outperform Orchard belt",  detail:"Shopper traffic recovered to pre-COVID levels; rental reversion of 6.3% on new leases." },
-    { ticker:"YF8",  name:"YZJ Financial",     impact:"positive", headline:"YZJ Financial grows loan book 8% amid strong SME demand",                detail:"NPL ratio stays low at 1.2%; management signals potential special dividend at year-end." },
-    { ticker:"DCRU", name:"Digital Core REIT", impact:"negative", headline:"Digital Core REIT cuts DPU guidance on higher US financing costs",       detail:"Refinancing of USD debt at higher rates compresses distributable income; occupancy near 100%." }
+    { ticker:"D05",  name:"DBS Group",       impact:"positive", headline:"DBS reports record net profit; raises dividend to S$0.60 per quarter",  detail:"NIM compression slowing; wealth management AUM up 12% with strong inflows from Southeast Asia." },
+    { ticker:"O39",  name:"OCBC",            impact:"positive", headline:"OCBC exceeds earnings forecast on insurance and trading income",          detail:"Great Eastern integration adds fee income; loan growth steady at 4%." },
+    { ticker:"C38U", name:"CapLand IntlCom", impact:"neutral",  headline:"CICT maintains DPU; suburban malls outperform Orchard belt",             detail:"Shopper traffic recovered to pre-COVID levels; rental reversion of 6.3% on new leases." }
   ],
   cryptoNews: [
     { ticker:"BTC", impact:"positive", headline:"Bitcoin breaks $108K as institutional ETF inflows hit weekly record", detail:"BlackRock IBIT sees $900M single-day inflow; funding rates suggest measured optimism." },
@@ -183,7 +180,7 @@ var NEWS_DATA = {
 var FINNHUB_KEY = "d86jmmpr01qgiu45ni4gd86jmmpr01qgiu45ni50"; // <-- paste your Finnhub key here
 
 var US_TICKERS  = ["ASTS","AMZN","CRWD","GOOG","MSFT","PLTR","ZS","NOW","QQQ"];
-var SG_TICKERS  = ["D05.SI","O39.SI","AU8U.SI","C38U.SI","YF8.SI","DCRU.SI"];
+var SG_TICKERS  = ["D05:SP","O39:SP","C38U:SP"];
 var CG_IDS      = { BTC:"bitcoin", ETH:"ethereum", DOT:"polkadot-2" };
 
 var iColor = { positive:"#22c55e", negative:"#ef4444", neutral:"#94a3b8" };
@@ -331,8 +328,9 @@ function renderPrices() {
   var sh = "";
   for (var i = 0; i < SG_TICKERS.length; i++) {
     var sym = SG_TICKERS[i];
+    var dispSym = sym.replace(":SP","");
     var d = liveData.prices[sym];
-    if (d) { sh += priceTile(sym, d.price, d.chg); } else { sh += "<div class='price-tile'><div class='price-ticker'>" + sym.replace(".SI","") + "</div><div style='font-size:11px;color:#64748b'>--</div></div>"; }
+    if (d) { sh += priceTile(dispSym, d.price, d.chg); } else { sh += "<div class='price-tile'><div class='price-ticker'>" + dispSym + "</div><div style='font-size:11px;color:#64748b'>--</div></div>"; }
   }
   ge("sg-prices").innerHTML = sh;
 
