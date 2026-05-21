@@ -130,7 +130,38 @@ body.light .ba{background:#fef3c7;color:#92400e}
   <div class="section">
     <div class="sec-title"><i class="ti ti-home" aria-hidden="true"></i> <span class="sec-title-text">Property &amp; loan inputs</span></div>
     <div class="grid">
-      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="0" inputmode="numeric"></div>
-      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="0" inputmode="numeric"></div>
-      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="0" inputmode="numeric"></div>
-      <div class="ig"><label>Cash available (S$)</
+      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="2,300,000" inputmode="numeric"></div>
+      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="1,482,000" inputmode="numeric"></div>
+      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="154,000" inputmode="numeric"></div>
+      <div class="ig"><label>Cash available (S$)</label><input type="text" id="cash" value="700,000" inputmode="numeric"></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="ig">
+        <label>Mortgage interest rate: <span id="rateLabel" style="font-weight:600">1.40%</span></label>
+        <div class="rrow">
+          <span class="range-hint" style="font-size:12px">1%</span>
+          <input type="range" id="rate" min="1" max="5" step="0.1" value="1.4">
+          <span class="range-hint" style="font-size:12px">5%</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="ig"><label>Loan tenure (years)</label><input type="text" id="tenure" value="30" inputmode="numeric"></div>
+      <div class="ig"><label>Condo maintenance fee — expense (S$/mth)</label><input type="text" id="condofee" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Rental income — HDB — income (S$/mth)</label><input type="text" id="rental" value="3,500" inputmode="numeric"></div>
+      <div class="ig"><label>Monthly CPF OA contribution — income (S$)</label><input type="text" id="cpfmo" value="1,840" inputmode="numeric"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-receipt" aria-hidden="true"></i> <span class="sec-title-text">Upfront cost summary</span></div>
+    <div class="mgrid" id="summaryCards"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-credit-card" aria-hidden="true"></i> <span class="sec-title-text">Loan scenarios</span></div>
+    <div class="tabs" id="scenarioTabs"></div>
+    <div id="scenarioPanels"></div>
+  </div>
+
+  <div
