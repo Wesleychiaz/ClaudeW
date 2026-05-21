@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesley's Property Purchase Calculator</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -74,10 +75,10 @@ body.light .range-hint{color:#94a3b8}
 body.light .stress-head{color:#64748b}
 body.light .sec-title-text{color:#0f172a}
 
-/* Shared */
+/* Shared Layouts */
+.container{max-width:1200px;margin:0 auto;padding:1rem}
 .section{border:0.5px solid;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
 .header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem}
-.header-left{}
 h1{font-size:22px;font-weight:600;margin-bottom:4px;letter-spacing:-0.3px}
 .sub{font-size:13px;margin-bottom:0}
 .toggle-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid;transition:all .2s;white-space:nowrap;flex-shrink:0}
@@ -94,4 +95,348 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
 .ml{font-size:12px;margin-bottom:4px}
 .mv{font-size:18px;font-weight:600}
 .ms{font-size:11px;margin-top:2px}
-.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid;font
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid;font-size:14px}
+.row:last-child{border-bottom:none}
+.ri{padding-left:16px}
+.tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid;background:transparent;transition:all .15s}
+.tab.active{background:#2563eb;color:#fff;border-color:#2563eb}
+.sp{display:none}.sp.active{display:block}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;margin-left:6px}
+.bg{background:#14291a;color:#4ade80}
+.ba{background:#2d2010;color:#fbbf24}
+body.light .bg{background:#dcfce7;color:#166534}
+body.light .ba{background:#fef3c7;color:#92400e}
+.divider{border:none;border-top:0.5px solid;margin:12px 0}
+.info{font-size:13px;border-radius:8px;padding:10px 14px;margin-top:10px;line-height:1.6}
+.sir{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.sir label{font-size:12px;white-space:nowrap}
+.sir input{width:110px;font-size:13px;padding:4px 8px;text-align:right;border:0.5px solid;border-radius:8px}
+</style>
+</head>
+<body class="dark">
+
+<div class="container">
+  <div class="header-row">
+    <div>
+      <h1>Wesley's Property Purchase Calculator</h1>
+      <p class="sub">Singapore private property — upfront costs, loan scenarios &amp; monthly cash flow</p>
+    </div>
+    <button class="toggle-btn" onclick="toggleMode()" id="modeBtn">
+      <i class="ti ti-moon" id="modeIcon"></i> Dark mode
+    </button>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-home" aria-hidden="true"></i> <span class="sec-title-text">Property &amp; loan inputs</span></div>
+    <div class="grid">
+      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Cash available (S$)</label><input type="text" id="cash" value="0" inputmode="numeric"></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="ig">
+        <label>Mortgage interest rate: <span id="rateLabel" style="font-weight:600">1.40%</span></label>
+        <div class="rrow">
+          <span class="range-hint" style="font-size:12px">1%</span>
+          <input type="range" id="rate" min="1" max="5" step="0.1" value="1.4">
+          <span class="range-hint" style="font-size:12px">5%</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="ig"><label>Loan tenure (years)</label><input type="text" id="tenure" value="30" inputmode="numeric"></div>
+      <div class="ig"><label>Condo maintenance fee (S$/mth)</label><input type="text" id="condofee" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Rental income — HDB (S$/mth)</label><input type="text" id="rental" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Monthly CPF OA contribution (S$)</label><input type="text" id="cpfmo" value="0" inputmode="numeric"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-receipt" aria-hidden="true"></i> <span class="sec-title-text">Upfront cost summary</span></div>
+    <div class="mgrid" id="summaryCards"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-credit-card" aria-hidden="true"></i> <span class="sec-title-text">Loan scenarios</span></div>
+    <div class="tabs" id="scenarioTabs"></div>
+    <div id="scenarioPanels"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-calendar-stats" aria-hidden="true"></i> <span class="sec-title-text">Monthly cash flow</span></div>
+    <div id="cashflow"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> <span class="sec-title-text">Stress test</span></div>
+    <div id="stresstest"></div>
+  </div>
+</div>
+
+<script>
+var isDark = true;
+var currentTabId = 'full';
+
+function toggleMode() {
+  isDark = !isDark;
+  document.body.className = isDark ? 'dark' : 'light';
+  var btn = document.getElementById('modeBtn');
+  var icon = document.getElementById('modeIcon');
+  if (isDark) {
+    icon.className = 'ti ti-moon';
+    btn.innerHTML = '<i class="ti ti-moon" id="modeIcon"></i> Dark mode';
+  } else {
+    icon.className = 'ti ti-sun';
+    btn.innerHTML = '<i class="ti ti-sun" id="modeIcon"></i> Light mode';
+  }
+  calc();
+}
+
+function fmt(v) { 
+  return 'S$' + Math.round(v).toLocaleString('en-SG'); 
+}
+
+function pv(id) {
+  var el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat(el.value.replace(/,/g, '')) || 0;
+}
+
+function fmtField(el) {
+  var raw = el.value.replace(/,/g, '').replace(/[^0-9.]/g, '');
+  var num = parseFloat(raw);
+  if (!isNaN(num)) {
+    el.value = num.toLocaleString('en-SG');
+  } else {
+    el.value = "0";
+  }
+}
+
+function pmt(r, n, pval) {
+  if (r === 0 || n <= 0) return pval / (n || 1);
+  return pval * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+function ru1k(v) { 
+  return Math.ceil(v / 1000) * 1000; 
+}
+
+function row(label, value, bold, color, indent, small) {
+  var lStyle = bold ? ' style="font-weight:600"' : '';
+  var vStyle = color ? (' style="font-weight:600;color:' + color + '"') : (bold ? ' style="font-weight:600"' : '');
+  var cls = 'row' + (indent ? ' ri' : '');
+  var fsize = small ? ' style="font-size:12px"' : '';
+  return '<div class="' + cls + '"><span class="rl"' + fsize + lStyle + '>' + label + '</span><span class="rv"' + vStyle + '>' + value + '</span></div>';
+}
+
+function getColors() {
+  if (isDark) return { G: '#4ade80', R: '#f87171', A: '#fbbf24' };
+  return { G: '#16a34a', R: '#dc2626', A: '#d97706' };
+}
+
+function calc() {
+  var c = getColors();
+  var price  = pv('propPrice');
+  var ipa    = pv('ipa');
+  var cpf    = pv('cpf');
+  var cash   = pv('cash');
+  var rate   = parseFloat(document.getElementById('rate').value) / 100;
+  var tenure = pv('tenure') || 30;
+  var condo  = pv('condofee');
+  var rental = pv('rental');
+  var cpfmo  = pv('cpfmo');
+
+  document.getElementById('rateLabel').textContent = (rate * 100).toFixed(2) + '%';
+
+  var max75     = price * 0.75;
+  var shortfall = Math.max(0, max75 - ipa);
+  var hasS      = shortfall > 0;
+  var opt       = price * 0.01;
+  var ex        = price * 0.04;
+  
+  var bsd = 0;
+  if (price > 0) {
+    bsd = price * 0.05 - 30400;
+    if (bsd < 0) bsd = 0;
+  }
+  
+  var legal     = price > 0 ? 3000 : 0;
+  var dp        = price * 0.20;
+  var cashOnly  = opt + ex + bsd + legal;
+  var totalCPF  = cashOnly + dp;
+  var cpfUsed   = Math.min(cpf, dp);
+  var dpCash    = dp - cpfUsed;
+  var r         = rate / 12;
+  var n         = tenure * 12;
+
+  var pledge = 0, show = 0;
+  if (hasS) {
+    pledge = ru1k((pmt(0.04 / 12, 360, shortfall) / 0.55) * 48);
+    show   = ru1k(pledge / 0.30);
+  }
+
+  var cashBase  = cashOnly + dpCash;
+  var cashNeedA = cashOnly + dpCash + shortfall;
+  var csA       = Math.max(0, cashNeedA - cash);
+  var totalShow = cashBase + show;
+  var csShow    = Math.max(0, totalShow - cash);
+  var totalPledge = cashBase + pledge;
+  var csPledge  = Math.max(0, totalPledge - cash);
+
+  // Summary Metrics Tiles
+  document.getElementById('summaryCards').innerHTML =
+    '<div class="metric hi"><div class="ml">Property price</div><div class="mv">' + fmt(price) + '</div></div>' +
+    '<div class="metric"><div class="ml">Max loan (75%)</div><div class="mv">' + fmt(max75) + '</div></div>' +
+    '<div class="metric"><div class="ml">BSD</div><div class="mv">' + fmt(bsd) + '</div><div class="ms">Price x 5% - $30,400</div></div>' +
+    '<div class="metric"><div class="ml">Downpayment (20%)</div><div class="mv">' + fmt(dp) + '</div></div>' +
+    '<div class="metric"><div class="ml">Option (1%) + Exercise fee (4%)</div><div class="mv">' + fmt(opt + ex) + '</div></div>' +
+    '<div class="metric"><div class="ml">Legal fees + valuation (est.)</div><div class="mv">' + fmt(legal) + '</div></div>' +
+    '<div class="metric ' + (hasS ? 'warn' : 'good') + '"><div class="ml">Loan shortfall</div><div class="mv">' + (hasS ? fmt(shortfall) : 'None') + '</div><div class="ms">' + (hasS ? 'IPA < 75% of price' : 'IPA covers full 75%') + '</div></div>';
+
+  function costRows(loanAmt) {
+    return row('Loan amount ' + (loanAmt === ipa ? '(IPA)' : '(75% of price)'), fmt(loanAmt)) +
+      row('Downpayment (20%) — cash/CPF', fmt(dp)) +
+      row('Option fee (1%) — cash only', fmt(opt)) +
+      row('Exercise fee (4%) — cash only', fmt(ex)) +
+      row('BSD — cash only', fmt(bsd)) +
+      row('Legal fees + valuation — cash only', fmt(legal)) +
+      '<hr class="divider">' +
+      row('Total cash & CPF required', fmt(totalCPF), true) +
+      row('Less: Cash available', '-' + fmt(cash), false, c.G) +
+      row('Less: CPF OA available', '-' + fmt(cpfUsed), false, c.G);
+  }
+
+  var tabsHtml = '', panelsHtml = '';
+  if (hasS) {
+    if (currentTabId === 'full') currentTabId = 'noshow';
+    
+    tabsHtml =
+      '<button class="tab' + (currentTabId === 'noshow' ? ' active' : '') + '" onclick="switchTab(\'noshow\')">No show / pledge</button>' +
+      '<button class="tab' + (currentTabId === 'show' ? ' active' : '') + '" onclick="switchTab(\'show\')">Show funds <span class="badge ba">option</span></button>' +
+      '<button class="tab' + (currentTabId === 'pledge' ? ' active' : '') + '" onclick="switchTab(\'pledge\')">Pledge funds <span class="badge bg">recommended</span></button>';
+
+    panelsHtml +=
+      '<div class="sp' + (currentTabId === 'noshow' ? ' active' : '') + '" id="panel-noshow">' + costRows(ipa) +
+      row('Loan shortfall — cash/CPF', fmt(shortfall), false, c.R) +
+      '<hr class="divider">' +
+      row('Total cash required excl. CPF', fmt(cashNeedA), true) +
+      row('Cash shortfall', csA > 0 ? fmt(csA) : 'None — fully covered', true, csA > 0 ? c.R : c.G) +
+      '<div class="info">You take the IPA loan of ' + fmt(ipa) + ' and fund the ' + fmt(shortfall) + ' loan shortfall from your own cash/CPF.</div></div>';
+
+    panelsHtml +=
+      '<div class="sp' + (currentTabId === 'show' ? ' active' : '') + '" id="panel-show">' + costRows(max75) +
+      row('Show of funds required — cash', fmt(show), false, c.A) +
+      row('= Pledge / 30%', '', false, '', true, true) +
+      '<hr class="divider">' +
+      row('Total cash required excl. CPF (with show)', fmt(totalShow), true) +
+      row('Cash shortfall', csShow > 0 ? fmt(csShow) : 'None — fully covered', true, csShow > 0 ? c.R : c.G) +
+      '<div class="info">Show ' + fmt(show) + ' in liquid assets to demonstrate ability to service the loan. Funds remain yours — bank just needs to see them.</div></div>';
+
+    panelsHtml +=
+      '<div class="sp' + (currentTabId === 'pledge' ? ' active' : '') + '" id="panel-pledge">' + costRows(max75) +
+      row('Pledge funds required — cash', fmt(pledge), false, c.G) +
+      row('PMT(4%/12, 360, shortfall) / 0.55 x 48 mths', '', false, '', true, true) +
+      '<hr class="divider">' +
+      row('Total cash required excl. CPF (with pledge)', fmt(totalPledge), true) +
+      row('Cash shortfall', csPledge > 0 ? fmt(csPledge) : 'None — fully covered', true, csPledge > 0 ? c.R : c.G) +
+      '<div class="info">Pledge ' + fmt(pledge) + ' of assets with the bank. Lower threshold than show funds. Assets are held as collateral for the loan.</div></div>';
+  } else {
+    currentTabId = 'full';
+    tabsHtml = '<button class="tab active" onclick="switchTab(\'full\')">Full 75% loan <span class="badge bg">no shortfall</span></button>';
+    var cs0 = Math.max(0, cashBase - cash);
+    panelsHtml =
+      '<div class="sp active" id="panel-full">' + costRows(max75) +
+      '<hr class="divider">' +
+      row('Total cash required excl. CPF', fmt(cashBase), true) +
+      row('Cash shortfall', cs0 > 0 ? fmt(cs0) : 'None — fully covered', true, cs0 > 0 ? c.R : c.G) +
+      '<div class="info">Your IPA covers the full 75% loan — no show or pledge funds needed.</div></div>';
+  }
+
+  document.getElementById('scenarioTabs').innerHTML = tabsHtml;
+  document.getElementById('scenarioPanels').innerHTML = panelsHtml;
+
+  // Cashflow calculations
+  var currentLoanAmt = hasS && currentTabId === 'noshow' ? ipa : max75;
+  var mo       = pmt(r, n, currentLoanAmt);
+  var interest = currentLoanAmt * r;
+  var prin     = mo - interest;
+  var netMo    = mo + condo - rental - cpfmo;
+
+  document.getElementById('cashflow').innerHTML =
+    row('Monthly mortgage repayment', fmt(mo)) +
+    row('— Principal', fmt(prin), false, '', true) +
+    row('— Interest', fmt(interest), false, '', true) +
+    row('+ Condo maintenance fee — expense', fmt(condo)) +
+    row('- Rental income — HDB', '-' + fmt(rental), false, c.G) +
+    row('- Monthly CPF OA contribution — income', '-' + fmt(cpfmo), false, c.G) +
+    '<hr class="divider">' +
+    row('Net monthly cash top-up', fmt(Math.abs(netMo)) + (netMo > 0 ? ' outflow' : ' surplus'), true, netMo > 0 ? c.R : c.G) +
+    '<div class="ms" style="margin-top:4px;text-align:right">Based on ' + (rate * 100).toFixed(2) + '% p.a., ' + tenure + '-yr loan</div>';
+
+  // Stress testing components
+  var stRBC   = parseFloat((document.getElementById('st-rbc') || {value:'1.4'}).value) || 1.4;
+  var stRWC   = parseFloat((document.getElementById('st-rwc') || {value:'2.3'}).value) || 2.3;
+  var stCBC   = parseFloat((document.getElementById('st-cbc') || {value:String(condo)}).value) || 0;
+  var stCWC   = parseFloat((document.getElementById('st-cwc') || {value:String(condo)}).value) || 0;
+  var stRenBC = parseFloat((document.getElementById('st-renbc') || {value:String(rental)}).value) || 0;
+  var stRenWC = parseFloat((document.getElementById('st-renwc') || {value:'0'}).value) || 0;
+  var stCpfBC = parseFloat((document.getElementById('st-cpfbc') || {value:String(cpfmo)}).value) || 0;
+  var stCpfWC = parseFloat((document.getElementById('st-cpfwc') || {value:'0'}).value) || 0;
+
+  var bcMo  = pmt(stRBC / 100 / 12, n, currentLoanAmt);
+  var wcMo  = pmt(stRWC / 100 / 12, n, currentLoanAmt);
+  var bcNet = bcMo + stCBC - stRenBC - stCpfBC;
+  var wcNet = wcMo + stCWC - stRenWC - stCpfWC;
+
+  document.getElementById('stresstest').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">' +
+    '<div><div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Best case inputs</div>' +
+    '<div class="sir"><label>Interest rate (%)</label><input type="text" id="st-rbc" value="' + stRBC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>Condo fee (S$/mth)</label><input type="text" id="st-cbc" value="' + stCBC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>HDB rental (S$/mth)</label><input type="text" id="st-renbc" value="' + stRenBC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>CPF OA (S$/mth)</label><input type="text" id="st-cpfbc" value="' + stCpfBC + '" oninput="calc()"></div></div>' +
+    '<div><div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Worst case inputs</div>' +
+    '<div class="sir"><label>Interest rate (%)</label><input type="text" id="st-rwc" value="' + stRWC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>Condo fee (S$/mth)</label><input type="text" id="st-cwc" value="' + stCWC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>HDB rental (S$/mth)</label><input type="text" id="st-renwc" value="' + stRenWC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>CPF OA (S$/mth)</label><input type="text" id="st-cpfwc" value="' + stCpfWC + '" oninput="calc()"></div></div></div>' +
+    '<hr class="divider">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">' +
+    '<div class="metric ' + (bcNet > 0 ? 'warn' : 'good') + '">' +
+    '<div class="ml">Best case — ' + stRBC.toFixed(2) + '% i/r</div>' +
+    '<div class="mv">' + fmt(Math.abs(bcNet)) + '/mth</div>' +
+    '<div class="ms">' + (bcNet > 0 ? 'net outflow' : 'net surplus') + '</div>' +
+    '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
+    '<div style="font-size:12px" class="ml">1.5-yr cash reserve</div>' +
+    '<div style="font-size:16px;font-weight:600" class="mv">' + (bcNet > 0 ? fmt(bcNet * 18) : 'None') + '</div></div></div>' +
+    '<div class="metric ' + (wcNet > 0 ? 'danger' : 'good') + '">' +
+    '<div class="ml">Worst case — ' + stRWC.toFixed(2) + '% i/r</div>' +
+    '<div class="mv">' + fmt(Math.abs(wcNet)) + '/mth</div>' +
+    '<div class="ms">' + (wcNet > 0 ? 'net outflow' : 'net surplus') + '</div>' +
+    '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
+    '<div style="font-size:12px" class="ml">1.5-yr cash reserve</div>' +
+    '<div style="font-size:16px;font-weight:600" class="mv">' + (wcNet > 0 ? fmt(wcNet * 18) : 'None') + '</div></div></div>' +
+    '</div><div class="info" style="margin-top:10px">Cash reserve = net monthly outflow x 18 months.</div>';
+}
+
+function switchTab(id) {
+  currentTabId = id;
+  calc();
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  ['propPrice','ipa','cpf','cash','condofee','rental','cpfmo'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('blur', function() { fmtField(this); calc(); });
+      el.addEventListener('input', calc);
+    }
+  });
+  document.getElementById('rate').addEventListener('input', calc);
+  calc();
+});
+</script>
+</body>
+</html>
