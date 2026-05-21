@@ -21,7 +21,6 @@
     top: 0; left: 0; right: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 20px 36px;
     z-index: 100;
   }
@@ -43,40 +42,17 @@
     margin-top: 1px;
   }
 
-  .nav-links {
-    display: flex;
-    gap: 4px;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 999px;
-    padding: 6px 8px;
-  }
-
-  .nav-links a {
-    color: #aaa;
-    text-decoration: none;
-    font-size: 13px;
-    padding: 5px 14px;
-    border-radius: 999px;
-    transition: all 0.2s;
-  }
-
-  .nav-links a.active, .nav-links a:hover {
-    background: #2e2e2e;
-    color: #f0f0f0;
-  }
-
   /* HERO */
   .hero {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 100px 36px 60px;
+    padding: 100px 24px 0;
   }
 
   .hero-inner {
-    max-width: 860px;
+    max-width: 1100px;
     width: 100%;
   }
 
@@ -103,13 +79,13 @@
   .dot-green { background: #28c840; }
 
   .window-content {
-    padding: 64px 56px 72px;
+    padding: 72px 64px 80px;
   }
 
   .hero-headline {
-    font-size: clamp(36px, 6vw, 58px);
+    font-size: clamp(40px, 6.5vw, 72px);
     font-weight: 700;
-    line-height: 1.12;
+    line-height: 1.1;
     letter-spacing: -0.02em;
     margin-bottom: 32px;
   }
@@ -124,7 +100,7 @@
     font-size: 15px;
     color: #999;
     line-height: 1.7;
-    max-width: 420px;
+    max-width: 460px;
     margin-bottom: 8px;
   }
 
@@ -136,43 +112,13 @@
   .hero-sub-2 {
     font-size: 14px;
     color: #666;
-    margin-bottom: 40px;
+    margin-bottom: 48px;
   }
 
-  .cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #f0f0f0;
-    color: #0e0e0e;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 12px 24px;
-    border-radius: 999px;
-    transition: all 0.2s;
-    letter-spacing: 0.01em;
-  }
-
-  .cta-btn:hover {
-    background: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(255,255,255,0.12);
-  }
-
-  .cta-btn svg {
-    transition: transform 0.2s;
-  }
-
-  .cta-btn:hover svg {
-    transform: translateX(3px);
-  }
-
-  /* PROJECTS SECTION */
-  .projects {
-    padding: 0 36px 100px;
-    max-width: 860px;
-    margin: 0 auto;
+  /* PROJECTS inside window */
+  .projects-inner {
+    border-top: 1px solid #1e1e1e;
+    padding-top: 40px;
   }
 
   .section-label {
@@ -180,22 +126,24 @@
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: #555;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .project-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
   }
 
   .card {
-    background: #141414;
+    background: #0e0e0e;
     border: 1px solid #222;
     border-radius: 10px;
-    padding: 24px;
+    padding: 22px;
     transition: border-color 0.2s, transform 0.2s;
-    cursor: default;
+    text-decoration: none;
+    display: block;
+    color: inherit;
   }
 
   .card:hover {
@@ -204,8 +152,8 @@
   }
 
   .card-icon {
-    font-size: 22px;
-    margin-bottom: 14px;
+    font-size: 20px;
+    margin-bottom: 12px;
   }
 
   .card-title {
@@ -223,10 +171,10 @@
 
   .card-tag {
     display: inline-block;
-    margin-top: 14px;
+    margin-top: 12px;
     font-size: 11px;
     color: #555;
-    background: #1e1e1e;
+    background: #1a1a1a;
     border: 1px solid #2a2a2a;
     border-radius: 999px;
     padding: 3px 10px;
@@ -239,26 +187,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 860px;
-    margin: 0 auto;
+    max-width: 1100px;
+    margin: 40px auto 0;
   }
 
   footer span {
     font-size: 12px;
     color: #444;
-  }
-
-  .scroll-hint {
-    display: flex;
-    justify-content: center;
-    margin-top: 28px;
-    color: #444;
-    animation: bounce 2s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
   }
 </style>
 </head>
@@ -268,10 +203,6 @@
   <div class="nav-name">
     <span>Wesley</span>
     <span>Programme Manager</span>
-  </div>
-  <div class="nav-links">
-    <a href="#" class="active">Work</a>
-    <a href="#projects">Projects</a>
   </div>
 </nav>
 
@@ -292,42 +223,32 @@
           from personal finance and health to how we work.
         </p>
         <p class="hero-sub-2">Built with Claude. Powered by curiosity.</p>
-        <a href="https://wesleychiaz.github.io/ClaudeW/dashboard/" class="cta-btn" target="_blank">
-          View Dashboard
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2.5 7H11.5M11.5 7L7.5 3M11.5 7L7.5 11" stroke="#0e0e0e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-        <div class="scroll-hint">
-          <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
-            <path d="M8 3v14M2 13l6 6 6-6" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="projects" id="projects">
-  <p class="section-label">Current Experiments</p>
-  <div class="project-cards">
-    <div class="card">
-      <div class="card-icon">📊</div>
-      <div class="card-title">Personal Dashboard</div>
-      <div class="card-desc">A central hub tracking finances, habits, and daily priorities.</div>
-      <span class="card-tag">Live</span>
-    </div>
-    <div class="card">
-      <div class="card-icon">🤖</div>
-      <div class="card-title">AI Experiments</div>
-      <div class="card-desc">Exploring what Claude can do across work, health, and life.</div>
-      <span class="card-tag">Ongoing</span>
-    </div>
-    <div class="card">
-      <div class="card-icon">⚡</div>
-      <div class="card-title">More Coming Soon</div>
-      <div class="card-desc">New tools and ideas being built and tested regularly.</div>
-      <span class="card-tag">In progress</span>
+        <div class="projects-inner">
+          <p class="section-label">Current Experiments</p>
+          <div class="project-cards">
+            <a href="https://wesleychiaz.github.io/ClaudeW/dashboard/" target="_blank" class="card">
+              <div class="card-icon">📊</div>
+              <div class="card-title">Personal Dashboard</div>
+              <div class="card-desc">A central hub tracking finances, habits, and daily priorities.</div>
+              <span class="card-tag">Live</span>
+            </a>
+            <div class="card">
+              <div class="card-icon">🌅</div>
+              <div class="card-title">Morning Investor Dashboard</div>
+              <div class="card-desc">A morning briefing tool for staying on top of markets and investments.</div>
+              <span class="card-tag">Live</span>
+            </div>
+            <div class="card">
+              <div class="card-icon">🤖</div>
+              <div class="card-title">AI Experiments</div>
+              <div class="card-desc">Exploring what Claude can do across work, health, and life.</div>
+              <span class="card-tag">Ongoing</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
