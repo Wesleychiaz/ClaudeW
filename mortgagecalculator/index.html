@@ -128,10 +128,10 @@ body.light .ba{background:#fef3c7;color:#92400e}
   <div class="section">
     <div class="sec-title"><i class="ti ti-home" aria-hidden="true"></i> <span class="sec-title-text">Property &amp; loan inputs</span></div>
     <div class="grid">
-      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="2,300,000" inputmode="numeric"></div>
-      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="1,482,000" inputmode="numeric"></div>
-      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="154,000" inputmode="numeric"></div>
-      <div class="ig"><label>Cash available (S$)</label><input type="text" id="cash" value="700,000" inputmode="numeric"></div>
+      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Cash available (S$)</label><input type="text" id="cash" value="0" inputmode="numeric"></div>
     </div>
     <div style="margin-top:12px">
       <div class="ig">
@@ -146,8 +146,8 @@ body.light .ba{background:#fef3c7;color:#92400e}
     <div class="grid" style="margin-top:12px">
       <div class="ig"><label>Loan tenure (years)</label><input type="text" id="tenure" value="30" inputmode="numeric"></div>
       <div class="ig"><label>Condo maintenance fee (S$/mth)</label><input type="text" id="condofee" value="0" inputmode="numeric"></div>
-      <div class="ig"><label>Rental income — HDB (S$/mth)</label><input type="text" id="rental" value="3,500" inputmode="numeric"></div>
-      <div class="ig"><label>Monthly CPF OA contribution (S$)</label><input type="text" id="cpfmo" value="1,840" inputmode="numeric"></div>
+      <div class="ig"><label>Rental income — HDB (S$/mth)</label><input type="text" id="rental" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Monthly CPF OA contribution (S$)</label><input type="text" id="cpfmo" value="0" inputmode="numeric"></div>
     </div>
   </div>
 
@@ -242,8 +242,9 @@ function calc() {
   var hasS      = shortfall > 0;
   var opt       = price * 0.01;
   var ex        = price * 0.04;
-  var bsd       = price * 0.05 - 30400;
-  var legal     = 3000;
+  var bsd       = price > 0 ? (price * 0.05 - 30400) : 0; // Guard against negative BSD on 0 price
+  if (bsd < 0) bsd = 0;
+  var legal     = price > 0 ? 3000 : 0;
   var dp        = price * 0.20;
   var cashOnly  = opt + ex + bsd + legal;
   var totalCPF  = cashOnly + dp;
@@ -310,7 +311,7 @@ function calc() {
       '<div class="sp" id="panel-show">' + costRows(max75) +
       row('Show of funds required — cash', fmt(show), false, c.A) +
       row('= Pledge / 30%', '', false, '', true, true) +
-      '<hr class="divider">' +
+      <hr class="divider">' +
       row('Total cash required excl. CPF (with show)', fmt(totalShow), true) +
       row('Cash shortfall', csShow > 0 ? fmt(csShow) : 'None — fully covered', true, csShow > 0 ? c.R : c.G) +
       '<div class="info">Show ' + fmt(show) + ' in liquid assets to demonstrate ability to service the loan. Funds remain yours — bank just needs to see them.</div></div>';
