@@ -130,10 +130,10 @@ body.light .ba{background:#fef3c7;color:#92400e}
   <div class="section">
     <div class="sec-title"><i class="ti ti-home" aria-hidden="true"></i> <span class="sec-title-text">Property &amp; loan inputs</span></div>
     <div class="grid">
-      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="2,300,000" inputmode="numeric"></div>
-      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="1,482,000" inputmode="numeric"></div>
-      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="154,000" inputmode="numeric"></div>
-      <div class="ig"><label>Cash available (S$)</label><input type="text" id="cash" value="700,000" inputmode="numeric"></div>
+      <div class="ig"><label>Property price (S$)</label><input type="text" id="propPrice" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>In-principle approval / IPA (S$)</label><input type="text" id="ipa" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>CPF OA balance (S$)</label><input type="text" id="cpf" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Cash available (S$)</label><input type="text" id="cash" value="0" inputmode="numeric"></div>
     </div>
     <div style="margin-top:12px">
       <div class="ig">
@@ -148,8 +148,8 @@ body.light .ba{background:#fef3c7;color:#92400e}
     <div class="grid" style="margin-top:12px">
       <div class="ig"><label>Loan tenure (years)</label><input type="text" id="tenure" value="30" inputmode="numeric"></div>
       <div class="ig"><label>Condo maintenance fee (S$/mth)</label><input type="text" id="condofee" value="0" inputmode="numeric"></div>
-      <div class="ig"><label>Rental income — HDB (S$/mth)</label><input type="text" id="rental" value="3,500" inputmode="numeric"></div>
-      <div class="ig"><label>Monthly CPF OA contribution (S$)</label><input type="text" id="cpfmo" value="1,840" inputmode="numeric"></div>
+      <div class="ig"><label>Rental income — HDB (S$/mth)</label><input type="text" id="rental" value="0" inputmode="numeric"></div>
+      <div class="ig"><label>Monthly CPF OA contribution (S$)</label><input type="text" id="cpfmo" value="0" inputmode="numeric"></div>
     </div>
   </div>
 
@@ -171,33 +171,13 @@ body.light .ba{background:#fef3c7;color:#92400e}
 
   <div class="section">
     <div class="sec-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> <span class="sec-title-text">Stress test</span></div>
-    
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:12px">
-      <div>
-        <div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Best case inputs</div>
-        <div class="sir"><label>Interest rate (%)</label><input type="text" id="st_rbc" value="1.4"></div>
-        <div class="sir"><label>Condo fee (S$/mth)</label><input type="text" id="st_cbc" value="0"></div>
-        <div class="sir"><label>HDB rental (S$/mth)</label><input type="text" id="st_renbc" value="3,500"></div>
-        <div class="sir"><label>CPF OA (S$/mth)</label><input type="text" id="st_cpfbc" value="1,840"></div>
-      </div>
-      <div>
-        <div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Worst case inputs</div>
-        <div class="sir"><label>Interest rate (%)</label><input type="text" id="st_rwc" value="2.3"></div>
-        <div class="sir"><label>Condo fee (S$/mth)</label><input type="text" id="st_cwc" value="0"></div>
-        <div class="sir"><label>HDB rental (S$/mth)</label><input type="text" id="st_renwc" value="0"></div>
-        <div class="sir"><label>CPF OA (S$/mth)</label><input type="text" id="st_cpfwc" value="0"></div>
-      </div>
-    </div>
-    
-    <hr class="divider">
-    <div id="stressResults"></div>
+    <div id="stresstest"></div>
   </div>
 </div>
 
 <script>
 var isDark = true;
 var currentTabId = 'full';
-var hasCustomStressInputs = false;
 
 function toggleMode() {
   isDark = !isDark;
@@ -270,13 +250,6 @@ function calc() {
 
   document.getElementById('rateLabel').textContent = (rate * 100).toFixed(2) + '%';
 
-  if (!hasCustomStressInputs) {
-    if(document.getElementById('st_cbc')) document.getElementById('st_cbc').value = condo.toLocaleString('en-SG');
-    if(document.getElementById('st_cwc')) document.getElementById('st_cwc').value = condo.toLocaleString('en-SG');
-    if(document.getElementById('st_renbc')) document.getElementById('st_renbc').value = rental.toLocaleString('en-SG');
-    if(document.getElementById('st_cpfbc')) document.getElementById('st_cpfbc').value = cpfmo.toLocaleString('en-SG');
-  }
-
   var max75     = price * 0.75;
   var shortfall = Math.max(0, max75 - ipa);
   var hasS      = shortfall > 0;
@@ -312,17 +285,15 @@ function calc() {
   var totalPledge = cashBase + pledge;
   var csPledge  = Math.max(0, totalPledge - cash);
 
-  var scEl = document.getElementById('summaryCards');
-  if (scEl) {
-    scEl.innerHTML =
-      '<div class="metric hi"><div class="ml">Property price</div><div class="mv">' + fmt(price) + '</div></div>' +
-      '<div class="metric"><div class="ml">Max loan (75%)</div><div class="mv">' + fmt(max75) + '</div></div>' +
-      '<div class="metric"><div class="ml">BSD</div><div class="mv">' + fmt(bsd) + '</div><div class="ms">Price x 5% - $30,400</div></div>' +
-      '<div class="metric"><div class="ml">Downpayment (20%)</div><div class="mv">' + fmt(dp) + '</div></div>' +
-      '<div class="metric"><div class="ml">Option (1%) + Exercise fee (4%)</div><div class="mv">' + fmt(opt + ex) + '</div></div>' +
-      '<div class="metric"><div class="ml">Legal fees + valuation (est.)</div><div class="mv">' + fmt(legal) + '</div></div>' +
-      '<div class="metric ' + (hasS ? 'warn' : 'good') + '"><div class="ml">Loan shortfall</div><div class="mv">' + (hasS ? fmt(shortfall) : 'None') + '</div><div class="ms">' + (hasS ? 'IPA < 75% of price' : 'IPA covers full 75%') + '</div></div>';
-  }
+  // Summary Metrics Tiles
+  document.getElementById('summaryCards').innerHTML =
+    '<div class="metric hi"><div class="ml">Property price</div><div class="mv">' + fmt(price) + '</div></div>' +
+    '<div class="metric"><div class="ml">Max loan (75%)</div><div class="mv">' + fmt(max75) + '</div></div>' +
+    '<div class="metric"><div class="ml">BSD</div><div class="mv">' + fmt(bsd) + '</div><div class="ms">Price x 5% - $30,400</div></div>' +
+    '<div class="metric"><div class="ml">Downpayment (20%)</div><div class="mv">' + fmt(dp) + '</div></div>' +
+    '<div class="metric"><div class="ml">Option (1%) + Exercise fee (4%)</div><div class="mv">' + fmt(opt + ex) + '</div></div>' +
+    '<div class="metric"><div class="ml">Legal fees + valuation (est.)</div><div class="mv">' + fmt(legal) + '</div></div>' +
+    '<div class="metric ' + (hasS ? 'warn' : 'good') + '"><div class="ml">Loan shortfall</div><div class="mv">' + (hasS ? fmt(shortfall) : 'None') + '</div><div class="ms">' + (hasS ? 'IPA < 75% of price' : 'IPA covers full 75%') + '</div></div>';
 
   function costRows(loanAmt) {
     return row('Loan amount ' + (loanAmt === ipa ? '(IPA)' : '(75% of price)'), fmt(loanAmt)) +
@@ -383,61 +354,71 @@ function calc() {
       '<div class="info">Your IPA covers the full 75% loan — no show or pledge funds needed.</div></div>';
   }
 
-  if(document.getElementById('scenarioTabs')) document.getElementById('scenarioTabs').innerHTML = tabsHtml;
-  if(document.getElementById('scenarioPanels')) document.getElementById('scenarioPanels').innerHTML = panelsHtml;
+  document.getElementById('scenarioTabs').innerHTML = tabsHtml;
+  document.getElementById('scenarioPanels').innerHTML = panelsHtml;
 
+  // Cashflow calculations
   var currentLoanAmt = hasS && currentTabId === 'noshow' ? ipa : max75;
   var mo       = pmt(r, n, currentLoanAmt);
   var interest = currentLoanAmt * r;
   var prin     = mo - interest;
   var netMo    = mo + condo - rental - cpfmo;
 
-  if(document.getElementById('cashflow')) {
-    document.getElementById('cashflow').innerHTML =
-      row('Monthly mortgage repayment', fmt(mo)) +
-      row('— Principal', fmt(prin), false, '', true) +
-      row('— Interest', fmt(interest), false, '', true) +
-      row('+ Condo maintenance fee — expense', fmt(condo)) +
-      row('- Rental income — HDB — income', '-' + fmt(rental), false, c.G) +
-      row('- Monthly CPF OA contribution — income', '-' + fmt(cpfmo), false, c.G) +
-      '<hr class="divider">' +
-      row('Net monthly cash top-up', fmt(Math.abs(netMo)) + (netMo > 0 ? ' outflow' : ' surplus'), true, netMo > 0 ? c.R : c.G) +
-      '<div class="ms" style="margin-top:4px;text-align:right">Based on ' + (rate * 100).toFixed(2) + '% p.a., ' + tenure + '-yr loan</div>';
-  }
+  document.getElementById('cashflow').innerHTML =
+    row('Monthly mortgage repayment', fmt(mo)) +
+    row('— Principal', fmt(prin), false, '', true) +
+    row('— Interest', fmt(interest), false, '', true) +
+    row('+ Condo maintenance fee — expense', fmt(condo)) +
+    row('- Rental income — HDB', '-' + fmt(rental), false, c.G) +
+    row('- Monthly CPF OA contribution — income', '-' + fmt(cpfmo), false, c.G) +
+    '<hr class="divider">' +
+    row('Net monthly cash top-up', fmt(Math.abs(netMo)) + (netMo > 0 ? ' outflow' : ' surplus'), true, netMo > 0 ? c.R : c.G) +
+    '<div class="ms" style="margin-top:4px;text-align:right">Based on ' + (rate * 100).toFixed(2) + '% p.a., ' + tenure + '-yr loan</div>';
 
-  var stRBC   = (document.getElementById('st_rbc')) ? parseFloat(document.getElementById('st_rbc').value) || 0 : 0;
-  var stRWC   = (document.getElementById('st_rwc')) ? parseFloat(document.getElementById('st_rwc').value) || 0 : 0;
-  var stCBC   = (document.getElementById('st_cbc')) ? parseFloat(document.getElementById('st_cbc').value.replace(/,/g, '')) || 0 : 0;
-  var stCWC   = (document.getElementById('st_cwc')) ? parseFloat(document.getElementById('st_cwc').value.replace(/,/g, '')) || 0 : 0;
-  var stRenBC = (document.getElementById('st_renbc')) ? parseFloat(document.getElementById('st_renbc').value.replace(/,/g, '')) || 0 : 0;
-  var stRenWC = (document.getElementById('st_renwc')) ? parseFloat(document.getElementById('st_renwc').value.replace(/,/g, '')) || 0 : 0;
-  var stCpfBC = (document.getElementById('st_cpfbc')) ? parseFloat(document.getElementById('st_cpfbc').value.replace(/,/g, '')) || 0 : 0;
-  var stCpfWC = (document.getElementById('st_cpfwc')) ? parseFloat(document.getElementById('st_cpfwc').value.replace(/,/g, '')) || 0 : 0;
+  // Stress testing components
+  var stRBC   = parseFloat((document.getElementById('st-rbc') || {value:'1.4'}).value) || 1.4;
+  var stRWC   = parseFloat((document.getElementById('st-rwc') || {value:'2.3'}).value) || 2.3;
+  var stCBC   = parseFloat((document.getElementById('st-cbc') || {value:String(condo)}).value) || 0;
+  var stCWC   = parseFloat((document.getElementById('st-cwc') || {value:String(condo)}).value) || 0;
+  var stRenBC = parseFloat((document.getElementById('st-renbc') || {value:String(rental)}).value) || 0;
+  var stRenWC = parseFloat((document.getElementById('st-renwc') || {value:'0'}).value) || 0;
+  var stCpfBC = parseFloat((document.getElementById('st-cpfbc') || {value:String(cpfmo)}).value) || 0;
+  var stCpfWC = parseFloat((document.getElementById('st-cpfwc') || {value:'0'}).value) || 0;
 
   var bcMo  = pmt(stRBC / 100 / 12, n, currentLoanAmt);
   var wcMo  = pmt(stRWC / 100 / 12, n, currentLoanAmt);
   var bcNet = bcMo + stCBC - stRenBC - stCpfBC;
   var wcNet = wcMo + stCWC - stRenWC - stCpfWC;
 
-  if(document.getElementById('stressResults')) {
-    document.getElementById('stressResults').innerHTML =
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">' +
-      '<div class="metric ' + (bcNet > 0 ? 'warn' : 'good') + '">' +
-      '<div class="ml">Best case — ' + stRBC.toFixed(2) + '% i/r</div>' +
-      '<div class="mv">' + fmt(Math.abs(bcNet)) + '/mth</div>' +
-      '<div class="ms">' + (bcNet > 0 ? 'net outflow' : 'net surplus') + '</div>' +
-      '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
-      '<div style="font-size:12px" class="ml">1.5-yr cash reserve</div>' +
-      '<div style="font-size:16px;font-weight:600" class="mv">' + (bcNet > 0 ? fmt(bcNet * 18) : 'None') + '</div></div></div>' +
-      '<div class="metric ' + (wcNet > 0 ? 'danger' : 'good') + '">' +
-      '<div class="ml">Worst case — ' + stRWC.toFixed(2) + '% i/r</div>' +
-      '<div class="mv">' + fmt(Math.abs(wcNet)) + '/mth</div>' +
-      '<div class="ms">' + (wcNet > 0 ? 'net outflow' : 'net surplus') + '</div>' +
-      '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
-      '<div style="font-size:12px" class="ml">1.5-yr cash reserve</div>' +
-      '<div style="font-size:16px;font-weight:600" class="mv">' + (wcNet > 0 ? fmt(wcNet * 18) : 'None') + '</div></div></div>' +
-      '</div><div class="info" style="margin-top:10px">Cash reserve = net monthly outflow x 18 months.</div>';
-  }
+  document.getElementById('stresstest').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">' +
+    '<div><div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Best case inputs</div>' +
+    '<div class="sir"><label>Interest rate (%)</label><input type="text" id="st-rbc" value="' + stRBC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>Condo fee (S$/mth)</label><input type="text" id="st-cbc" value="' + stCBC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>HDB rental (S$/mth)</label><input type="text" id="st-renbc" value="' + stRenBC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>CPF OA (S$/mth)</label><input type="text" id="st-cpfbc" value="' + stCpfBC + '" oninput="calc()"></div></div>' +
+    '<div><div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Worst case inputs</div>' +
+    '<div class="sir"><label>Interest rate (%)</label><input type="text" id="st-rwc" value="' + stRWC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>Condo fee (S$/mth)</label><input type="text" id="st-cwc" value="' + stCWC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>HDB rental (S$/mth)</label><input type="text" id="st-renwc" value="' + stRenWC + '" oninput="calc()"></div>' +
+    '<div class="sir"><label>CPF OA (S$/mth)</label><input type="text" id="st-cpfwc" value="' + stCpfWC + '" oninput="calc()"></div></div></div>' +
+    '<hr class="divider">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">' +
+    '<div class="metric ' + (bcNet > 0 ? 'warn' : 'good') + '">' +
+    '<div class="ml">Best case — ' + stRBC.toFixed(2) + '% i/r</div>' +
+    '<div class="mv">' + fmt(Math.abs(bcNet)) + '/mth</div>' +
+    '<div class="ms">' + (bcNet > 0 ? 'net outflow' : 'net surplus') + '</div>' +
+    '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
+    '<div style="font-size:12px" class="ml">1.5-yr cash reserve</div>' +
+    '<div style="font-size:16px;font-weight:600" class="mv">' + (bcNet > 0 ? fmt(bcNet * 18) : 'None') + '</div></div></div>' +
+    '<div class="metric ' + (wcNet > 0 ? 'danger' : 'good') + '">' +
+    '<div class="ml">Worst case — ' + stRWC.toFixed(2) + '% i/r</div>' +
+    '<div class="mv">' + fmt(Math.abs(wcNet)) + '/mth</div>' +
+    '<div class="ms">' + (wcNet > 0 ? 'net outflow' : 'net surplus') + '</div>' +
+    '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
+    '<div style="font-size:12px" class="ml">1.5-yr cash reserve</div>' +
+    '<div style="font-size:16px;font-weight:600" class="mv">' + (wcNet > 0 ? fmt(wcNet * 18) : 'None') + '</div></div></div>' +
+    '</div><div class="info" style="margin-top:10px">Cash reserve = net monthly outflow x 18 months.</div>';
 }
 
 function switchTab(id) {
@@ -453,18 +434,7 @@ window.addEventListener('DOMContentLoaded', function() {
       el.addEventListener('input', calc);
     }
   });
-  
-  ['st_rbc', 'st_rwc', 'st_cbc', 'st_cwc', 'st_renbc', 'st_renwc', 'st_cpfbc', 'st_cpfwc'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('input', function() {
-        hasCustomStressInputs = true;
-        calc();
-      });
-    }
-  });
-
-  if(document.getElementById('rate')) document.getElementById('rate').addEventListener('input', calc);
+  document.getElementById('rate').addEventListener('input', calc);
   calc();
 });
 </script>
