@@ -1,1 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japanese for Beginners · မြန်မာဘာသာ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f0; color: #1a1a18; min-height: 100vh; }
+.container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+.hero { background: #fff; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center; border: 1px solid #e8e6df; }
+.hero h1 { font-size: 26px; font-weight: 500; color: #1a1a18; margin-top: 8px; }
+.hero p { font-size: 14px; color: #6b6a65; margin-top: 6px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { padding: 7px 14px; border-radius: 8px; border: 1px solid #d3d1c7; font-size: 13px; cursor: pointer; background: transparent; color: #6b6a65; transition: all 0.15s; }
+.tab:hover { background: #f1efe8; }
+.tab.active { background: #fff; color: #1a1a18; font-weight: 500; border-color: #888780; }
+.section { display: none; }
+.section.active { display: block; }
+.card { background: #fff; border: 1px solid #e8e6df; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.card-title { font-size: 11px; font-weight: 500; color: #6b6a65; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+.kana-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+.kana-card { background: #f5f5f0; border-radius: 8px; padding: 10px 6px; text-align: center; border: 1px solid #e8e6df; }
+.kana-char { font-size: 26px; color: #1a1a18; display: block; }
+.kana-rom { font-size: 12px; color: #185FA5; font-weight: 500; margin-top: 3px; }
+.vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 8px; }
+.vocab-card { background: #f5f5f0; border-radius: 8px; padding: 10px; border: 1px solid #e8e6df; }
+.vocab-jp { font-size: 17px; color: #1a1a18; font-weight: 500; }
+.vocab-rom { font-size: 11px; color: #185FA5; margin-top: 3px; }
+.vocab-en { font-size: 11px; color: #6b6a65; margin-top: 4px; }
+.vocab-mm { font-size: 11px; color: #0F6E56; margin-top: 3px; }
+.cat-header { font-size: 12px; font-weight: 500; color: #6b6a65; text-transform: uppercase; letter-spacing: 0.05em; margin: 1.2rem 0 8px; padding-bottom: 6px; border-bottom: 1px solid #e8e6df; }
+.phrase-row { padding: 9px 0; border-bottom: 1px solid #f1efe8; }
+.phrase-row:last-child { border-bottom: none; }
+.phrase-jp { font-size: 16px; color: #1a1a18; font-weight: 500; }
+.phrase-rom { font-size: 11px; color: #185FA5; margin-top: 3px; }
+.phrase-en { font-size: 12px; color: #6b6a65; margin-top: 4px; }
+.phrase-mm { font-size: 12px; color: #0F6E56; margin-top: 3px; }
+.num-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 8px; }
+.num-card { background: #f5f5f0; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #e8e6df; }
+.num-num { font-size: 22px; color: #185FA5; font-weight: 500; }
+.num-jp { font-size: 16px; color: #1a1a18; font-weight: 500; margin-top: 2px; }
+.num-rom { font-size: 11px; color: #6b6a65; margin-top: 3px; }
+.num-mm { font-size: 11px; color: #0F6E56; margin-top: 3px; }
+.quiz-box { background: #f5f5f0; border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1rem; border: 1px solid #e8e6df; }
+.quiz-q { font-size: 38px; font-weight: 500; color: #1a1a18; margin: 0.5rem 0 1rem; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quiz-opt { padding: 10px 8px; border-radius: 8px; border: 1px solid #d3d1c7; cursor: pointer; font-size: 12px; background: #fff; color: #1a1a18; transition: all 0.15s; text-align: center; }
+.quiz-opt:hover { border-color: #888780; background: #f5f5f0; }
+.quiz-opt.correct { background: #E1F5EE; color: #0F6E56; border-color: #0F6E56; }
+.quiz-opt.wrong { background: #FCEBEB; color: #A32D2D; border-color: #A32D2D; }
+.score-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 14px; border-radius: 20px; background: #E6F1FB; color: #185FA5; margin-bottom: 1rem; font-weight: 500; }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid #d3d1c7; font-size: 11px; cursor: pointer; background: transparent; color: #6b6a65; transition: all 0.15s; }
+.filter-btn:hover { background: #f1efe8; }
+.filter-btn.active { background: #f1efe8; color: #1a1a18; font-weight: 500; border-color: #888780; }
+.search-box { width: 100%; padding: 9px 14px; border-radius: 8px; border: 1px solid #d3d1c7; font-size: 13px; background: #fff; color: #1a1a18; margin-bottom: 12px; outline: none; transition: border-color 0.15s; }
+.search-box:focus { border-color: #888780; }
+.legend { display: flex; gap: 16px; font-size: 12px; margin-bottom: 14px; flex-wrap: wrap; color: #6b6a65; }
+.legend span { display: flex; align-items: center; gap: 5px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.quiz-hint { font-size: 13px; color: #6b6a65; margin-bottom: 12px; min-height: 20px; }
+.btn { padding: 8px 20px; border-radius: 8px; border: 1px solid #d3d1c7; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+.btn:hover { background: #f1efe8; }
+.btn-primary { background: #f1efe8; color: #1a1a18; font-weight: 500; }
+footer { text-align: center; font-size: 12px; color: #b4b2a9; margin-top: 2rem; padding: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
 
+<div class="hero">
+  <div style="font-size:36px;">🇯🇵</div>
+  <h1>Japanese for Beginners</h1>
+  <p>English &nbsp;·&nbsp; မြန်မာဘာသာ (Burmese) &nbsp;·&nbsp; 日本語</p>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#185FA5;"></span> Romaji (pronunciation)</span>
+  <span><span class="dot" style="background:#0F6E56;"></span> မြန်မာဘာသာ (Burmese)</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('hiragana')">Hiragana</button>
+  <button class="tab" onclick="switchTab('katakana')">Katakana</button>
+  <button class="tab" onclick="switchTab('vocab')">Vocabulary (100)</button>
+  <button class="tab" onclick="switchTab('phrases')">Phrases (100)</button>
+  <button class="tab" onclick="switchTab('numbers')">Numbers</button>
+  <button class="tab" onclick="switchTab('quiz')">Quiz</button>
+</div>
+
+<!-- HIRAGANA -->
+<div id="tab-hiragana" class="section active">
+  <div class="card">
+    <div class="card-title">Hiragana — ひらがな · Japanese alphabet (soft sounds)</div>
+    <p style="font-size:13px;color:#6b6a65;margin-bottom:14px;">Hiragana is the first alphabet to learn. · ဟီရာဂါနာသည် ပထမဆုံး သင်ယူရမည့် အက္ခရာဖြစ်သည်။</p>
+    <div class="kana-grid">
+      <div class="kana-card"><span class="kana-char">あ</span><span class="kana-rom">a</span></div><div class="kana-card"><span class="kana-char">い</span><span class="kana-rom">i</span></div><div class="kana-card"><span class="kana-char">う</span><span class="kana-rom">u</span></div><div class="kana-card"><span class="kana-char">え</span><span class="kana-rom">e</span></div><div class="kana-card"><span class="kana-char">お</span><span class="kana-rom">o</span></div>
+      <div class="kana-card"><span class="kana-char">か</span><span class="kana-rom">ka</span></div><div class="kana-card"><span class="kana-char">き</span><span class="kana-rom">ki</span></div><div class="kana-card"><span class="kana-char">く</span><span class="kana-rom">ku</span></div><div class="kana-card"><span class="kana-char">け</span><span class="kana-rom">ke</span></div><div class="kana-card"><span class="kana-char">こ</span><span class="kana-rom">ko</span></div>
+      <div class="kana-card"><span class="kana-char">さ</span><span class="kana-rom">sa</span></div><div class="kana-card"><span class="kana-char">し</span><span class="kana-rom">shi</span></div><div class="kana-card"><span class="kana-char">す</span><span class="kana-rom">su</span></div><div class="kana-card"><span class="kana-char">せ</span><span class="kana-rom">se</span></div><div class="kana-card"><span class="kana-char">そ</span><span class="kana-rom">so</span></div>
+      <div class="kana-card"><span class="kana-char">た</span><span class="kana-rom">ta</span></div><div class="kana-card"><span class="kana-char">ち</span><span class="kana-rom">chi</span></div><div class="kana-card"><span class="kana-char">つ</span><span class="kana-rom">tsu</span></div><div class="kana-card"><span class="kana-char">て</span><span class="kana-rom">te</span></div><div class="kana-card"><span class="kana-char">と</span><span class="kana-rom">to</span></div>
+      <div class="kana-card"><span class="kana-char">な</span><span class="kana-rom">na</span></div><div class="kana-card"><span class="kana-char">に</span><span class="kana-rom">ni</span></div><div class="kana-card"><span class="kana-char">ぬ</span><span class="kana-rom">nu</span></div><div class="kana-card"><span class="kana-char">ね</span><span class="kana-rom">ne</span></div><div class="kana-card"><span class="kana-char">の</span><span class="kana-rom">no</span></div>
+      <div class="kana-card"><span class="kana-char">は</span><span class="kana-rom">ha</span></div><div class="kana-card"><span class="kana-char">ひ</span><span class="kana-rom">hi</span></div><div class="kana-card"><span class="kana-char">ふ</span><span class="kana-rom">fu</span></div><div class="kana-card"><span class="kana-char">へ</span><span class="kana-rom">he</span></div><div class="kana-card"><span class="kana-char">ほ</span><span class="kana-rom">ho</span></div>
+      <div class="kana-card"><span class="kana-char">ま</span><span class="kana-rom">ma</span></div><div class="kana-card"><span class="kana-char">み</span><span class="kana-rom">mi</span></div><div class="kana-card"><span class="kana-char">む</span><span class="kana-rom">mu</span></div><div class="kana-card"><span class="kana-char">め</span><span class="kana-rom">me</span></div><div class="kana-card"><span class="kana-char">も</span><span class="kana-rom">mo</span></div>
+      <div class="kana-card"><span class="kana-char">や</span><span class="kana-rom">ya</span></div><div class="kana-card"><span class="kana-char">ゆ</span><span class="kana-rom">yu</span></div><div class="kana-card"><span class="kana-char">よ</span><span class="kana-rom">yo</span></div>
+      <div class="kana-card"><span class="kana-char">ら</span><span class="kana-rom">ra</span></div><div class="kana-card"><span class="kana-char">り</span><span class="kana-rom">ri</span></div><div class="kana-card"><span class="kana-char">る</span><span class="kana-rom">ru</span></div><div class="kana-card"><span class="kana-char">れ</span><span class="kana-rom">re</span></div><div class="kana-card"><span class="kana-char">ろ</span><span class="kana-rom">ro</span></div>
+      <div class="kana-card"><span class="kana-char">わ</span><span class="kana-rom">wa</span></div><div class="kana-card"><span class="kana-char">を</span><span class="kana-rom">wo</span></div><div class="kana-card"><span class="kana-char">ん</span><span class="kana-rom">n</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- KATAKANA -->
+<div id="tab-katakana" class="section">
+  <div class="card">
+    <div class="card-title">Katakana — カタカナ · Used for foreign words</div>
+    <p style="font-size:13px;color:#6b6a65;margin-bottom:14px;">Used for foreign loanwords like "coffee" (コーヒー). · ကာတာကာနာသည် နိုင်ငံခြားစကားလုံးများအတွက် အသုံးပြုသည်။</p>
+    <div class="kana-grid">
+      <div class="kana-card"><span class="kana-char">ア</span><span class="kana-rom">a</span></div><div class="kana-card"><span class="kana-char">イ</span><span class="kana-rom">i</span></div><div class="kana-card"><span class="kana-char">ウ</span><span class="kana-rom">u</span></div><div class="kana-card"><span class="kana-char">エ</span><span class="kana-rom">e</span></div><div class="kana-card"><span class="kana-char">オ</span><span class="kana-rom">o</span></div>
+      <div class="kana-card"><span class="kana-char">カ</span><span class="kana-rom">ka</span></div><div class="kana-card"><span class="kana-char">キ</span><span class="kana-rom">ki</span></div><div class="kana-card"><span class="kana-char">ク</span><span class="kana-rom">ku</span></div><div class="kana-card"><span class="kana-char">ケ</span><span class="kana-rom">ke</span></div><div class="kana-card"><span class="kana-char">コ</span><span class="kana-rom">ko</span></div>
+      <div class="kana-card"><span class="kana-char">サ</span><span class="kana-rom">sa</span></div><div class="kana-card"><span class="kana-char">シ</span><span class="kana-rom">shi</span></div><div class="kana-card"><span class="kana-char">ス</span><span class="kana-rom">su</span></div><div class="kana-card"><span class="kana-char">セ</span><span class="kana-rom">se</span></div><div class="kana-card"><span class="kana-char">ソ</span><span class="kana-rom">so</span></div>
+      <div class="kana-card"><span class="kana-char">タ</span><span class="kana-rom">ta</span></div><div class="kana-card"><span class="kana-char">チ</span><span class="kana-rom">chi</span></div><div class="kana-card"><span class="kana-char">ツ</span><span class="kana-rom">tsu</span></div><div class="kana-card"><span class="kana-char">テ</span><span class="kana-rom">te</span></div><div class="kana-card"><span class="kana-char">ト</span><span class="kana-rom">to</span></div>
+      <div class="kana-card"><span class="kana-char">ナ</span><span class="kana-rom">na</span></div><div class="kana-card"><span class="kana-char">ニ</span><span class="kana-rom">ni</span></div><div class="kana-card"><span class="kana-char">ヌ</span><span class="kana-rom">nu</span></div><div class="kana-card"><span class="kana-char">ネ</span><span class="kana-rom">ne</span></div><div class="kana-card"><span class="kana-char">ノ</span><span class="kana-rom">no</span></div>
+      <div class="kana-card"><span class="kana-char">ハ</span><span class="kana-rom">ha</span></div><div class="kana-card"><span class="kana-char">ヒ</span><span class="kana-rom">hi</span></div><div class="kana-card"><span class="kana-char">フ</span><span class="kana-rom">fu</span></div><div class="kana-card"><span class="kana-char">ヘ</span><span class="kana-rom">he</span></div><div class="kana-card"><span class="kana-char">ホ</span><span class="kana-rom">ho</span></div>
+      <div class="kana-card"><span class="kana-char">マ</span><span class="kana-rom">ma</span></div><div class="kana-card"><span class="kana-char">ミ</span><span class="kana-rom">mi</span></div><div class="kana-card"><span class="kana-char">ム</span><span class="kana-rom">mu</span></div><div class="kana-card"><span class="kana-char">メ</span><span class="kana-rom">me</span></div><div class="kana-card"><span class="kana-char">モ</span><span class="kana-rom">mo</span></div>
+      <div class="kana-card"><span class="kana-char">ヤ</span><span class="kana-rom">ya</span></div><div class="kana-card"><span class="kana-char">ユ</span><span class="kana-rom">yu</span></div><div class="kana-card"><span class="kana-char">ヨ</span><span class="kana-rom">yo</span></div>
+      <div class="kana-card"><span class="kana-char">ラ</span><span class="kana-rom">ra</span></div><div class="kana-card"><span class="kana-char">リ</span><span class="kana-rom">ri</span></div><div class="kana-card"><span class="kana-char">ル</span><span class="kana-rom">ru</span></div><div class="kana-card"><span class="kana-char">レ</span><span class="kana-rom">re</span></div><div class="kana-card"><span class="kana-char">ロ</span><span class="kana-rom">ro</span></div>
+      <div class="kana-card"><span class="kana-char">ワ</span><span class="kana-rom">wa</span></div><div class="kana-card"><span class="kana-char">ヲ</span><span class="kana-rom">wo</span></div><div class="kana-card"><span class="kana-char">ン</span><span class="kana-rom">n</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- VOCAB -->
+<div id="tab-vocab" class="section">
+  <input class="search-box" type="text" placeholder="Search vocabulary... (e.g. water, ရေ, mizu)" oninput="filterVocab(this.value)" id="vocab-search">
+  <div class="filter-row" id="vocab-filters"></div>
+  <div id="vocab-container"></div>
+</div>
+
+<!-- PHRASES -->
+<div id="tab-phrases" class="section">
+  <input class="search-box" type="text" placeholder="Search phrases... (e.g. thank you, ကျေးဇူး)" oninput="filterPhrases(this.value)" id="phrase-search">
+  <div class="filter-row" id="phrase-filters"></div>
+  <div id="phrase-container"></div>
+</div>
+
+<!-- NUMBERS -->
+<div id="tab-numbers" class="section">
+  <div class="card">
+    <div class="card-title">Numbers — နံပါတ်များ</div>
+    <div class="num-grid">
+      <div class="num-card"><div class="num-num">0</div><div class="num-jp">ゼロ</div><div class="num-rom">zero</div><div class="num-mm">သုည</div></div>
+      <div class="num-card"><div class="num-num">1</div><div class="num-jp">一</div><div class="num-rom">ichi</div><div class="num-mm">တစ်</div></div>
+      <div class="num-card"><div class="num-num">2</div><div class="num-jp">二</div><div class="num-rom">ni</div><div class="num-mm">နှစ်</div></div>
+      <div class="num-card"><div class="num-num">3</div><div class="num-jp">三</div><div class="num-rom">san</div><div class="num-mm">သုံး</div></div>
+      <div class="num-card"><div class="num-num">4</div><div class="num-jp">四</div><div class="num-rom">yon/shi</div><div class="num-mm">လေး</div></div>
+      <div class="num-card"><div class="num-num">5</div><div class="num-jp">五</div><div class="num-rom">go</div><div class="num-mm">ငါး</div></div>
+      <div class="num-card"><div class="num-num">6</div><div class="num-jp">六</div><div class="num-rom">roku</div><div class="num-mm">ခြောက်</div></div>
+      <div class="num-card"><div class="num-num">7</div><div class="num-jp">七</div><div class="num-rom">nana</div><div class="num-mm">ခုနစ်</div></div>
+      <div class="num-card"><div class="num-num">8</div><div class="num-jp">八</div><div class="num-rom">hachi</div><div class="num-mm">ရှစ်</div></div>
+      <div class="num-card"><div class="num-num">9</div><div class="num-jp">九</div><div class="num-rom">kyuu</div><div class="num-mm">ကိုး</div></div>
+      <div class="num-card"><div class="num-num">10</div><div class="num-jp">十</div><div class="num-rom">juu</div><div class="num-mm">တစ်ဆယ်</div></div>
+      <div class="num-card"><div class="num-num">11</div><div class="num-jp">十一</div><div class="num-rom">juu-ichi</div><div class="num-mm">တစ်ဆယ့်တစ်</div></div>
+      <div class="num-card"><div class="num-num">20</div><div class="num-jp">二十</div><div class="num-rom">ni-juu</div><div class="num-mm">နှစ်ဆယ်</div></div>
+      <div class="num-card"><div class="num-num">30</div><div class="num-jp">三十</div><div class="num-rom">san-juu</div><div class="num-mm">သုံးဆယ်</div></div>
+      <div class="num-card"><div class="num-num">100</div><div class="num-jp">百</div><div class="num-rom">hyaku</div><div class="num-mm">တစ်ရာ</div></div>
+      <div class="num-card"><div class="num-num">1,000</div><div class="num-jp">千</div><div class="num-rom">sen</div><div class="num-mm">တစ်ထောင်</div></div>
+      <div class="num-card"><div class="num-num">10,000</div><div class="num-jp">万</div><div class="num-rom">man</div><div class="num-mm">တစ်သောင်း</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="tab-quiz" class="section">
+  <div class="score-badge">⭐ Score: <span id="score">0</span> / <span id="total">0</span></div>
+  <div class="quiz-box">
+    <div style="font-size:13px;color:#6b6a65;margin-bottom:6px;" id="quiz-type">What does this mean?</div>
+    <div class="quiz-q" id="quiz-q">あ</div>
+    <div class="quiz-hint" id="quiz-hint"></div>
+    <div class="quiz-options" id="quiz-opts"></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;">
+    <button class="btn btn-primary" onclick="nextQ()">Next question →</button>
+    <button class="btn" onclick="resetQuiz()">Reset</button>
+  </div>
+</div>
+
+<footer>Made with ❤️ using Claude AI &nbsp;·&nbsp; Japanese for Beginners &nbsp;·&nbsp; မြန်မာဘာသာ</footer>
+
+</div>
+
+<script>
+const vocabData = {
+  'People & Family': [
+    {jp:'母 (はは)',rom:'haha',en:'Mother',mm:'အမေ'},
+    {jp:'父 (ちち)',rom:'chichi',en:'Father',mm:'အဖေ'},
+    {jp:'姉 (あね)',rom:'ane',en:'Older sister',mm:'အစ်မ'},
+    {jp:'兄 (あに)',rom:'ani',en:'Older brother',mm:'အစ်ကို'},
+    {jp:'妹 (いもうと)',rom:'imouto',en:'Younger sister',mm:'ညီမ'},
+    {jp:'弟 (おとうと)',rom:'otouto',en:'Younger brother',mm:'ညီ'},
+    {jp:'子供 (こども)',rom:'kodomo',en:'Child',mm:'ကလေး'},
+    {jp:'赤ちゃん',rom:'akachan',en:'Baby',mm:'ကလေးငယ်'},
+    {jp:'友達 (ともだち)',rom:'tomodachi',en:'Friend',mm:'သူငယ်ချင်း'},
+    {jp:'先生 (せんせい)',rom:'sensei',en:'Teacher',mm:'ဆရာ/မ'},
+  ],
+  'Food & Drink': [
+    {jp:'ご飯 (ごはん)',rom:'gohan',en:'Rice / Meal',mm:'ထမင်း'},
+    {jp:'水 (みず)',rom:'mizu',en:'Water',mm:'ရေ'},
+    {jp:'お茶 (おちゃ)',rom:'ocha',en:'Tea',mm:'လက်ဖက်ရည်'},
+    {jp:'コーヒー',rom:'koohii',en:'Coffee',mm:'ကော်ဖီ'},
+    {jp:'パン',rom:'pan',en:'Bread',mm:'မုန့်'},
+    {jp:'肉 (にく)',rom:'niku',en:'Meat',mm:'အသား'},
+    {jp:'魚 (さかな)',rom:'sakana',en:'Fish',mm:'ငါး'},
+    {jp:'野菜 (やさい)',rom:'yasai',en:'Vegetables',mm:'ဟင်းသီးဟင်းရွက်'},
+    {jp:'果物 (くだもの)',rom:'kudamono',en:'Fruit',mm:'သစ်သီး'},
+    {jp:'卵 (たまご)',rom:'tamago',en:'Egg',mm:'ဥ'},
+    {jp:'牛乳 (ぎゅうにゅう)',rom:'gyuunyuu',en:'Milk',mm:'နို့'},
+    {jp:'塩 (しお)',rom:'shio',en:'Salt',mm:'ဆား'},
+    {jp:'砂糖 (さとう)',rom:'satou',en:'Sugar',mm:'သကြား'},
+    {jp:'ラーメン',rom:'raamen',en:'Ramen',mm:'ရာမင်'},
+    {jp:'寿司 (すし)',rom:'sushi',en:'Sushi',mm:'ဆူရှိ'},
+  ],
+  'Home & Daily Life': [
+    {jp:'家 (いえ)',rom:'ie',en:'House',mm:'အိမ်'},
+    {jp:'部屋 (へや)',rom:'heya',en:'Room',mm:'အခန်း'},
+    {jp:'台所 (だいどころ)',rom:'daidokoro',en:'Kitchen',mm:'မီးဖိုချောင်'},
+    {jp:'トイレ',rom:'toire',en:'Toilet',mm:'အိမ်သာ'},
+    {jp:'ベッド',rom:'beddo',en:'Bed',mm:'အိပ်ရာ'},
+    {jp:'机 (つくえ)',rom:'tsukue',en:'Desk',mm:'စားပွဲ'},
+    {jp:'椅子 (いす)',rom:'isu',en:'Chair',mm:'ကုလားထိုင်'},
+    {jp:'窓 (まど)',rom:'mado',en:'Window',mm:'ပြတင်းပေါက်'},
+    {jp:'ドア',rom:'doa',en:'Door',mm:'တံခါး'},
+    {jp:'鍵 (かぎ)',rom:'kagi',en:'Key',mm:'သော့'},
+    {jp:'電気 (でんき)',rom:'denki',en:'Electricity / Light',mm:'လျှပ်စစ်'},
+    {jp:'洗濯 (せんたく)',rom:'sentaku',en:'Laundry',mm:'အဝတ်လျှော်'},
+    {jp:'掃除 (そうじ)',rom:'souji',en:'Cleaning',mm:'သန့်ရှင်းရေး'},
+    {jp:'料理 (りょうり)',rom:'ryouri',en:'Cooking',mm:'ချက်ပြုတ်ခြင်း'},
+    {jp:'買い物 (かいもの)',rom:'kaimono',en:'Shopping',mm:'ဈေးဝယ်ခြင်း'},
+  ],
+  'Body & Health': [
+    {jp:'頭 (あたま)',rom:'atama',en:'Head',mm:'ခေါင်း'},
+    {jp:'目 (め)',rom:'me',en:'Eye',mm:'မျက်လုံး'},
+    {jp:'耳 (みみ)',rom:'mimi',en:'Ear',mm:'နား'},
+    {jp:'鼻 (はな)',rom:'hana',en:'Nose',mm:'နှာခေါင်း'},
+    {jp:'口 (くち)',rom:'kuchi',en:'Mouth',mm:'ပါး'},
+    {jp:'手 (て)',rom:'te',en:'Hand',mm:'လက်'},
+    {jp:'足 (あし)',rom:'ashi',en:'Foot / Leg',mm:'ခြေ'},
+    {jp:'病院 (びょういん)',rom:'byouin',en:'Hospital',mm:'ဆေးရုံ'},
+    {jp:'薬 (くすり)',rom:'kusuri',en:'Medicine',mm:'ဆေး'},
+    {jp:'痛い (いたい)',rom:'itai',en:'Painful / Ouch',mm:'နာတယ်'},
+  ],
+  'Time & Weather': [
+    {jp:'今日 (きょう)',rom:'kyou',en:'Today',mm:'ဒီနေ့'},
+    {jp:'明日 (あした)',rom:'ashita',en:'Tomorrow',mm:'မနက်ဖြန်'},
+    {jp:'昨日 (きのう)',rom:'kinou',en:'Yesterday',mm:'မနေ့က'},
+    {jp:'今 (いま)',rom:'ima',en:'Now',mm:'အခု'},
+    {jp:'朝 (あさ)',rom:'asa',en:'Morning',mm:'နံနက်'},
+    {jp:'昼 (ひる)',rom:'hiru',en:'Afternoon',mm:'နေ့လည်'},
+    {jp:'夜 (よる)',rom:'yoru',en:'Night',mm:'ညနေ'},
+    {jp:'晴れ (はれ)',rom:'hare',en:'Sunny',mm:'နေရောင်ရှိသည်'},
+    {jp:'雨 (あめ)',rom:'ame',en:'Rain',mm:'မိုး'},
+    {jp:'寒い (さむい)',rom:'samui',en:'Cold',mm:'အေး'},
+    {jp:'暑い (あつい)',rom:'atsui',en:'Hot',mm:'ပူ'},
+  ],
+  'Transport & Places': [
+    {jp:'電車 (でんしゃ)',rom:'densha',en:'Train',mm:'ရထား'},
+    {jp:'バス',rom:'basu',en:'Bus',mm:'ဘတ်စ်ကား'},
+    {jp:'タクシー',rom:'takushii',en:'Taxi',mm:'တက်စီ'},
+    {jp:'空港 (くうこう)',rom:'kuukou',en:'Airport',mm:'လေဆိပ်'},
+    {jp:'駅 (えき)',rom:'eki',en:'Train station',mm:'ရထားဘူတာ'},
+    {jp:'銀行 (ぎんこう)',rom:'ginkou',en:'Bank',mm:'ဘဏ်'},
+    {jp:'コンビニ',rom:'konbini',en:'Convenience store',mm:'ဆိုင်'},
+    {jp:'右 (みぎ)',rom:'migi',en:'Right',mm:'ညာ'},
+    {jp:'左 (ひだり)',rom:'hidari',en:'Left',mm:'ဘယ်'},
+    {jp:'まっすぐ',rom:'massugu',en:'Straight ahead',mm:'တည့်တည့်သွား'},
+    {jp:'近い (ちかい)',rom:'chikai',en:'Near / Close',mm:'နီးတယ်'},
+  ],
+  'Work & Study': [
+    {jp:'仕事 (しごと)',rom:'shigoto',en:'Work',mm:'အလုပ်'},
+    {jp:'会社 (かいしゃ)',rom:'kaisha',en:'Company',mm:'ကုမ္ပဏီ'},
+    {jp:'学校 (がっこう)',rom:'gakkou',en:'School',mm:'ကျောင်း'},
+    {jp:'本 (ほん)',rom:'hon',en:'Book',mm:'စာအုပ်'},
+    {jp:'ペン',rom:'pen',en:'Pen',mm:'ဘောပင်'},
+    {jp:'電話 (でんわ)',rom:'denwa',en:'Phone',mm:'ဖုန်း'},
+    {jp:'お金 (おかね)',rom:'okane',en:'Money',mm:'ငွေ'},
+    {jp:'会議 (かいぎ)',rom:'kaigi',en:'Meeting',mm:'အစည်းအဝေး'},
+    {jp:'休み (やすみ)',rom:'yasumi',en:'Rest / Holiday',mm:'အနားယူသည်'},
+    {jp:'忙しい (いそがしい)',rom:'isogashii',en:'Busy',mm:'အလုပ်များသည်'},
+  ],
+};
+
+const phrasesData = {
+  'Greetings': [
+    {jp:'こんにちは',rom:'Konnichiwa',en:'Hello',mm:'မင်္ဂလာပါ'},
+    {jp:'おはようございます',rom:'Ohayou gozaimasu',en:'Good morning',mm:'မင်္ဂလာနံနက်ခင်းပါ'},
+    {jp:'こんばんは',rom:'Konbanwa',en:'Good evening',mm:'မင်္ဂလာညနေပါ'},
+    {jp:'おやすみなさい',rom:'Oyasumi nasai',en:'Good night',mm:'မင်္ဂလာအိပ်ပျော်ပါ'},
+    {jp:'さようなら',rom:'Sayounara',en:'Goodbye',mm:'သွားတော့မယ်'},
+    {jp:'またね',rom:'Mata ne',en:'See you later',mm:'နောက်မှတွေ့မယ်'},
+    {jp:'はじめまして',rom:'Hajimemashite',en:'Nice to meet you',mm:'တွေ့ရတာဝမ်းသာပါတယ်'},
+    {jp:'よろしくお願いします',rom:'Yoroshiku onegaishimasu',en:'Please treat me well',mm:'ကောင်းကောင်းဆက်ဆံပေးပါ'},
+    {jp:'お元気ですか？',rom:'Ogenki desu ka?',en:'How are you?',mm:'နေကောင်းလား?'},
+    {jp:'元気です、ありがとう',rom:'Genki desu, arigatou',en:'I\'m fine, thank you',mm:'ကောင်းပါတယ်၊ ကျေးဇူးတင်ပါတယ်'},
+  ],
+  'Polite Expressions': [
+    {jp:'ありがとうございます',rom:'Arigatou gozaimasu',en:'Thank you very much',mm:'အလွန်ကျေးဇူးတင်ပါတယ်'},
+    {jp:'どういたしまして',rom:'Dou itashimashite',en:'You\'re welcome',mm:'ဘာမှမဟုတ်ပါဘူး'},
+    {jp:'すみません',rom:'Sumimasen',en:'Excuse me / Sorry',mm:'ဆောရီးပါ'},
+    {jp:'ごめんなさい',rom:'Gomen nasai',en:'I\'m sorry',mm:'တောင်းပန်ပါတယ်'},
+    {jp:'大丈夫です',rom:'Daijoubu desu',en:'It\'s okay',mm:'ရပါတယ်'},
+    {jp:'お願いします',rom:'Onegaishimasu',en:'Please',mm:'ကျေးဇူးပြု၍'},
+    {jp:'はい',rom:'Hai',en:'Yes',mm:'ဟုတ်ကဲ့'},
+    {jp:'いいえ',rom:'Iie',en:'No',mm:'မဟုတ်ဘူး'},
+    {jp:'少々お待ちください',rom:'Shoushou omachi kudasai',en:'Please wait a moment',mm:'ခဏစောင့်ပါ'},
+    {jp:'失礼します',rom:'Shitsurei shimasu',en:'Excuse me (formal)',mm:'ခွင့်လွှတ်ပါ'},
+  ],
+  'Asking for Help': [
+    {jp:'わかりません',rom:'Wakarimasen',en:'I don\'t understand',mm:'နားမလည်ပါ'},
+    {jp:'もう一度お願いします',rom:'Mou ichido onegaishimasu',en:'Please say that again',mm:'နောက်တစ်ကြိမ် ပြောပြပါ'},
+    {jp:'ゆっくり話してください',rom:'Yukkuri hanashite kudasai',en:'Please speak slowly',mm:'ဖြည်းဖြည်း ပြောပေးပါ'},
+    {jp:'日本語がわかりません',rom:'Nihongo ga wakarimasen',en:'I don\'t understand Japanese',mm:'ဂျပန်ဘာသာ နားမလည်ပါ'},
+    {jp:'英語がわかりますか？',rom:'Eigo ga wakarimasu ka?',en:'Do you understand English?',mm:'အင်္ဂလိပ်ဘာသာ နားလည်လား?'},
+    {jp:'助けてください',rom:'Tasukete kudasai',en:'Please help me',mm:'ကူညီပေးပါ'},
+    {jp:'どこですか？',rom:'Doko desu ka?',en:'Where is it?',mm:'ဘယ်မှာလဲ?'},
+    {jp:'どうすればいいですか？',rom:'Dou sureba ii desu ka?',en:'What should I do?',mm:'ဘာလုပ်ရမလဲ?'},
+    {jp:'電話番号を教えてください',rom:'Denwa bangou wo oshiete kudasai',en:'Please tell me your phone number',mm:'ဖုန်းနံပါတ် ပြောပေးပါ'},
+    {jp:'救急車を呼んでください',rom:'Kyuukyuusha wo yonde kudasai',en:'Please call an ambulance',mm:'အရေးပေါ်ကား ခေါ်ပေးပါ'},
+  ],
+  'Shopping': [
+    {jp:'いくらですか？',rom:'Ikura desu ka?',en:'How much is it?',mm:'ဘယ်လောက်လဲ?'},
+    {jp:'高いですね',rom:'Takai desu ne',en:'That\'s expensive',mm:'စျေးကြီးတယ်'},
+    {jp:'安いですね',rom:'Yasui desu ne',en:'That\'s cheap',mm:'စျေးသက်သာတယ်'},
+    {jp:'これをください',rom:'Kore wo kudasai',en:'I\'ll take this one',mm:'ဒါကိုပေးပါ'},
+    {jp:'他のはありますか？',rom:'Hoka no wa arimasu ka?',en:'Do you have other ones?',mm:'အခြားတွေ ရှိလား?'},
+    {jp:'試着できますか？',rom:'Shichaku dekimasu ka?',en:'Can I try it on?',mm:'ဝတ်ကြည့်လို့ ရလား?'},
+    {jp:'袋をください',rom:'Fukuro wo kudasai',en:'Please give me a bag',mm:'အိတ်ပေးပါ'},
+    {jp:'カードで払えますか？',rom:'Kaado de haraemasu ka?',en:'Can I pay by card?',mm:'ကတ်နဲ့ ပေးလို့ ရလား?'},
+    {jp:'レシートをください',rom:'Reshiito wo kudasai',en:'Please give me a receipt',mm:'ဘောင်ချာပေးပါ'},
+    {jp:'返品できますか？',rom:'Henpin dekimasu ka?',en:'Can I return this?',mm:'ပြန်ပေးလို့ ရလား?'},
+  ],
+  'At Home (Domestic Helper)': [
+    {jp:'掃除してください',rom:'Souji shite kudasai',en:'Please clean',mm:'သန့်ရှင်းရေး လုပ်ပေးပါ'},
+    {jp:'洗濯してください',rom:'Sentaku shite kudasai',en:'Please do the laundry',mm:'အဝတ်လျှော်ပေးပါ'},
+    {jp:'料理してください',rom:'Ryouri shite kudasai',en:'Please cook',mm:'ချက်ပေးပါ'},
+    {jp:'子供を見てください',rom:'Kodomo wo mite kudasai',en:'Please watch the children',mm:'ကလေးကို ကြည့်ပေးပါ'},
+    {jp:'ゴミを捨ててください',rom:'Gomi wo sutete kudasai',en:'Please take out the trash',mm:'အမှိုက်ပြစ်ပေးပါ'},
+    {jp:'窓を開けてください',rom:'Mado wo akete kudasai',en:'Please open the window',mm:'ပြတင်းပေါက် ဖွင့်ပေးပါ'},
+    {jp:'ドアを閉めてください',rom:'Doa wo shimete kudasai',en:'Please close the door',mm:'တံခါးပိတ်ပေးပါ'},
+    {jp:'電気を消してください',rom:'Denki wo keshite kudasai',en:'Please turn off the light',mm:'မီးသတ်ပေးပါ'},
+    {jp:'電気をつけてください',rom:'Denki wo tsukete kudasai',en:'Please turn on the light',mm:'မီးဖွင့်ပေးပါ'},
+    {jp:'今日は休んでいいです',rom:'Kyou wa yasunde ii desu',en:'You can rest today',mm:'ဒီနေ့ အနားယူလို့ ရတယ်'},
+    {jp:'ありがとう、よくできました',rom:'Arigatou, yoku dekimashita',en:'Thank you, well done',mm:'ကျေးဇူးတင်တယ်၊ ကောင်းတယ်'},
+    {jp:'ゆっくり食べてください',rom:'Yukkuri tabete kudasai',en:'Please eat well',mm:'ဖြည်းဖြည်းစားပါ'},
+    {jp:'何か必要ですか？',rom:'Nanika hitsuyou desu ka?',en:'Do you need anything?',mm:'ဘာမှ လိုအပ်တာ ရှိလား?'},
+    {jp:'気をつけてください',rom:'Ki wo tsukete kudasai',en:'Please be careful',mm:'သတိထားပါ'},
+    {jp:'お疲れ様でした',rom:'Otsukaresama deshita',en:'Good work today',mm:'ပင်ပန်းတာ ကျေးဇူးတင်တယ်'},
+  ],
+  'Food & Eating': [
+    {jp:'いただきます',rom:'Itadakimasu',en:'Let\'s eat (before meal)',mm:'ကြည်ညိုပူဇော်ပါတယ်'},
+    {jp:'ごちそうさまでした',rom:'Gochisousama deshita',en:'Thank you for the meal',mm:'ကျေးဇူးတင်ပါတယ်'},
+    {jp:'美味しい！',rom:'Oishii!',en:'Delicious!',mm:'အရသာရှိတယ်!'},
+    {jp:'お腹がすきました',rom:'Onaka ga sukimashita',en:'I\'m hungry',mm:'ဗိုက်ဆာတယ်'},
+    {jp:'お腹がいっぱいです',rom:'Onaka ga ippai desu',en:'I\'m full',mm:'ဗိုက်ပြည့်ပြီ'},
+    {jp:'水をください',rom:'Mizu wo kudasai',en:'Please give me water',mm:'ရေ ပေးပါ'},
+    {jp:'アレルギーがあります',rom:'Arerugii ga arimasu',en:'I have allergies',mm:'ဓာတ်မတည့်တာ ရှိတယ်'},
+    {jp:'辛いのは苦手です',rom:'Karai no wa nigate desu',en:'I\'m not good with spicy food',mm:'စပ်တာ မကြိုက်ဘူး'},
+    {jp:'おすすめは何ですか？',rom:'Osusume wa nan desu ka?',en:'What do you recommend?',mm:'ဘာကို ညွှန်းမလဲ?'},
+    {jp:'お会計をお願いします',rom:'Okaikei wo onegaishimasu',en:'Bill please',mm:'ငွေပေးချေမည်'},
+  ],
+  'Feelings & Emotions': [
+    {jp:'嬉しい',rom:'Ureshii',en:'Happy',mm:'ပျော်တယ်'},
+    {jp:'悲しい',rom:'Kanashii',en:'Sad',mm:'ဝမ်းနည်းတယ်'},
+    {jp:'疲れました',rom:'Tsukaremashita',en:'I\'m tired',mm:'ပင်ပန်းတယ်'},
+    {jp:'眠いです',rom:'Nemui desu',en:'I\'m sleepy',mm:'အိပ်ချင်တယ်'},
+    {jp:'大丈夫ですか？',rom:'Daijoubu desu ka?',en:'Are you okay?',mm:'ကောင်းလား?'},
+    {jp:'心配しないでください',rom:'Shinpai shinaide kudasai',en:'Please don\'t worry',mm:'စိုးရိမ်မနေပါနဲ့'},
+    {jp:'楽しかったです',rom:'Tanoshikatta desu',en:'It was fun',mm:'ပျော်တယ်'},
+    {jp:'びっくりしました',rom:'Bikkuri shimashita',en:'I was surprised',mm:'놀랐습니다'},
+    {jp:'寂しい',rom:'Sabishii',en:'Lonely',mm:'တမ်းတတယ်'},
+    {jp:'頑張ります',rom:'Ganbarimasu',en:'I\'ll do my best',mm:'အကောင်းဆုံး ကြိုးစားမယ်'},
+  ],
+};
+
+function buildVocab() {
+  const filters = document.getElementById('vocab-filters');
+  const container = document.getElementById('vocab-container');
+  const cats = Object.keys(vocabData);
+  filters.innerHTML = '<button class="filter-btn active" onclick="filterVocab(\'\', this)">All</button>' +
+    cats.map(c => `<button class="filter-btn" onclick="filterVocab('${c}', this)">${c}</button>`).join('');
+  let html = '';
+  cats.forEach(cat => {
+    html += `<div class="cat-header vocab-cat" data-cat="${cat}">${cat}</div><div class="vocab-grid" id="vg-${cat.replace(/\s/g,'_')}">`;
+    vocabData[cat].forEach(v => {
+      html += `<div class="vocab-card" data-en="${v.en.toLowerCase()}" data-mm="${v.mm}" data-rom="${v.rom.toLowerCase()}" data-cat="${cat}">
+        <div class="vocab-jp">${v.jp}</div><div class="vocab-rom">${v.rom}</div>
+        <div class="vocab-en">${v.en}</div><div class="vocab-mm">${v.mm}</div></div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function filterVocab(query, btn) {
+  if (btn) {
+    document.querySelectorAll('#vocab-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('vocab-search').value = '';
+  }
+  const isCat = Object.keys(vocabData).includes(query);
+  document.querySelectorAll('.vocab-card').forEach(card => {
+    const matchCat = !query || !isCat || card.dataset.cat === query;
+    const q = query.toLowerCase();
+    const matchSearch = !query || isCat || card.dataset.en.includes(q) || card.dataset.mm.includes(query) || card.dataset.rom.includes(q);
+    card.style.display = (matchCat && matchSearch) ? '' : 'none';
+  });
+  document.querySelectorAll('.vocab-cat').forEach(header => {
+    const grid = header.nextElementSibling;
+    const visible = grid ? grid.querySelectorAll('.vocab-card:not([style*="none"])').length : 0;
+    header.style.display = visible === 0 ? 'none' : '';
+    if (grid) grid.style.display = visible === 0 ? 'none' : '';
+  });
+}
+
+function buildPhrases() {
+  const filters = document.getElementById('phrase-filters');
+  const container = document.getElementById('phrase-container');
+  const cats = Object.keys(phrasesData);
+  filters.innerHTML = '<button class="filter-btn active" onclick="filterPhrases(\'\', this)">All</button>' +
+    cats.map(c => `<button class="filter-btn" onclick="filterPhrases('${c}', this)">${c}</button>`).join('');
+  let html = '';
+  cats.forEach(cat => {
+    html += `<div class="card"><div class="card-title">${cat}</div>`;
+    phrasesData[cat].forEach(p => {
+      html += `<div class="phrase-row" data-cat="${cat}" data-en="${p.en.toLowerCase()}" data-mm="${p.mm}" data-rom="${p.rom.toLowerCase()}">
+        <div class="phrase-jp">${p.jp}</div><div class="phrase-rom">${p.rom}</div>
+        <div class="phrase-en">${p.en}</div><div class="phrase-mm">${p.mm}</div></div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function filterPhrases(query, btn) {
+  if (btn) {
+    document.querySelectorAll('#phrase-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('phrase-search').value = '';
+  }
+  const isCat = Object.keys(phrasesData).includes(query);
+  const q = query.toLowerCase();
+  document.querySelectorAll('.phrase-row').forEach(row => {
+    const matchCat = !query || !isCat || row.dataset.cat === query;
+    const matchSearch = !query || isCat || row.dataset.en.includes(q) || row.dataset.mm.includes(query) || row.dataset.rom.includes(q);
+    row.style.display = (matchCat && matchSearch) ? '' : 'none';
+  });
+  document.querySelectorAll('#phrase-container .card').forEach(card => {
+    const visible = card.querySelectorAll('.phrase-row:not([style*="none"])').length;
+    card.style.display = visible === 0 ? 'none' : '';
+  });
+}
+
+function switchTab(name) {
+  const names = ['hiragana','katakana','vocab','phrases','numbers','quiz'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'quiz' && !quizReady) { quizReady = true; nextQ(); }
+}
+
+const allVocab = Object.values(vocabData).flat();
+const allPhrases = Object.values(phrasesData).flat();
+const quizPool = [
+  ...allVocab.slice(0,30).map(v => ({q:v.jp, a:`${v.en} · ${v.mm}`, type:'Vocabulary', pool:allVocab.slice(0,30).map(x=>`${x.en} · ${x.mm}`)})),
+  ...allPhrases.slice(0,20).map(p => ({q:p.jp, a:p.en, type:'Phrase', pool:allPhrases.slice(0,20).map(x=>x.en)})),
+  ...[{q:'あ',a:'a'},{q:'か',a:'ka'},{q:'さ',a:'sa'},{q:'な',a:'na'},{q:'は',a:'ha'},{q:'ア',a:'a'},{q:'カ',a:'ka'}]
+    .map(k=>({q:k.q, a:k.a, type:'Kana', pool:['a','i','u','e','o','ka','ki','ku','sa','shi','na','ha','ma','ya','ra']}))
+];
+
+let cur=0, score=0, total=0, answered=false, quizReady=false;
+let pool2 = [...quizPool].sort(()=>Math.random()-0.5);
+
+function nextQ() {
+  if (cur >= pool2.length) { pool2=[...quizPool].sort(()=>Math.random()-0.5); cur=0; }
+  const q = pool2[cur++];
+  answered = false;
+  document.getElementById('quiz-type').textContent = `What does this ${q.type} mean?`;
+  document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-hint').textContent = '';
+  const wrong = [...q.pool].filter(o=>o!==q.a).sort(()=>Math.random()-0.5).slice(0,3);
+  const opts = [q.a,...wrong].sort(()=>Math.random()-0.5);
+  document.getElementById('quiz-opts').innerHTML = opts.map(o =>
+    `<button class="quiz-opt" onclick="checkAns(this,'${o.replace(/'/g,"\\'")}','${q.a.replace(/'/g,"\\'")}')">${o}</button>`
+  ).join('');
+}
+
+function checkAns(btn, chosen, correct) {
+  if (answered) return;
+  answered = true; total++;
+  if (chosen === correct) {
+    btn.classList.add('correct'); score++;
+    document.getElementById('quiz-hint').textContent = '✓ မှန်ကန်သည်! Correct!';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-opt').forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    document.getElementById('quiz-hint').textContent = 'Answer: ' + correct;
+  }
+  document.getElementById('score').textContent = score;
+  document.getElementById('total').textContent = total;
+}
+
+function resetQuiz() {
+  score=0; total=0; cur=0;
+  pool2=[...quizPool].sort(()=>Math.random()-0.5);
+  document.getElementById('score').textContent=0;
+  document.getElementById('total').textContent=0;
+  nextQ();
+}
+
+buildVocab();
+buildPhrases();
+</script>
+</body>
+</html>
