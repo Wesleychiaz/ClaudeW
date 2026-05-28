@@ -279,42 +279,34 @@
       );
     }
 
-    // ── ASK AI ──
-    function AskAI() {
-      const [question, setQuestion] = useState("");
-      const [answer, setAnswer] = useState("");
-      const [loading, setLoading] = useState(false);
-      const ask = async () => {
-        if (!question.trim()) return;
-        setLoading(true); setAnswer("");
-        try {
-          const res = await fetch("https://api.anthropic.com/v1/messages", {
-            method:"POST", headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000,
-              system:"You are a friendly, casual REIT educator helping a Singapore beginner named Soon Lian learn about S-REITs. Keep answers simple, jargon-free, Singapore-focused. Use SGD examples. Be warm and encouraging. Max 200 words. Short paragraphs only.",
-              messages:[{role:"user",content:question}] })
-          });
-          const data = await res.json();
-          setAnswer(data.content?.find(b=>b.type==="text")?.text || "Sorry, couldn't get an answer. Try again!");
-        } catch { setAnswer("Oops! Something went wrong. Please try again in a moment."); }
-        setLoading(false);
-      };
-      const suggestions = ["What's the difference between DPU and yield?","Is a P/NAV below 1 always a good buy?","How often do Singapore REITs pay distributions?","What happens if a REIT breaches the 50% gearing limit?"];
+    // ── STATIC FAQ ──
+    const FAQ_DATA = [
+      { q:"What's the difference between DPU and yield?", a:"DPU (Distribution Per Unit) is the actual dollar amount paid out per unit — e.g. 10 cents per unit. Yield is DPU expressed as a percentage of the current price. So if a REIT trades at S$2.00 and pays 10 cents DPU, the yield is 5%. DPU tells you the absolute payout; yield tells you the return relative to what you paid." },
+      { q:"Is a P/NAV below 1 always a good buy?", a:"Not necessarily! A P/NAV below 1.0 means you're buying properties for less than their book value — which sounds great. But ask yourself WHY it's cheap. Is the sector struggling? Are the properties declining in quality? Is the sponsor unreliable? A discount can be a bargain or a value trap. Always combine P/NAV with yield, gearing, and DPU trend." },
+      { q:"How often do Singapore REITs pay distributions?", a:"Most S-REITs pay quarterly (4 times a year), though some pay semi-annually (twice a year). The distribution is deposited directly into your brokerage account — no action needed from you. This regular income is one of the main reasons investors love REITs for passive income." },
+      { q:"What happens if a REIT breaches the 50% gearing limit?", a:"MAS requires REITs to stay within the 50% gearing cap. If a REIT breaches this limit, it must take corrective action — typically by raising equity (issuing new units, which dilutes existing holders) or selling assets to pay down debt. This is why gearing above 45% is a warning sign — there's very little room for error." },
+      { q:"Can I use CPF to invest in REITs?", a:"Yes! Under the CPF Investment Scheme (CPFIS), you can use your CPF Ordinary Account (OA) funds to invest in SGX-listed REITs. Your OA currently earns 2.5% — if the REIT yields 5–6%, you could potentially earn more. However, unlike CPF interest, REIT unit prices can fall, so your capital is at risk. Only invest CPF funds you won't need in the short term." },
+      { q:"What is WALE and why does it matter?", a:"WALE stands for Weighted Average Lease Expiry — the average time remaining on all the REIT's leases, weighted by income. A WALE of 5 years means tenants are locked in for an average of 5 more years. Higher WALE = more income certainty. A low WALE (under 2 years) means many leases are expiring soon, which introduces risk if tenants don't renew or demand lower rents." },
+      { q:"What's the difference between a REIT and a Business Trust?", a:"REITs must distribute at least 90% of income and are restricted to owning real estate assets. Business Trusts have more flexibility — they can retain earnings and invest in operating businesses. However, Business Trusts don't enjoy the same tax transparency as REITs. Examples of Business Trusts on SGX include Hutchison Port Holdings Trust and Netlink NBN Trust." },
+      { q:"Are Singapore REITs safe during a recession?", a:"REITs are generally more resilient than stocks during recessions because rental income from long-term leases provides a cushion. Healthcare and industrial REITs tend to hold up best. Hospitality REITs suffer the most (hotels are immediately hit). During COVID-19, some REITs cut distributions temporarily but most recovered within 1–2 years. As always, quality REITs with low gearing and strong sponsors fare better." },
+    ];
+
+    function StaticFAQ() {
+      const [open, setOpen] = useState(null);
       return (
         <div>
-          <div className="card" style={{marginBottom:24}}>
-            <h4 style={{marginBottom:12,color:C.accent}}>💬 Try asking...</h4>
-            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-              {suggestions.map(s=><button key={s} onClick={()=>setQuestion(s)} style={{background:C.accentXL,border:`1px solid ${C.border}`,borderRadius:20,padding:"6px 14px",fontSize:"0.82rem",cursor:"pointer",color:C.accent,fontWeight:500,fontFamily:"'DM Sans',sans-serif"}}>{s}</button>)}
+          {FAQ_DATA.map((item, i) => (
+            <div key={i} className="card" style={{marginBottom:12,cursor:"pointer",borderLeft:`4px solid ${open===i?C.accent:C.border}`}} onClick={()=>setOpen(open===i?null:i)}>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <span style={{fontSize:"1.2rem"}}>❓</span>
+                <h4 style={{flex:1,fontSize:"0.95rem",fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>{item.q}</h4>
+                <span style={{color:C.muted,fontSize:"1.1rem",flexShrink:0}}>{open===i?"▲":"▼"}</span>
+              </div>
+              {open===i && (
+                <p style={{marginTop:14,fontSize:"0.9rem",color:C.muted,paddingLeft:36,lineHeight:1.7}} className="fade-up">{item.a}</p>
+              )}
             </div>
-          </div>
-          <div style={{display:"flex",gap:10,marginBottom:20}}>
-            <textarea value={question} onChange={e=>setQuestion(e.target.value)} placeholder="Ask anything about Singapore REITs…"
-              style={{flex:1,padding:"12px 16px",borderRadius:8,border:`1.5px solid ${C.border}`,fontFamily:"'DM Sans',sans-serif",fontSize:"0.92rem",resize:"vertical",minHeight:70,outline:"none",background:C.bg}}
-              onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),ask())} />
-            <button className="btn-primary" style={{alignSelf:"flex-end",padding:"12px 20px"}} onClick={ask} disabled={loading}>{loading?"...":"Ask →"}</button>
-          </div>
-          {(loading||answer) && <div className="ai-chat-box fade-up">{loading?<span className="ai-thinking">Thinking about your question…</span>:answer}</div>}
+          ))}
         </div>
       );
     }
@@ -380,7 +372,7 @@
                 {icon:"⚠️",title:"Pitfalls to Avoid",page:"Pitfalls",desc:"Common mistakes that trip up beginner REIT investors"},
                 {icon:"🧮",title:"Calculators",page:"Calculators",desc:"Yield, P/NAV, and passive income calculators — try them out!"},
                 {icon:"🧠",title:"Test Yourself",page:"Quiz",desc:"A 10-question quiz to check what you've learned"},
-                {icon:"🤖",title:"Ask AI",page:"Ask AI",desc:"Have a REIT question? Get a plain-English answer instantly"},
+                {icon:"🤖",title:"Ask AI",page:"Ask AI",desc:"FAQ + link to Claude AI for any questions beyond this guide"},
               ].map(item=>(
                 <div key={item.title} className="card" style={{cursor:"pointer"}} onClick={()=>goTo(item.page)}>
                   <div className="icon-box">{item.icon}</div>
@@ -560,9 +552,51 @@
     function AskAIPage() {
       return (
         <div className="section">
-          <h2 className="section-title">Ask AI Anything</h2>
-          <p className="section-sub">Got a REIT question that wasn't covered? Just ask — plain English answers, no jargon.</p>
-          <AskAI />
+          <h2 className="section-title">Got More Questions?</h2>
+          <p className="section-sub">We've answered the most common beginner questions below. Still curious? Claude AI can help explain anything REIT-related in plain English!</p>
+
+          {/* Claude CTA Banner */}
+          <div style={{background:"linear-gradient(135deg,#1A3A2A,#2C6E49)",borderRadius:16,padding:"32px 28px",marginBottom:40,color:"white",display:"flex",flexDirection:"column",gap:16,alignItems:"center",textAlign:"center"}}>
+            <span style={{fontSize:"2.5rem"}}>🤖</span>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.5rem"}}>Chat with Claude AI about REITs</h3>
+            <p style={{opacity:0.85,fontSize:"0.95rem",maxWidth:520}}>Claude is a free AI assistant that can answer any REIT question in plain English — no jargon, no judgment. Ask it to explain gearing, compare two REITs, or help you understand an annual report.</p>
+            <div style={{display:"flex",gap:12,flexWrap:"wrap",justifyContent:"center",marginTop:4}}>
+              <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer"
+                style={{display:"inline-flex",alignItems:"center",gap:8,background:"white",color:"#2C6E49",padding:"11px 24px",borderRadius:8,fontWeight:700,fontSize:"0.92rem",textDecoration:"none",boxShadow:"0 4px 16px rgba(0,0,0,0.2)",transition:"transform 0.2s",fontFamily:"'DM Sans',sans-serif"}}>
+                💬 Chat with Claude — Free
+              </a>
+              <a href="https://claude.ai/login?returnTo=%2F" target="_blank" rel="noopener noreferrer"
+                style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.15)",color:"white",padding:"11px 24px",borderRadius:8,fontWeight:600,fontSize:"0.92rem",textDecoration:"none",border:"1.5px solid rgba(255,255,255,0.35)",fontFamily:"'DM Sans',sans-serif"}}>
+                📝 Create Free Account
+              </a>
+            </div>
+            <p style={{opacity:0.6,fontSize:"0.78rem",marginTop:4}}>Free to use · No credit card needed · Just sign up with your email</p>
+          </div>
+
+          {/* Sample prompts */}
+          <div className="card" style={{marginBottom:36}}>
+            <h4 style={{marginBottom:6,color:C.accent}}>💡 Try asking Claude these questions</h4>
+            <p style={{fontSize:"0.85rem",color:C.muted,marginBottom:16}}>Just copy and paste any of these into Claude:</p>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {[
+                "Explain what a REIT is to me like I'm a complete beginner in Singapore",
+                "Compare CapitaLand Integrated Commercial Trust vs Frasers Centrepoint Trust for a beginner investor",
+                "How do I read a REIT's annual report? What are the 5 most important numbers to look for?",
+                "What are the risks of investing in REITs during high interest rate environments?",
+                "Help me understand what a debt maturity schedule is and why it matters for REIT investors",
+              ].map((prompt,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 14px",background:C.bg,borderRadius:8,border:`1px solid ${C.border}`}}>
+                  <span style={{color:C.accent,fontWeight:700,fontSize:"0.8rem",marginTop:2,flexShrink:0}}>{i+1}.</span>
+                  <span style={{fontSize:"0.88rem",color:C.text,fontStyle:"italic"}}>"{prompt}"</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Static FAQ */}
+          <h3 style={{color:C.accent,marginBottom:8}}>❓ Frequently Asked Questions</h3>
+          <p style={{color:C.muted,fontSize:"0.9rem",marginBottom:24}}>Click any question to reveal the answer.</p>
+          <StaticFAQ />
         </div>
       );
     }
@@ -588,7 +622,7 @@
       const navLabel = p => ({
         "What is a REIT?":"Basics","Types of REITs":"Types","REITs vs Others":"vs Others",
         "How to Analyse":"Analysis","Pitfalls":"⚠️ Pitfalls","Calculators":"🧮 Calc",
-        "Quiz":"🧠 Quiz","Ask AI":"🤖 Ask AI"
+        "Quiz":"🧠 Quiz","Ask AI":"💬 FAQ & AI"
       }[p]||p);
       return (
         <>
