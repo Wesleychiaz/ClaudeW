@@ -1,1201 +1,613 @@
-import { useState, useEffect, useRef } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soon Lian's REIT Guide 🏢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #FAFAF7; color: #1A1A1A; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    h1,h2,h3,h4 { font-family: 'Playfair Display', serif; line-height: 1.25; }
+    .nav { position: sticky; top: 0; z-index: 100; background: rgba(250,250,247,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #E8E5DE; padding: 0 24px; display: flex; align-items: center; height: 60px; }
+    .nav-brand { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #2C6E49; font-weight: 700; margin-right: auto; white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-btn { background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; color: #6B6B6B; padding: 6px 10px; border-radius: 6px; transition: all 0.2s; white-space: nowrap; }
+    .nav-btn:hover { color: #2C6E49; background: #D4EDDA; }
+    .nav-btn.active { color: #2C6E49; background: #D4EDDA; font-weight: 600; }
+    .hero { background: linear-gradient(135deg, #1A3A2A 0%, #2C6E49 60%, #4A9E6E 100%); color: white; padding: 80px 40px 60px; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); opacity: 0.4; }
+    .hero-pill { display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 20px; letter-spacing: 0.5px; position: relative; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 16px; position: relative; }
+    .hero p { font-size: 1.05rem; opacity: 0.85; max-width: 560px; margin: 0 auto 32px; position: relative; }
+    .hero-cta { display: inline-flex; align-items: center; gap: 8px; background: white; color: #2C6E49; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; font-family: 'DM Sans', sans-serif; }
+    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .section { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
+    .section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); color: #2C6E49; margin-bottom: 8px; }
+    .section-sub { color: #6B6B6B; margin-bottom: 40px; font-size: 0.95rem; }
+    .card { background: #FFFFFF; border: 1px solid #E8E5DE; border-radius: 12px; padding: 24px; transition: box-shadow 0.2s, transform 0.2s; }
+    .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+    .badge-green { background: #D4EDDA; color: #2C6E49; }
+    .badge-gold  { background: #FDF3DC; color: #C4922A; }
+    .badge-blue  { background: #DFF0F7; color: #1A6B8A; }
+    .badge-red   { background: #FDECEA; color: #C0392B; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .tab { padding: 8px 18px; border-radius: 20px; border: 1.5px solid #E8E5DE; background: none; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: #6B6B6B; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .tab.active { background: #2C6E49; color: white; border-color: #2C6E49; }
+    .tab:hover:not(.active) { border-color: #2C6E49; color: #2C6E49; }
+    .callout { border-left: 4px solid #2C6E49; background: #D4EDDA; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 0.92rem; }
+    .callout-warn { border-left-color: #C4922A; background: #FDF3DC; }
+    .callout-danger { border-left-color: #C0392B; background: #FDECEA; }
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #E8E5DE; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { background: #2C6E49; color: white; padding: 10px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
+    td { padding: 10px 14px; border-bottom: 1px solid #E8E5DE; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #F6F6F2; }
+    .metric-card { background: #FFFFFF; border: 1px solid #E8E5DE; border-radius: 10px; padding: 20px; text-align: center; }
+    .metric-card .num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: #2C6E49; }
+    .metric-card .label { font-size: 0.8rem; color: #6B6B6B; margin-top: 4px; }
+    .calc-group { margin-bottom: 20px; }
+    .calc-label { display: block; font-size: 0.85rem; font-weight: 600; color: #6B6B6B; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .calc-input { width: 100%; padding: 10px 14px; border: 1.5px solid #E8E5DE; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none; transition: border 0.2s; background: #FAFAF7; }
+    .calc-input:focus { border-color: #2C6E49; }
+    .calc-result { background: linear-gradient(135deg, #2C6E49, #4A9E6E); color: white; border-radius: 10px; padding: 20px; text-align: center; margin-top: 20px; }
+    .calc-result .big { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; }
+    .calc-result .small { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+    .btn-primary { background: #2C6E49; color: white; border: none; padding: 11px 24px; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem; transition: background 0.2s, transform 0.15s; }
+    .btn-primary:hover { background: #235539; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .quiz-card { background: #FFFFFF; border: 1px solid #E8E5DE; border-radius: 12px; padding: 32px; max-width: 680px; margin: 0 auto; }
+    .quiz-q { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+    .quiz-opt { display: block; width: 100%; background: #FAFAF7; border: 1.5px solid #E8E5DE; padding: 12px 18px; border-radius: 8px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .quiz-opt:hover:not(:disabled) { border-color: #2C6E49; background: #D4EDDA; }
+    .quiz-opt.correct { border-color: #2C6E49; background: #D4EDDA; color: #2C6E49; font-weight: 600; }
+    .quiz-opt.wrong   { border-color: #C0392B; background: #FDECEA; color: #C0392B; }
+    .quiz-opt:disabled { cursor: default; }
+    .quiz-progress { display: flex; gap: 6px; margin-bottom: 24px; }
+    .quiz-dot { height: 6px; border-radius: 3px; flex: 1; background: #E8E5DE; transition: background 0.3s; }
+    .quiz-dot.done { background: #2C6E49; }
+    .quiz-dot.current { background: #C4922A; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .compare-table th, .compare-table td { padding: 12px 16px; text-align: center; border: 1px solid #E8E5DE; }
+    .compare-table th { background: #2C6E49; color: white; }
+    .compare-table td:first-child { text-align: left; font-weight: 600; background: #FAFAF7; }
+    .compare-table .highlight { background: #D4EDDA; }
+    .icon-box { font-size: 2.2rem; margin-bottom: 12px; }
+    .step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #2C6E49; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+    .pitfall-card { border: 1.5px solid #C0392B; border-radius: 10px; padding: 20px; background: #FDECEA; }
+    .pitfall-card h4 { color: #C0392B; margin-bottom: 8px; }
+    .ai-chat-box { background: #FAFAF7; border: 1.5px solid #E8E5DE; border-radius: 12px; padding: 20px; min-height: 80px; font-size: 0.9rem; line-height: 1.7; color: #1A1A1A; white-space: pre-wrap; }
+    .ai-thinking { color: #6B6B6B; font-style: italic; }
+    footer { background: #1A3A2A; color: rgba(255,255,255,0.6); text-align: center; padding: 28px 24px; font-size: 0.82rem; margin-top: 60px; }
+    footer strong { color: white; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.5s ease forwards; }
+    @media (max-width: 600px) { .nav-links { display: none; } .hero { padding: 60px 20px 40px; } .section { padding: 40px 16px; } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
 
-// ── Palette & tokens ──────────────────────────────────────────────────────────
-const C = {
-  bg:      "#FAFAF7",
-  surface: "#FFFFFF",
-  border:  "#E8E5DE",
-  accent:  "#2C6E49",        // forest green
-  accentL: "#4A9E6E",
-  accentXL:"#D4EDDA",
-  gold:    "#C4922A",
-  goldL:   "#FDF3DC",
-  text:    "#1A1A1A",
-  muted:   "#6B6B6B",
-  danger:  "#C0392B",
-  dangerL: "#FDECEA",
-  info:    "#1A6B8A",
-  infoL:   "#DFF0F7",
-};
+    const C = {
+      bg:"#FAFAF7", surface:"#FFFFFF", border:"#E8E5DE", accent:"#2C6E49",
+      accentL:"#4A9E6E", accentXL:"#D4EDDA", gold:"#C4922A", goldL:"#FDF3DC",
+      text:"#1A1A1A", muted:"#6B6B6B", danger:"#C0392B", dangerL:"#FDECEA",
+      info:"#1A6B8A", infoL:"#DFF0F7"
+    };
 
-const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+    const PAGES = ["Home","What is a REIT?","Types of REITs","REITs vs Others","How to Analyse","Pitfalls","Calculators","Quiz","Ask AI"];
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    const REIT_TYPES = [
+      { icon:"🛍️", name:"Retail REITs", badge:"badge-green",
+        examples:"CapitaLand Integrated Commercial Trust (CICT), Frasers Centrepoint Trust (FCT)",
+        pros:["Easy to evaluate — walk into the mall!","High foot traffic in dense Singapore","Stable income from long leases"],
+        cons:["E-commerce pressure on physical retail","Sensitivity to consumer spending"],
+        description:"REITs that own shopping malls. Singapore's climate, high population density, and tourism make malls hugely popular. You can literally walk into a CapitaLand mall and judge the quality yourself — that's the transparency edge." },
+      { icon:"🏢", name:"Office REITs", badge:"badge-blue",
+        examples:"Keppel REIT, Manulife US REIT",
+        pros:["Long leases (3–5 years)","Premium CBD locations","Beneficiary of Singapore as business hub"],
+        cons:["Work-from-home trends","Oversupply risk in certain submarkets"],
+        description:"REITs that own office buildings in Singapore's CBD and business parks. Companies like banks and tech firms are tenants. Good news: Singapore remains a top regional HQ destination." },
+      { icon:"🏭", name:"Industrial REITs", badge:"badge-gold",
+        examples:"Ascendas REIT, Mapletree Logistics Trust (MLT), Mapletree Industrial Trust (MINT)",
+        pros:["Huge portfolio diversification","Rides e-commerce & logistics boom","Stable tenants (manufacturers, logistics)"],
+        cons:["Low organic rental growth","Need constant acquisitions to grow DPU"],
+        description:"Own warehouses, logistics hubs, business parks and flatted factories. The e-commerce boom has made logistics properties incredibly valuable — think last-mile delivery warehouses." },
+      { icon:"🏨", name:"Hospitality REITs", badge:"badge-red",
+        examples:"CDL Hospitality Trusts, Far East Hospitality Trust",
+        pros:["Rides recovery in Singapore tourism","Variable rents can capture upside"],
+        cons:["Very sensitive to pandemics, recessions","Shorter leases, more volatile DPU"],
+        description:"Own hotels across Singapore and Asia. These are the most volatile — as COVID proved. But Singapore's tourism rebound has been strong and hospitality REITs have recovered significantly." },
+      { icon:"🏥", name:"Healthcare REITs", badge:"badge-green",
+        examples:"Parkway Life REIT (PLife REIT)",
+        pros:["Extremely stable — hospitals don't close","Long leases with built-in rent escalators","Defensive during recessions"],
+        cons:["Limited number in Singapore","Lower yields due to stability premium"],
+        description:"Own hospitals and nursing homes. Parkway Life REIT owns hospitals like Gleneagles. These are arguably the most defensive REITs — people always need healthcare, rain or shine." },
+    ];
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: ${C.bg};
-    color: ${C.text};
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-  }
+    const COMPARE_DATA = [
+      { feature:"Entry cost", reit:"Low (from ~S$200)", property:"High (S$500K+)", stocks:"Low", bonds:"Medium", cpf:"None (auto)" },
+      { feature:"Liquidity", reit:"High (SGX-listed)", property:"Very Low", stocks:"High", bonds:"Medium", cpf:"Locked" },
+      { feature:"Passive income", reit:"Yes (quarterly)", property:"Yes (rental)", stocks:"Some (dividends)", bonds:"Yes (coupon)", cpf:"Yes (interest)" },
+      { feature:"Typical yield", reit:"5–7%", property:"2–4%", stocks:"2–4%", bonds:"3–5%", cpf:"2.5–5%" },
+      { feature:"Diversification", reit:"High (many assets)", property:"Low (1 unit)", stocks:"High", bonds:"Medium", cpf:"None" },
+      { feature:"Hassle factor", reit:"None", property:"High (tenants!)", stocks:"None", bonds:"None", cpf:"None" },
+      { feature:"Tax on income", reit:"0% (tax-exempt)", property:"Yes", stocks:"0% (SG dividends)", bonds:"Yes", cpf:"No" },
+      { feature:"Gearing limit", reit:"50% (MAS-regulated)", property:"Up to you", stocks:"N/A", bonds:"N/A", cpf:"N/A" },
+    ];
 
-  h1,h2,h3,h4 { font-family: 'Playfair Display', serif; line-height: 1.25; }
+    const QUIZ_DATA = [
+      { q:"What does REIT stand for?", opts:["Real Estate Investment Trust","Real Estate Interest Trust","Revenue Equity Investment Tax","Real Estate Income Tax"], ans:0, exp:"REIT = Real Estate Investment Trust. You pool money with other investors to own properties like malls and offices, and collect rent as dividends." },
+      { q:"Under MAS regulations, how much of its income must a Singapore REIT distribute to enjoy tax-exempt status?", opts:["At least 70%","At least 80%","At least 90%","100%"], ans:2, exp:"Singapore REITs must distribute at least 90% of their taxable income to unit holders to enjoy tax transparency. This is why they are great income vehicles!" },
+      { q:"What is the MAS-mandated maximum gearing (debt) limit for Singapore REITs?", opts:["30%","40%","50%","60%"], ans:2, exp:"MAS limits S-REIT gearing to 50% of asset value. This protects investors from over-leveraged REITs that could collapse in a downturn." },
+      { q:"What does DPU stand for in REIT investing?", opts:["Dividend Per Unit","Distribution Per Unit","Daily Price Update","Debt Per Unit"], ans:1, exp:"DPU = Distribution Per Unit. This is the amount of income paid out per REIT unit you hold — the key number to track as an income investor." },
+      { q:"A REIT is trading at S$1.20 and its NAV per unit is S$1.50. What is the Price-to-NAV ratio, and what does it mean?", opts:["0.8 — the REIT is overvalued","1.25 — you are buying at a premium","0.8 — the REIT is trading at a discount (potentially undervalued)","1.5 — this is the fair value"], ans:2, exp:"Price ÷ NAV = 1.20 ÷ 1.50 = 0.80. Below 1.0 means you're buying $1.50 worth of property for $1.20 — potentially a bargain. But always check WHY it's trading at a discount!" },
+      { q:"Which type of REIT is generally considered the most defensive (stable) investment?", opts:["Hospitality REIT","Retail REIT","Healthcare REIT","Industrial REIT"], ans:2, exp:"Healthcare REITs (like Parkway Life REIT) own hospitals and nursing homes. People always need medical care, making these REITs very stable even during recessions." },
+      { q:"What is 'gearing' in the context of REITs?", opts:["The number of properties the REIT owns","The ratio of debt to the total asset value","The management fee paid to the REIT manager","The speed at which the REIT grows"], ans:1, exp:"Gearing = total debt ÷ total assets. A 45% gearing means 45 cents of every $1 of property is funded by debt. Higher gearing = higher risk but potentially higher returns." },
+      { q:"If a REIT pays a DPU of 5 cents and you hold 10,000 units, how much would you receive in that distribution?", opts:["S$5","S$50","S$500","S$5,000"], ans:2, exp:"5 cents × 10,000 units = S$500. That's the beauty of REITs — passive income deposited into your brokerage account every quarter, no tenant calls required!" },
+      { q:"What is Net Property Income (NPI)?", opts:["The total rental income collected","Rental income minus property operating expenses","The total value of all properties","The dividend paid to unit holders"], ans:1, exp:"NPI = Gross Rental Income − Operating Expenses (maintenance, utilities, property tax). It's the true earnings power of the properties. Watch for NPI growth over time!" },
+      { q:"Which of the following is a red flag when evaluating a REIT?", opts:["Occupancy rate above 95%","Gearing ratio of 48% with debt maturing all in one year","DPU has been growing steadily for 5 years","Interest coverage ratio of 4x"], ans:1, exp:"High gearing (near 50% limit) with debt all maturing at once is dangerous — the REIT may struggle to refinance in a tight credit environment. Always check the debt maturity schedule!" },
+    ];
 
-  /* NAV */
-  .nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(250,250,247,0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid ${C.border};
-    padding: 0 24px;
-    display: flex; align-items: center; gap: 0; height: 60px;
-  }
-  .nav-brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem; color: ${C.accent}; font-weight: 700;
-    margin-right: auto; white-space: nowrap;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .nav-brand span { font-size: 1.4rem; }
-  .nav-links {
-    display: flex; gap: 4px; flex-wrap: wrap;
-  }
-  .nav-btn {
-    background: none; border: none; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500;
-    color: ${C.muted}; padding: 6px 10px; border-radius: 6px;
-    transition: all 0.2s; white-space: nowrap;
-  }
-  .nav-btn:hover { color: ${C.accent}; background: ${C.accentXL}; }
-  .nav-btn.active { color: ${C.accent}; background: ${C.accentXL}; font-weight: 600; }
+    const ANALYSIS_STEPS = [
+      { num:1, title:"Check the Distribution Yield", desc:"Yield = Annual DPU ÷ Current Price. A healthy S-REIT typically yields 4–7%. Too low? Maybe overpriced. Too high (>8%)? Could signal risk — dig deeper." },
+      { num:2, title:"Look at Price-to-NAV (P/NAV)", desc:"Below 1.0 = buying at a discount to property value (potentially undervalued). Above 1.0 = paying a premium. Use this alongside other metrics." },
+      { num:3, title:"Check Gearing (Debt Level)", desc:"Under 40%? Comfortable. 40–45%? Keep an eye on it. Above 45%? That's approaching the MAS 50% limit — risky in a rising interest rate environment." },
+      { num:4, title:"Review Interest Coverage Ratio", desc:"NPI ÷ Interest Expense. Above 3x is generally healthy — means even if income drops, they can still service debt. Below 2x is a yellow flag." },
+      { num:5, title:"Check Occupancy Rates", desc:"High-quality REITs maintain 95%+ occupancy across cycles. Watch for trends — is occupancy dropping over time? That's a warning sign." },
+      { num:6, title:"Look at DPU Trend (5-year)", desc:"Has DPU been growing, stable, or declining? Consistent growth is what you want. A declining DPU despite rising revenue = red flag (too many new units being issued)." },
+      { num:7, title:"Assess the Sponsor Quality", desc:"Who backs this REIT? CapitaLand, Mapletree, Frasers — these are strong sponsors with deep pipelines of quality assets to inject. Weaker sponsors = more risk." },
+      { num:8, title:"Read the Debt Maturity Schedule", desc:"Is a big chunk of debt maturing all at once? That's a refinancing cliff — dangerous if credit markets tighten. Good REITs spread their maturities evenly." },
+    ];
 
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, #1A3A2A 0%, #2C6E49 60%, #4A9E6E 100%);
-    color: white; padding: 80px 40px 60px;
-    text-align: center; position: relative; overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
-  .hero-pill {
-    display: inline-block;
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-    padding: 4px 14px; border-radius: 20px; font-size: 0.8rem;
-    margin-bottom: 20px; letter-spacing: 0.5px;
-  }
-  .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 16px; }
-  .hero p { font-size: 1.05rem; opacity: 0.85; max-width: 560px; margin: 0 auto 32px; }
-  .hero-cta {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: white; color: ${C.accent};
-    padding: 12px 28px; border-radius: 8px;
-    font-weight: 600; font-size: 0.95rem;
-    cursor: pointer; border: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  }
-  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    const PITFALLS = [
+      { title:"Chasing the Highest Yield", desc:"A REIT yielding 10%+ sounds amazing — but it often signals the market expects a DPU cut. Always ask WHY the yield is so high before buying." },
+      { title:"Ignoring Gearing Levels", desc:"High debt (>45%) is fine in good times but ugly in crises. REITs near the 50% MAS limit have very little buffer for acquisitions or emergencies." },
+      { title:"Overlooking Currency Risk", desc:"Many S-REITs own overseas properties (Australia, China, Japan). Their income is in foreign currency — a strong SGD can eat into your actual dividends." },
+      { title:"Confusing DPU Growth with Value Creation", desc:"Some REITs grow DPU by constantly issuing new units to fund acquisitions. If the number of units grows faster than income, each unit is worth less over time." },
+      { title:"Not Reading Debt Maturity Schedules", desc:"REITs that borrowed at 2% in 2020 will face much higher costs when refinancing. A REIT with 60% of debt due in one year in a high-rate environment is risky." },
+      { title:"Ignoring the Sponsor Track Record", desc:"The REIT manager controls what assets get injected at what price. A sponsor known for dumping overpriced assets onto the REIT destroys unit holder value over time." },
+    ];
 
-  /* SECTION */
-  .section { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
-  .section-title {
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    color: ${C.accent}; margin-bottom: 8px;
-  }
-  .section-sub { color: ${C.muted}; margin-bottom: 40px; font-size: 0.95rem; }
-
-  /* CARDS */
-  .card {
-    background: ${C.surface}; border: 1px solid ${C.border};
-    border-radius: 12px; padding: 24px;
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-
-  /* BADGE */
-  .badge {
-    display: inline-block; padding: 3px 10px; border-radius: 20px;
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
-  }
-  .badge-green { background: ${C.accentXL}; color: ${C.accent}; }
-  .badge-gold  { background: ${C.goldL};    color: ${C.gold};   }
-  .badge-blue  { background: ${C.infoL};    color: ${C.info};   }
-  .badge-red   { background: ${C.dangerL};  color: ${C.danger}; }
-
-  /* PILL TABS */
-  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
-  .tab {
-    padding: 8px 18px; border-radius: 20px; border: 1.5px solid ${C.border};
-    background: none; cursor: pointer; font-size: 0.875rem; font-weight: 500;
-    color: ${C.muted}; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-  }
-  .tab.active { background: ${C.accent}; color: white; border-color: ${C.accent}; }
-  .tab:hover:not(.active) { border-color: ${C.accent}; color: ${C.accent}; }
-
-  /* CALLOUT */
-  .callout {
-    border-left: 4px solid ${C.accent};
-    background: ${C.accentXL}; padding: 16px 20px; border-radius: 0 8px 8px 0;
-    margin: 20px 0; font-size: 0.92rem;
-  }
-  .callout-warn {
-    border-left-color: ${C.gold}; background: ${C.goldL};
-  }
-  .callout-danger { border-left-color: ${C.danger}; background: ${C.dangerL}; }
-
-  /* TABLE */
-  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid ${C.border}; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  th {
-    background: ${C.accent}; color: white;
-    padding: 10px 14px; text-align: left; font-weight: 600; white-space: nowrap;
-  }
-  td { padding: 10px 14px; border-bottom: 1px solid ${C.border}; }
-  tr:last-child td { border-bottom: none; }
-  tr:nth-child(even) td { background: #F6F6F2; }
-
-  /* METRIC CARD */
-  .metric-card {
-    background: ${C.surface}; border: 1px solid ${C.border};
-    border-radius: 10px; padding: 20px; text-align: center;
-  }
-  .metric-card .num {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem; font-weight: 700; color: ${C.accent};
-  }
-  .metric-card .label { font-size: 0.8rem; color: ${C.muted}; margin-top: 4px; }
-
-  /* CALCULATOR */
-  .calc-group { margin-bottom: 20px; }
-  .calc-label {
-    display: block; font-size: 0.85rem; font-weight: 600;
-    color: ${C.muted}; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px;
-  }
-  .calc-input {
-    width: 100%; padding: 10px 14px;
-    border: 1.5px solid ${C.border}; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
-    outline: none; transition: border 0.2s; background: ${C.bg};
-  }
-  .calc-input:focus { border-color: ${C.accent}; }
-  .calc-result {
-    background: linear-gradient(135deg, ${C.accent}, ${C.accentL});
-    color: white; border-radius: 10px; padding: 20px;
-    text-align: center; margin-top: 20px;
-  }
-  .calc-result .big { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; }
-  .calc-result .small { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
-
-  .btn-primary {
-    background: ${C.accent}; color: white; border: none;
-    padding: 11px 24px; border-radius: 8px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .btn-primary:hover { background: #235539; transform: translateY(-1px); }
-
-  /* QUIZ */
-  .quiz-card {
-    background: ${C.surface}; border: 1px solid ${C.border};
-    border-radius: 12px; padding: 32px; max-width: 680px; margin: 0 auto;
-  }
-  .quiz-q { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
-  .quiz-opt {
-    display: block; width: 100%;
-    background: ${C.bg}; border: 1.5px solid ${C.border};
-    padding: 12px 18px; border-radius: 8px; margin-bottom: 10px;
-    text-align: left; cursor: pointer; font-size: 0.9rem;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
-  .quiz-opt:hover:not(:disabled) { border-color: ${C.accent}; background: ${C.accentXL}; }
-  .quiz-opt.correct { border-color: ${C.accent}; background: ${C.accentXL}; color: ${C.accent}; font-weight: 600; }
-  .quiz-opt.wrong   { border-color: ${C.danger};  background: ${C.dangerL};  color: ${C.danger};  }
-  .quiz-progress {
-    display: flex; gap: 6px; margin-bottom: 24px;
-  }
-  .quiz-dot {
-    height: 6px; border-radius: 3px; flex: 1;
-    background: ${C.border}; transition: background 0.3s;
-  }
-  .quiz-dot.done { background: ${C.accent}; }
-  .quiz-dot.current { background: ${C.gold}; }
-
-  /* COMPARISON TABLE */
-  .compare-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  .compare-table th, .compare-table td { padding: 12px 16px; text-align: center; border: 1px solid ${C.border}; }
-  .compare-table th { background: ${C.accent}; color: white; }
-  .compare-table td:first-child { text-align: left; font-weight: 600; background: ${C.bg}; }
-  .compare-table .highlight { background: ${C.accentXL}; }
-
-  /* ICON BOX */
-  .icon-box { font-size: 2.2rem; margin-bottom: 12px; }
-
-  /* FOOTER */
-  footer {
-    background: #1A3A2A; color: rgba(255,255,255,0.6);
-    text-align: center; padding: 28px 24px; font-size: 0.82rem; margin-top: 60px;
-  }
-  footer strong { color: white; }
-
-  /* ANIMATE */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .fade-up { animation: fadeUp 0.5s ease forwards; }
-
-  /* REIT SECTOR ICON */
-  .sector-icon { font-size: 2rem; }
-  .steps { counter-reset: step; }
-  .step {
-    display: flex; gap: 16px; align-items: flex-start;
-    margin-bottom: 20px;
-  }
-  .step-num {
-    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
-    background: ${C.accent}; color: white;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.9rem;
-  }
-  .pitfall-card {
-    border: 1.5px solid ${C.danger}; border-radius: 10px;
-    padding: 20px; background: ${C.dangerL};
-  }
-  .pitfall-card h4 { color: ${C.danger}; margin-bottom: 8px; }
-
-  .ai-chat-box {
-    background: ${C.bg}; border: 1.5px solid ${C.border};
-    border-radius: 12px; padding: 20px; min-height: 80px;
-    font-size: 0.9rem; line-height: 1.7; color: ${C.text};
-    white-space: pre-wrap;
-  }
-  .ai-thinking { color: ${C.muted}; font-style: italic; }
-
-  @media (max-width: 600px) {
-    .nav-links { display: none; }
-    .hero { padding: 60px 20px 40px; }
-    .section { padding: 40px 16px; }
-  }
-`;
-
-// ── DATA ──────────────────────────────────────────────────────────────────────
-
-const PAGES = ["Home", "What is a REIT?", "Types of REITs", "REITs vs Others", "How to Analyse", "Pitfalls", "Calculators", "Quiz", "Ask AI"];
-
-const REIT_TYPES = [
-  {
-    icon: "🛍️", name: "Retail REITs", badge: "badge-green",
-    examples: "CapitaLand Integrated Commercial Trust (CICT), Frasers Centrepoint Trust (FCT)",
-    pros: ["Easy to evaluate — walk into the mall!", "High foot traffic in dense Singapore", "Stable income from long leases"],
-    cons: ["E-commerce pressure on physical retail", "Sensitivity to consumer spending"],
-    description: "REITs that own shopping malls. Singapore's climate, high population density, and tourism make malls hugely popular. You can literally walk into a Capitaland mall and judge the quality yourself — that's the transparency edge."
-  },
-  {
-    icon: "🏢", name: "Office REITs", badge: "badge-blue",
-    examples: "Keppel REIT, Manulife US REIT",
-    pros: ["Long leases (3–5 years)", "Premium CBD locations", "Beneficiary of Singapore as business hub"],
-    cons: ["Work-from-home trends", "Oversupply risk in certain submarkets"],
-    description: "REITs that own office buildings in Singapore's CBD and business parks. Companies like banks and tech firms are tenants. Good news: Singapore remains a top regional HQ destination."
-  },
-  {
-    icon: "🏭", name: "Industrial REITs", badge: "badge-gold",
-    examples: "Ascendas REIT, Mapletree Logistics Trust (MLT), Mapletree Industrial Trust (MINT)",
-    pros: ["Huge portfolio diversification", "Rides e-commerce & logistics boom", "Stable tenants (manufacturers, logistics)"],
-    cons: ["Low organic rental growth", "Need constant acquisitions to grow DPU"],
-    description: "Own warehouses, logistics hubs, business parks and flatted factories. The e-commerce boom has made logistics properties incredibly valuable — think last-mile delivery warehouses."
-  },
-  {
-    icon: "🏨", name: "Hospitality REITs", badge: "badge-red",
-    examples: "CDL Hospitality Trusts, Far East Hospitality Trust",
-    pros: ["Rides recovery in Singapore tourism", "Variable rents can capture upside"],
-    cons: ["Very sensitive to pandemics, recessions", "Shorter leases, more volatile DPU"],
-    description: "Own hotels across Singapore and Asia. These are the most volatile — as COVID proved. But Singapore's tourism rebound has been strong and hospitality REITs have recovered significantly."
-  },
-  {
-    icon: "🏥", name: "Healthcare REITs", badge: "badge-green",
-    examples: "Parkway Life REIT (PLife REIT)",
-    pros: ["Extremely stable — hospitals don't close", "Long leases with built-in rent escalators", "Defensive during recessions"],
-    cons: ["Limited number in Singapore", "Lower yields due to stability premium"],
-    description: "Own hospitals and nursing homes. Parkway Life REIT owns hospitals like Gleneagles. These are arguably the most defensive REITs — people always need healthcare, rain or shine."
-  },
-];
-
-const COMPARE_DATA = [
-  { feature: "Entry cost", reit: "Low (from ~S$200)", property: "High (S$500K+)", stocks: "Low", bonds: "Medium", cpf: "None (auto)" },
-  { feature: "Liquidity", reit: "High (SGX-listed)", property: "Very Low", stocks: "High", bonds: "Medium", cpf: "Locked" },
-  { feature: "Passive income", reit: "Yes (quarterly)", property: "Yes (rental)", stocks: "Some (dividends)", bonds: "Yes (coupon)", cpf: "Yes (interest)" },
-  { feature: "Typical yield", reit: "5–7%", property: "2–4%", stocks: "2–4%", bonds: "3–5%", cpf: "2.5–5%" },
-  { feature: "Diversification", reit: "High (many assets)", property: "Low (1 unit)", stocks: "High", bonds: "Medium", cpf: "None" },
-  { feature: "Hassle factor", reit: "None", property: "High (tenants!)", stocks: "None", bonds: "None", cpf: "None" },
-  { feature: "Tax on income", reit: "0% (tax-exempt)", property: "Yes", stocks: "0% (SG dividends)", bonds: "Yes", cpf: "No" },
-  { feature: "Gearing limit", reit: "50% (MAS-regulated)", property: "Up to you", stocks: "N/A", bonds: "N/A", cpf: "N/A" },
-];
-
-const QUIZ_DATA = [
-  {
-    q: "What does REIT stand for?",
-    opts: ["Real Estate Investment Trust", "Real Estate Interest Trust", "Revenue Equity Investment Tax", "Real Estate Income Tax"],
-    ans: 0, exp: "REIT = Real Estate Investment Trust. You pool money with other investors to own properties like malls and offices, and collect rent as dividends."
-  },
-  {
-    q: "Under MAS regulations, how much of its income must a Singapore REIT distribute to enjoy tax-exempt status?",
-    opts: ["At least 70%", "At least 80%", "At least 90%", "100%"],
-    ans: 2, exp: "Singapore REITs must distribute at least 90% of their taxable income to unit holders to enjoy tax transparency. This is why they are great income vehicles!"
-  },
-  {
-    q: "What is the MAS-mandated maximum gearing (debt) limit for Singapore REITs?",
-    opts: ["30%", "40%", "50%", "60%"],
-    ans: 2, exp: "MAS limits S-REIT gearing to 50% of asset value. This protects investors from over-leveraged REITs that could collapse in a downturn."
-  },
-  {
-    q: "What does DPU stand for in REIT investing?",
-    opts: ["Dividend Per Unit", "Distribution Per Unit", "Daily Price Update", "Debt Per Unit"],
-    ans: 1, exp: "DPU = Distribution Per Unit. This is the amount of income paid out per REIT unit you hold — the key number to track as an income investor."
-  },
-  {
-    q: "A REIT is trading at S$1.20 and its NAV per unit is S$1.50. What is the Price-to-NAV ratio, and what does it mean?",
-    opts: ["0.8 — the REIT is overvalued", "1.25 — you are buying at a premium", "0.8 — the REIT is trading at a discount (potentially undervalued)", "1.5 — this is the fair value"],
-    ans: 2, exp: "Price ÷ NAV = 1.20 ÷ 1.50 = 0.80. Below 1.0 means you're buying $1.50 worth of property for $1.20 — potentially a bargain. But always check WHY it's trading at a discount!"
-  },
-  {
-    q: "Which type of REIT is generally considered the most defensive (stable) investment?",
-    opts: ["Hospitality REIT", "Retail REIT", "Healthcare REIT", "Industrial REIT"],
-    ans: 2, exp: "Healthcare REITs (like Parkway Life REIT) own hospitals and nursing homes. People always need medical care, making these REITs very stable even during recessions."
-  },
-  {
-    q: "What is 'gearing' in the context of REITs?",
-    opts: ["The number of properties the REIT owns", "The ratio of debt to the total asset value", "The management fee paid to the REIT manager", "The speed at which the REIT grows"],
-    ans: 1, exp: "Gearing = total debt ÷ total assets. A 45% gearing means 45 cents of every $1 of property is funded by debt. Higher gearing = higher risk but potentially higher returns."
-  },
-  {
-    q: "If a REIT pays a DPU of 5 cents and you hold 10,000 units, how much would you receive in that distribution?",
-    opts: ["S$5", "S$50", "S$500", "S$5,000"],
-    ans: 2, exp: "5 cents × 10,000 units = S$500. That's the beauty of REITs — passive income deposited into your brokerage account every quarter, no tenant calls required!"
-  },
-  {
-    q: "What is Net Property Income (NPI)?",
-    opts: ["The total rental income collected", "Rental income minus property operating expenses", "The total value of all properties", "The dividend paid to unit holders"],
-    ans: 1, exp: "NPI = Gross Rental Income − Operating Expenses (maintenance, utilities, property tax). It's the true earnings power of the properties. Watch for NPI growth over time!"
-  },
-  {
-    q: "Which of the following is a red flag when evaluating a REIT?",
-    opts: ["Occupancy rate above 95%", "Gearing ratio of 48% with debt maturing all in one year", "DPU has been growing steadily for 5 years", "Interest coverage ratio of 4x"],
-    ans: 1, exp: "High gearing (near 50% limit) with debt all maturing at once is dangerous — the REIT may struggle to refinance in a tight credit environment. Always check the debt maturity schedule!"
-  },
-];
-
-const ANALYSIS_STEPS = [
-  { num: 1, title: "Check the Distribution Yield", desc: "Yield = Annual DPU ÷ Current Price. A healthy S-REIT typically yields 4–7%. Too low? Maybe overpriced. Too high (>8%)? Could signal risk — dig deeper." },
-  { num: 2, title: "Look at Price-to-NAV (P/NAV)", desc: "Below 1.0 = buying at a discount to property value (potentially undervalued). Above 1.0 = paying a premium. Use this alongside other metrics." },
-  { num: 3, title: "Check Gearing (Debt Level)", desc: "Under 40%? Comfortable. 40–45%? Keep an eye on it. Above 45%? That's approaching the MAS 50% limit — risky in a rising interest rate environment." },
-  { num: 4, title: "Review Interest Coverage Ratio", desc: "NPI ÷ Interest Expense. Above 3x is generally healthy — means even if income drops, they can still service debt. Below 2x is a yellow flag." },
-  { num: 5, title: "Check Occupancy Rates", desc: "High-quality REITs maintain 95%+ occupancy across cycles. Watch for trends — is occupancy dropping over time? That's a warning sign." },
-  { num: 6, title: "Look at DPU Trend (5-year)", desc: "Has DPU been growing, stable, or declining? Consistent growth is what you want. A declining DPU despite rising revenue = red flag (too many new units being issued)." },
-  { num: 7, title: "Assess the Sponsor Quality", desc: "Who backs this REIT? CapitaLand, Mapletree, Frasers — these are strong sponsors with deep pipelines of quality assets to inject. Weaker sponsors = more risk." },
-  { num: 8, title: "Read the Debt Maturity Schedule", desc: "Is a big chunk of debt maturing all at once? That's a refinancing cliff — dangerous if credit markets tighten. Good REITs spread their maturities evenly." },
-];
-
-const PITFALLS = [
-  { title: "Chasing the Highest Yield", desc: "A REIT yielding 10%+ sounds amazing — but it often signals the market expects a DPU cut. Always ask WHY the yield is so high before buying." },
-  { title: "Ignoring Gearing Levels", desc: "High debt (>45%) is fine in good times but ugly in crises. REITs near the 50% MAS limit have very little buffer for acquisitions or emergencies." },
-  { title: "Overlooking Currency Risk", desc: "Many S-REITs own overseas properties (Australia, China, Japan). Their income is in foreign currency — a strong SGD can eat into your actual dividends." },
-  { title: "Confusing DPU Growth with Value Creation", desc: "Some REITs grow DPU by constantly issuing new units to fund acquisitions. If the number of units grows faster than income, each unit is worth less over time." },
-  { title: "Not Reading Debt Maturity Schedules", desc: "REITs that borrowed at 2% in 2020 will face much higher costs when refinancing. A REIT with 60% of debt due in one year in a high-rate environment is risky." },
-  { title: "Ignoring the Sponsor Track Record", desc: "The REIT manager controls what assets get injected at what price. A sponsor known for dumping overpriced assets onto the REIT destroys unit holder value over time." },
-];
-
-// ── COMPONENTS ────────────────────────────────────────────────────────────────
-
-function YieldCalc() {
-  const [price, setPrice] = useState("1.80");
-  const [dpu, setDpu] = useState("0.10");
-  const yield_ = price && dpu ? ((parseFloat(dpu) / parseFloat(price)) * 100).toFixed(2) : null;
-  return (
-    <div>
-      <div className="calc-group">
-        <label className="calc-label">Current Unit Price (S$)</label>
-        <input className="calc-input" type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 1.80" />
-      </div>
-      <div className="calc-group">
-        <label className="calc-label">Annual DPU — Distribution Per Unit (S$)</label>
-        <input className="calc-input" type="number" value={dpu} onChange={e => setDpu(e.target.value)} placeholder="e.g. 0.10" />
-      </div>
-      {yield_ !== null && !isNaN(yield_) && (
-        <div className="calc-result fade-up">
-          <div className="big">{yield_}%</div>
-          <div className="small">Distribution Yield</div>
+    // ── CALCULATORS ──
+    function YieldCalc() {
+      const [price, setPrice] = useState("1.80");
+      const [dpu, setDpu] = useState("0.10");
+      const y = price && dpu ? ((parseFloat(dpu)/parseFloat(price))*100).toFixed(2) : null;
+      return (
+        <div>
+          <div className="calc-group"><label className="calc-label">Current Unit Price (S$)</label><input className="calc-input" type="number" value={price} onChange={e=>setPrice(e.target.value)} /></div>
+          <div className="calc-group"><label className="calc-label">Annual DPU — Distribution Per Unit (S$)</label><input className="calc-input" type="number" value={dpu} onChange={e=>setDpu(e.target.value)} /></div>
+          {y && !isNaN(y) && <div className="calc-result fade-up"><div className="big">{y}%</div><div className="small">Distribution Yield</div></div>}
         </div>
-      )}
-    </div>
-  );
-}
-
-function PBCalc() {
-  const [price, setPrice] = useState("1.20");
-  const [nav, setNav] = useState("1.50");
-  const pb = price && nav ? (parseFloat(price) / parseFloat(nav)).toFixed(3) : null;
-  const status = pb ? (parseFloat(pb) < 0.9 ? { label: "Trading at Discount 🟢", sub: "Potentially undervalued — buying properties for less than they're worth" } :
-                      parseFloat(pb) > 1.1 ? { label: "Trading at Premium 🔴", sub: "You're paying more than the underlying property value" } :
-                      { label: "Near Fair Value 🟡", sub: "Trading close to the intrinsic value of the properties" }) : null;
-  return (
-    <div>
-      <div className="calc-group">
-        <label className="calc-label">Current Unit Price (S$)</label>
-        <input className="calc-input" type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 1.20" />
-      </div>
-      <div className="calc-group">
-        <label className="calc-label">NAV Per Unit (S$) — from latest report</label>
-        <input className="calc-input" type="number" value={nav} onChange={e => setNav(e.target.value)} placeholder="e.g. 1.50" />
-      </div>
-      {pb && !isNaN(pb) && (
-        <div className="calc-result fade-up">
-          <div className="big">{pb}x</div>
-          <div className="small">{status.label}</div>
-          <div className="small" style={{marginTop: 6, opacity: 0.8}}>{status.sub}</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function IncomeCalc() {
-  const [invested, setInvested] = useState("10000");
-  const [yieldPct, setYieldPct] = useState("6");
-  const fmt = n => isNaN(n) ? "-" : "S$" + parseFloat(n).toLocaleString("en-SG", { minimumFractionDigits: 2 });
-
-  const annual = invested && yieldPct
-    ? (parseFloat(invested) * parseFloat(yieldPct) / 100)
-    : null;
-  const monthly  = annual ? annual / 12 : null;
-  const quarterly = annual ? annual / 4 : null;
-
-  return (
-    <div>
-      <div className="calc-group">
-        <label className="calc-label">Amount Invested (S$)</label>
-        <input className="calc-input" type="number" value={invested} onChange={e => setInvested(e.target.value)} placeholder="e.g. 10000" />
-      </div>
-      <div className="calc-group">
-        <label className="calc-label">REIT Distribution Yield (%)</label>
-        <input className="calc-input" type="number" value={yieldPct} onChange={e => setYieldPct(e.target.value)} placeholder="e.g. 6" step="0.1" />
-      </div>
-      {annual !== null && !isNaN(annual) && (
-        <div className="calc-result fade-up">
-          <div className="big">{fmt(annual)}</div>
-          <div className="small">Annual Passive Income</div>
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1.1rem", fontWeight: 700 }}>{fmt(quarterly)}</div>
-              <div style={{ fontSize: "0.78rem", opacity: 0.8, marginTop: 2 }}>Per Quarter</div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1.1rem", fontWeight: 700 }}>{fmt(monthly)}</div>
-              <div style={{ fontSize: "0.78rem", opacity: 0.8, marginTop: 2 }}>Monthly Equivalent</div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function QuizSection() {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [score, setScore] = useState(0);
-  const [done, setDone] = useState(false);
-  const [answers, setAnswers] = useState([]);
-
-  const q = QUIZ_DATA[current];
-
-  const pick = (i) => {
-    if (selected !== null) return;
-    setSelected(i);
-    const correct = i === q.ans;
-    if (correct) setScore(s => s + 1);
-    setAnswers(a => [...a, { correct }]);
-  };
-
-  const next = () => {
-    if (current + 1 >= QUIZ_DATA.length) {
-      setDone(true);
-    } else {
-      setCurrent(c => c + 1);
-      setSelected(null);
+      );
     }
-  };
 
-  const restart = () => {
-    setCurrent(0); setSelected(null); setScore(0); setDone(false); setAnswers([]);
-  };
-
-  if (done) {
-    const pct = Math.round((score / QUIZ_DATA.length) * 100);
-    const grade = pct >= 80 ? { label: "REIT Pro! 🎉", color: C.accent } : pct >= 60 ? { label: "Good Start! 📚", color: C.gold } : { label: "Keep Learning! 💪", color: C.muted };
-    return (
-      <div className="quiz-card fade-up" style={{ textAlign: "center" }}>
-        <div style={{ fontSize: "3.5rem", marginBottom: 12 }}>{pct >= 80 ? "🏆" : pct >= 60 ? "📈" : "📖"}</div>
-        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", marginBottom: 8, color: grade.color }}>{grade.label}</h3>
-        <p style={{ color: C.muted, marginBottom: 24 }}>You scored <strong style={{ color: C.text }}>{score} out of {QUIZ_DATA.length}</strong> ({pct}%)</p>
-        <div className="grid-3" style={{ marginBottom: 24 }}>
-          {QUIZ_DATA.map((_, i) => (
-            <div key={i} style={{ padding: "8px", borderRadius: "8px", background: answers[i]?.correct ? C.accentXL : C.dangerL, color: answers[i]?.correct ? C.accent : C.danger, fontSize: "0.82rem", fontWeight: 600 }}>
-              Q{i + 1}: {answers[i]?.correct ? "✓" : "✗"}
-            </div>
-          ))}
+    function PBCalc() {
+      const [price, setPrice] = useState("1.20");
+      const [nav, setNav] = useState("1.50");
+      const pb = price && nav ? (parseFloat(price)/parseFloat(nav)).toFixed(3) : null;
+      const st = pb ? (parseFloat(pb)<0.9 ? {label:"Trading at Discount 🟢",sub:"Potentially undervalued — buying properties for less than they're worth"} : parseFloat(pb)>1.1 ? {label:"Trading at Premium 🔴",sub:"You're paying more than the underlying property value"} : {label:"Near Fair Value 🟡",sub:"Trading close to the intrinsic value of the properties"}) : null;
+      return (
+        <div>
+          <div className="calc-group"><label className="calc-label">Current Unit Price (S$)</label><input className="calc-input" type="number" value={price} onChange={e=>setPrice(e.target.value)} /></div>
+          <div className="calc-group"><label className="calc-label">NAV Per Unit (S$) — from latest report</label><input className="calc-input" type="number" value={nav} onChange={e=>setNav(e.target.value)} /></div>
+          {pb && !isNaN(pb) && <div className="calc-result fade-up"><div className="big">{pb}x</div><div className="small">{st.label}</div><div className="small" style={{marginTop:6,opacity:0.8}}>{st.sub}</div></div>}
         </div>
-        <button className="btn-primary" onClick={restart}>Try Again</button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="quiz-card">
-      <div className="quiz-progress">
-        {QUIZ_DATA.map((_, i) => (
-          <div key={i} className={`quiz-dot ${i < current ? "done" : i === current ? "current" : ""}`} />
-        ))}
-      </div>
-      <p style={{ fontSize: "0.78rem", color: C.muted, marginBottom: 16, fontWeight: 600, letterSpacing: "0.5px" }}>QUESTION {current + 1} OF {QUIZ_DATA.length}</p>
-      <div className="quiz-q">{q.q}</div>
-      {q.opts.map((o, i) => {
-        let cls = "quiz-opt";
-        if (selected !== null) {
-          if (i === q.ans) cls += " correct";
-          else if (i === selected && selected !== q.ans) cls += " wrong";
-        }
-        return <button key={i} className={cls} onClick={() => pick(i)} disabled={selected !== null}>{o}</button>;
-      })}
-      {selected !== null && (
-        <div className="callout fade-up" style={{ marginTop: 16 }}>
-          <strong>{selected === q.ans ? "✅ Correct!" : "❌ Not quite."}</strong> {q.exp}
-        </div>
-      )}
-      {selected !== null && (
-        <button className="btn-primary" style={{ marginTop: 16 }} onClick={next}>
-          {current + 1 >= QUIZ_DATA.length ? "See Results" : "Next Question →"}
-        </button>
-      )}
-    </div>
-  );
-}
-
-function AskAI() {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const ask = async () => {
-    if (!question.trim()) return;
-    setLoading(true);
-    setAnswer("");
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: `You are a friendly, casual REIT educator helping a Singapore beginner named Soon Lian learn about S-REITs (Singapore Real Estate Investment Trusts). 
-Keep answers simple, jargon-free, and focused on Singapore. Use examples with SGD. Be warm and encouraging. 
-Max 200 words. Format with short paragraphs. No bullet lists, just plain friendly prose.`,
-          messages: [{ role: "user", content: question }]
-        })
-      });
-      const data = await res.json();
-      const text = data.content?.find(b => b.type === "text")?.text || "Sorry, couldn't get an answer. Try again!";
-      setAnswer(text);
-    } catch {
-      setAnswer("Oops! Something went wrong. Please try again in a moment.");
+      );
     }
-    setLoading(false);
-  };
 
-  const suggestions = [
-    "What's the difference between DPU and yield?",
-    "Is a P/NAV below 1 always a good buy?",
-    "How often do Singapore REITs pay distributions?",
-    "What happens if a REIT breaches the 50% gearing limit?",
-  ];
-
-  return (
-    <div>
-      <div className="card" style={{ marginBottom: 24 }}>
-        <h4 style={{ marginBottom: 12, color: C.accent }}>💬 Try asking...</h4>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {suggestions.map(s => (
-            <button key={s} onClick={() => setQuestion(s)} style={{
-              background: C.accentXL, border: `1px solid ${C.border}`, borderRadius: 20,
-              padding: "6px 14px", fontSize: "0.82rem", cursor: "pointer",
-              color: C.accent, fontWeight: 500, fontFamily: "'DM Sans', sans-serif"
-            }}>{s}</button>
-          ))}
-        </div>
-      </div>
-      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <textarea
-          value={question}
-          onChange={e => setQuestion(e.target.value)}
-          placeholder="Ask anything about Singapore REITs…"
-          style={{
-            flex: 1, padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`,
-            fontFamily: "'DM Sans', sans-serif", fontSize: "0.92rem", resize: "vertical",
-            minHeight: 70, outline: "none", background: C.bg
-          }}
-          onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), ask())}
-        />
-        <button className="btn-primary" style={{ alignSelf: "flex-end", padding: "12px 20px" }} onClick={ask} disabled={loading}>
-          {loading ? "..." : "Ask →"}
-        </button>
-      </div>
-      {(loading || answer) && (
-        <div className="ai-chat-box fade-up">
-          {loading ? <span className="ai-thinking">Thinking about your question…</span> : answer}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function LiveREITTable() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: "Return ONLY a valid JSON array. No markdown, no backticks, no preamble.",
-          messages: [{
-            role: "user",
-            content: `Give me a JSON array of 10 major Singapore REITs as of today (May 2026). 
-Each object must have: name (string), ticker (string), sector (string), price (number in SGD, realistic), 
-yield_pct (number, realistic TTM yield), p_nav (number, realistic price to NAV), 
-gearing_pct (number, realistic gearing %), trend (string: "up", "down", or "stable").
-Use realistic recent data. Include: CICT, PLife REIT, Ascendas REIT, Mapletree Pan Asia, 
-Keppel REIT, FCT, CDL Hospitality Trusts, Mapletree Logistics Trust, Suntec REIT, Parkway Life REIT.
-Return only the JSON array.`
-          }]
-        })
-      });
-      const json = await res.json();
-      const text = json.content?.find(b => b.type === "text")?.text || "[]";
-      const cleaned = text.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(cleaned);
-      setData(parsed);
-    } catch {
-      setData([]);
-    }
-    setLoading(false);
-    setLoaded(true);
-  };
-
-  const trendIcon = t => t === "up" ? "📈" : t === "down" ? "📉" : "➡️";
-  const pbColor = v => v < 0.9 ? C.accent : v > 1.1 ? C.danger : C.gold;
-  const yColor = v => v >= 6 ? C.accent : v < 4 ? C.danger : C.gold;
-
-  return (
-    <div>
-      <div className="callout" style={{ marginBottom: 20 }}>
-        <strong>📊 Indicative Data</strong> — This table is AI-generated with approximate recent figures for educational purposes. Always verify on SGX or the REIT's investor relations page before investing.
-      </div>
-      {!loaded && (
-        <div style={{ textAlign: "center", padding: "30px 0" }}>
-          <button className="btn-primary" onClick={fetchData} disabled={loading}>
-            {loading ? "Loading REIT Data…" : "📊 Load REIT Data Table"}
-          </button>
-        </div>
-      )}
-      {loaded && data && data.length > 0 && (
-        <div className="table-wrap fade-up">
-          <table>
-            <thead>
-              <tr>
-                <th>REIT</th><th>Ticker</th><th>Sector</th><th>Price (S$)</th>
-                <th>Yield (%)</th><th>P/NAV</th><th>Gearing (%)</th><th>Trend</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((r, i) => (
-                <tr key={i}>
-                  <td><strong>{r.name}</strong></td>
-                  <td><span className="badge badge-blue">{r.ticker}</span></td>
-                  <td>{r.sector}</td>
-                  <td>S${parseFloat(r.price).toFixed(2)}</td>
-                  <td style={{ color: yColor(r.yield_pct), fontWeight: 600 }}>{parseFloat(r.yield_pct).toFixed(1)}%</td>
-                  <td style={{ color: pbColor(r.p_nav), fontWeight: 600 }}>{parseFloat(r.p_nav).toFixed(2)}x</td>
-                  <td style={{ color: r.gearing_pct > 45 ? C.danger : C.text }}>{parseFloat(r.gearing_pct).toFixed(1)}%</td>
-                  <td>{trendIcon(r.trend)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      {loaded && data && data.length === 0 && (
-        <div className="callout callout-warn">Could not load data. Please try again.</div>
-      )}
-    </div>
-  );
-}
-
-// ── PAGES ─────────────────────────────────────────────────────────────────────
-
-function HomePage({ goTo }) {
-  return (
-    <div>
-      <div className="hero">
-        <div className="hero-pill">🇸🇬 Singapore REITs · A Beginner's Guide</div>
-        <h1>Hey Soon Lian,<br />let's talk REITs 👋</h1>
-        <p>Your personal guide to understanding Singapore REITs — what they are, how to pick good ones, and how they could generate passive income for you.</p>
-        <button className="hero-cta" onClick={() => goTo("What is a REIT?")}>Start Learning →</button>
-      </div>
-
-      <div className="section">
-        <h2 className="section-title">What's Inside</h2>
-        <p className="section-sub">Eight topics designed specifically for you — no finance degree required.</p>
-        <div className="grid-3">
-          {[
-            { icon: "🏢", title: "What is a REIT?", page: "What is a REIT?", desc: "The basics, how it works, and why Singapore REITs are special" },
-            { icon: "🗂️", title: "Types of REITs", page: "Types of REITs", desc: "Retail, industrial, healthcare — each one explained simply" },
-            { icon: "⚖️", title: "REITs vs Others", page: "REITs vs Others", desc: "How does a REIT compare to property, stocks, and bonds?" },
-            { icon: "🔍", title: "How to Analyse", page: "How to Analyse", desc: "8 simple steps to evaluate any S-REIT like a pro" },
-            { icon: "⚠️", title: "Pitfalls to Avoid", page: "Pitfalls", desc: "Common mistakes that trip up beginner REIT investors" },
-            { icon: "🧮", title: "Calculators", page: "Calculators", desc: "Yield, P/NAV, and passive income calculators — try them out!" },
-            { icon: "🧠", title: "Test Yourself", page: "Quiz", desc: "A 10-question quiz to check what you've learned" },
-            { icon: "🤖", title: "Ask AI", page: "Ask AI", desc: "Have a REIT question? Get a plain-English answer instantly" },
-          ].map(item => (
-            <div key={item.title} className="card" style={{ cursor: "pointer" }} onClick={() => goTo(item.page)}>
-              <div className="icon-box">{item.icon}</div>
-              <h4 style={{ marginBottom: 8 }}>{item.title}</h4>
-              <p style={{ fontSize: "0.85rem", color: C.muted }}>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop: 48 }}>
-          <h2 className="section-title">Singapore REITs at a Glance</h2>
-          <p className="section-sub">Key facts about the S-REIT market today.</p>
-          <div className="grid-3">
-            {[
-              { num: "40+", label: "REITs listed on SGX" },
-              { num: "~S$100B", label: "Total market cap" },
-              { num: "5–7%", label: "Typical distribution yield" },
-              { num: "90%", label: "Min. income to be distributed" },
-              { num: "50%", label: "Max gearing (MAS rule)" },
-              { num: "#3", label: "REIT market in Asia Pacific" },
-            ].map(m => (
-              <div key={m.label} className="metric-card">
-                <div className="num">{m.num}</div>
-                <div className="label">{m.label}</div>
+    function IncomeCalc() {
+      const [invested, setInvested] = useState("10000");
+      const [yp, setYp] = useState("6");
+      const fmt = n => isNaN(n) ? "-" : "S$" + parseFloat(n).toLocaleString("en-SG",{minimumFractionDigits:2});
+      const annual = invested && yp ? parseFloat(invested)*parseFloat(yp)/100 : null;
+      const monthly = annual ? annual/12 : null;
+      const quarterly = annual ? annual/4 : null;
+      return (
+        <div>
+          <div className="calc-group"><label className="calc-label">Amount Invested (S$)</label><input className="calc-input" type="number" value={invested} onChange={e=>setInvested(e.target.value)} /></div>
+          <div className="calc-group"><label className="calc-label">REIT Distribution Yield (%)</label><input className="calc-input" type="number" value={yp} step="0.1" onChange={e=>setYp(e.target.value)} /></div>
+          {annual!==null && !isNaN(annual) && (
+            <div className="calc-result fade-up">
+              <div className="big">{fmt(annual)}</div>
+              <div className="small">Annual Passive Income</div>
+              <div style={{marginTop:14,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.3)"}}>
+                <div style={{textAlign:"center"}}><div style={{fontSize:"1.1rem",fontWeight:700}}>{fmt(quarterly)}</div><div style={{fontSize:"0.78rem",opacity:0.8,marginTop:2}}>Per Quarter</div></div>
+                <div style={{textAlign:"center"}}><div style={{fontSize:"1.1rem",fontWeight:700}}>{fmt(monthly)}</div><div style={{fontSize:"0.78rem",opacity:0.8,marginTop:2}}>Monthly Equivalent</div></div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function WhatIsREIT() {
-  return (
-    <div className="section">
-      <h2 className="section-title">What is a REIT?</h2>
-      <p className="section-sub">Let's start from the very beginning — no jargon, promise.</p>
-
-      <div className="callout">
-        <strong>Simple definition:</strong> A REIT (Real Estate Investment Trust) is like a shared ownership scheme for properties. You buy units on the stock market, own a slice of real buildings like malls and offices, and collect rent as regular dividends — without the hassle of being a landlord.
-      </div>
-
-      <div className="grid-2" style={{ margin: "32px 0" }}>
-        <div className="card">
-          <div className="icon-box">🏬</div>
-          <h4 style={{ marginBottom: 10 }}>The Analogy That Makes It Click</h4>
-          <p style={{ fontSize: "0.9rem", color: C.muted }}>Imagine 1,000 people pooling their money to buy Orchard Road's Paragon Mall. Each person owns a "unit" and gets a share of the rental income every quarter. That's essentially what a REIT is — except it's listed on the SGX, so you can buy and sell units as easily as stocks.</p>
-        </div>
-        <div className="card">
-          <div className="icon-box">💸</div>
-          <h4 style={{ marginBottom: 10 }}>Why REITs Pay High Dividends</h4>
-          <p style={{ fontSize: "0.9rem", color: C.muted }}>Singapore law requires REITs to distribute <strong>at least 90% of their income</strong> to unit holders to enjoy tax transparency. That means most of what the properties earn — from tenants like Cold Storage, DBS, or Grab — flows directly to investors like you.</p>
-        </div>
-      </div>
-
-      <h3 style={{ marginBottom: 16, color: C.accent }}>🇸🇬 Why Singapore REITs are Special</h3>
-      <div className="grid-2" style={{ marginBottom: 32 }}>
-        {[
-          { icon: "🏛️", title: "Strong Regulation (MAS)", desc: "MAS regulates S-REITs strictly. Gearing is capped at 50%, protecting you from over-leveraged REITs that could go bust." },
-          { icon: "🏷️", title: "Tax-Free Dividends", desc: "Individual investors pay zero tax on REIT distributions in Singapore. That 5.5% yield is what you actually get — unlike rental income from a condo." },
-          { icon: "🌏", title: "World-Class Assets", desc: "You can co-own Raffles City, Marina Bay Financial Centre, or Gleneagles Hospital for as little as S$200. Try buying those outright!" },
-          { icon: "📈", title: "Started in 2002", desc: "Singapore's first REIT (CapitaMall Trust) launched in 2002. Since then, the market has grown to 40+ REITs worth ~S$100 billion." },
-        ].map(i => (
-          <div key={i.title} className="card">
-            <span style={{ fontSize: "1.8rem" }}>{i.icon}</span>
-            <h4 style={{ margin: "10px 0 8px" }}>{i.title}</h4>
-            <p style={{ fontSize: "0.88rem", color: C.muted }}>{i.desc}</p>
-          </div>
-        ))}
-      </div>
-
-      <h3 style={{ marginBottom: 16, color: C.accent }}>📐 How a REIT is Structured</h3>
-      <div className="card">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {[
-            ["You (Unit Holder)", "Buy units on SGX → receive quarterly dividends"],
-            ["REIT Manager", "Professional team that manages strategy, acquisitions & operations"],
-            ["Trustee", "Independent party that holds the assets on your behalf, protecting your interests"],
-            ["Properties", "The actual malls, offices, warehouses, hotels — where rent comes from"],
-          ].map(([a, b]) => (
-            <div key={a} style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              <div style={{ background: C.accent, color: "white", borderRadius: 8, padding: "8px 12px", fontSize: "0.82rem", fontWeight: 600, minWidth: 140, textAlign: "center" }}>{a}</div>
-              <div style={{ fontSize: "0.88rem", color: C.muted, flex: 1 }}>→ {b}</div>
             </div>
-          ))}
+          )}
         </div>
-      </div>
-
-      <div className="callout" style={{ marginTop: 32 }}>
-        <strong>💡 Real example:</strong> When you buy 5,000 units of CapitaLand Integrated Commercial Trust (CICT) at around S$2 each (S$10,000 investment), you effectively own a tiny slice of Raffles City Shopping Centre, Plaza Singapura, Junction 8, and many more malls. The rents paid by tenants like Uniqlo, NTUC FairPrice, and Starbucks flow to you as quarterly distributions.
-      </div>
-    </div>
-  );
-}
-
-function TypesPage() {
-  const [active, setActive] = useState(0);
-  const t = REIT_TYPES[active];
-  return (
-    <div className="section">
-      <h2 className="section-title">Types of Singapore REITs</h2>
-      <p className="section-sub">Singapore has 5 main REIT sectors. Each one behaves differently — here's what you need to know.</p>
-      <div className="tabs">
-        {REIT_TYPES.map((r, i) => (
-          <button key={r.name} className={`tab ${active === i ? "active" : ""}`} onClick={() => setActive(i)}>
-            {r.icon} {r.name.replace(" REITs", "")}
-          </button>
-        ))}
-      </div>
-      <div className="card fade-up" key={active}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-          <span style={{ fontSize: "2.5rem" }}>{t.icon}</span>
-          <div>
-            <h3 style={{ color: C.accent }}>{t.name}</h3>
-            <span className={`badge ${t.badge}`}>{t.name.replace(" REITs", "")} Sector</span>
-          </div>
-        </div>
-        <p style={{ marginBottom: 20, color: C.muted }}>{t.description}</p>
-        <div style={{ marginBottom: 16 }}>
-          <strong style={{ fontSize: "0.85rem", color: C.accent }}>🏦 Singapore Examples</strong>
-          <p style={{ fontSize: "0.88rem", marginTop: 4 }}>{t.examples}</p>
-        </div>
-        <div className="grid-2">
-          <div>
-            <p style={{ fontWeight: 700, color: C.accent, marginBottom: 8, fontSize: "0.85rem" }}>✅ Strengths</p>
-            {t.pros.map(p => <p key={p} style={{ fontSize: "0.88rem", marginBottom: 6, color: C.muted }}>• {p}</p>)}
-          </div>
-          <div>
-            <p style={{ fontWeight: 700, color: C.danger, marginBottom: 8, fontSize: "0.85rem" }}>⚠️ Watch Out For</p>
-            {t.cons.map(c => <p key={c} style={{ fontSize: "0.88rem", marginBottom: 6, color: C.muted }}>• {c}</p>)}
-          </div>
-        </div>
-      </div>
-      <div style={{ marginTop: 40 }}>
-        <h3 style={{ marginBottom: 20, color: C.accent }}>📊 Sector Snapshot</h3>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Sector</th><th>Typical Yield</th><th>Stability</th><th>Growth Potential</th><th>Best For</th></tr></thead>
-            <tbody>
-              {[
-                ["🛍️ Retail", "4–6%", "High", "Medium", "Steady income seekers"],
-                ["🏢 Office", "4–5%", "Medium", "Medium", "Singapore business hub believers"],
-                ["🏭 Industrial", "5–7%", "Medium-High", "High (logistics)", "E-commerce optimists"],
-                ["🏨 Hospitality", "4–8%", "Low", "High (in good times)", "Higher risk/reward"],
-                ["🏥 Healthcare", "4–5%", "Very High", "Low-Medium", "Ultra-conservative investors"],
-              ].map(r => <tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td><td style={{ color: C.muted }}>{r[4]}</td></tr>)}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ComparisonPage() {
-  return (
-    <div className="section">
-      <h2 className="section-title">REITs vs Other Investments</h2>
-      <p className="section-sub">How does investing in S-REITs stack up against other popular options in Singapore?</p>
-      <div className="callout" style={{ marginBottom: 32 }}>
-        <strong>Quick take:</strong> REITs sit in a sweet spot — higher yield than CPF and bonds, lower hassle than physical property, and more consistent income than most stocks. But no investment is perfect. Here's the full picture.
-      </div>
-      <div className="table-wrap" style={{ marginBottom: 40 }}>
-        <table className="compare-table">
-          <thead>
-            <tr>
-              <th style={{ textAlign: "left" }}>Feature</th>
-              <th style={{ background: C.accent }}>🏢 REITs</th>
-              <th>🏠 Property</th>
-              <th>📈 Stocks</th>
-              <th>📄 Bonds</th>
-              <th>🏦 CPF</th>
-            </tr>
-          </thead>
-          <tbody>
-            {COMPARE_DATA.map((r, i) => (
-              <tr key={r.feature}>
-                <td>{r.feature}</td>
-                <td className="highlight" style={{ fontWeight: 600, color: C.accent }}>{r.reit}</td>
-                <td>{r.property}</td>
-                <td>{r.stocks}</td>
-                <td>{r.bonds}</td>
-                <td>{r.cpf}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="grid-2">
-        <div className="card">
-          <h4 style={{ marginBottom: 12, color: C.accent }}>🏠 REITs vs Physical Property</h4>
-          <p style={{ fontSize: "0.88rem", color: C.muted }}>Buying a condo gives you a single asset, one tenant, and all the landlord headaches. A REIT gives you 20–100 properties, managed by professionals, for S$200. The rental yield on Singapore residential properties has been squeezed to 2–4%. S-REITs typically yield 5–7% with zero stamp duty and zero tenancy drama.</p>
-        </div>
-        <div className="card">
-          <h4 style={{ marginBottom: 12, color: C.accent }}>📈 REITs vs High-Dividend Stocks</h4>
-          <p style={{ fontSize: "0.88rem", color: C.muted }}>DBS and OCBC yield around 5–6% but they can cut dividends when profits fall. REITs are legally required to distribute 90%+ of income, making their payouts more predictable. The trade-off? REITs can't grow earnings as explosively as a tech company.</p>
-        </div>
-        <div className="card">
-          <h4 style={{ marginBottom: 12, color: C.accent }}>📄 REITs vs Singapore Savings Bonds</h4>
-          <p style={{ fontSize: "0.88rem", color: C.muted }}>SSBs are ultra-safe (government-backed) but currently yield 2.5–3.5%. REITs yield more (5–7%) but carry more risk. A good strategy: use SSBs as your emergency fund, and REITs for the growth/income portion of your portfolio.</p>
-        </div>
-        <div className="card">
-          <h4 style={{ marginBottom: 12, color: C.accent }}>🏦 REITs vs CPF</h4>
-          <p style={{ fontSize: "0.88rem", color: C.muted }}>CPF OA earns 2.5% and SA earns 4% — guaranteed. REITs yield more but unit prices fluctuate. You can actually use your CPF OA to invest in REITs through the CPFIS scheme, letting you potentially earn more while keeping liquidity.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AnalysisPage() {
-  const [activeStep, setActiveStep] = useState(null);
-  return (
-    <div className="section">
-      <h2 className="section-title">How to Analyse a REIT</h2>
-      <p className="section-sub">8 practical steps to evaluate any Singapore REIT — bookmark this page!</p>
-      <div className="callout" style={{ marginBottom: 32 }}>
-        <strong>Where to find the numbers?</strong> Every SGX-listed REIT publishes quarterly/half-yearly financial statements. You can find them on the REIT's investor relations website, SGX.com, or Moomoo itself.
-      </div>
-      <div className="steps">
-        {ANALYSIS_STEPS.map(s => (
-          <div key={s.num} className="card" style={{ marginBottom: 16, cursor: "pointer", borderLeft: `4px solid ${activeStep === s.num ? C.accent : C.border}` }}
-               onClick={() => setActiveStep(activeStep === s.num ? null : s.num)}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div className="step-num">{s.num}</div>
-              <h4 style={{ flex: 1 }}>{s.title}</h4>
-              <span style={{ color: C.muted, fontSize: "1.2rem" }}>{activeStep === s.num ? "▲" : "▼"}</span>
-            </div>
-            {activeStep === s.num && (
-              <p style={{ marginTop: 14, fontSize: "0.9rem", color: C.muted, paddingLeft: 48 }}>{s.desc}</p>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div style={{ marginTop: 48 }}>
-        <h3 style={{ marginBottom: 20, color: C.accent }}>📊 Quick Reference: What the Numbers Mean</h3>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Metric</th><th>What It Is</th><th>🟢 Healthy</th><th>🔴 Caution</th></tr></thead>
-            <tbody>
-              {[
-                ["Distribution Yield", "Annual DPU ÷ Price", "4–7%", ">9% (check why)"],
-                ["P/NAV", "Price ÷ NAV per unit", "0.8–1.1x", ">1.3x (pricey)"],
-                ["Gearing", "Debt ÷ Total Assets", "<40%", ">45%"],
-                ["Interest Coverage", "NPI ÷ Interest Expense", ">3x", "<2x"],
-                ["Occupancy Rate", "% of space rented out", ">93%", "<85%"],
-                ["DPU Trend (5yr)", "Is income per unit growing?", "Growing", "Declining"],
-              ].map(r => <tr key={r[0]}><td><strong>{r[0]}</strong></td><td style={{color:C.muted}}>{r[1]}</td><td style={{color:C.accent,fontWeight:600}}>{r[2]}</td><td style={{color:C.danger,fontWeight:600}}>{r[3]}</td></tr>)}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 40 }}>
-        <h3 style={{ marginBottom: 20, color: C.accent }}>📋 Live REIT Data (Indicative)</h3>
-        <LiveREITTable />
-      </div>
-    </div>
-  );
-}
-
-function PitfallsPage() {
-  return (
-    <div className="section">
-      <h2 className="section-title">Pitfalls to Avoid</h2>
-      <p className="section-sub">Beginner mistakes that even experienced investors make. Learn from others' losses!</p>
-      <div className="callout callout-warn" style={{ marginBottom: 32 }}>
-        <strong>⚠️ Important:</strong> REITs are great investments — but they're not risk-free. These pitfalls have cost real investors real money. Read carefully.
-      </div>
-      <div className="grid-2">
-        {PITFALLS.map(p => (
-          <div key={p.title} className="pitfall-card">
-            <h4>⚠️ {p.title}</h4>
-            <p style={{ fontSize: "0.88rem" }}>{p.desc}</p>
-          </div>
-        ))}
-      </div>
-      <div className="callout" style={{ marginTop: 40 }}>
-        <strong>💡 The Golden Rule:</strong> Never buy a REIT just because the yield looks high. Always ask: Is the DPU sustainable? Is gearing manageable? Does the sponsor have a good track record? A REIT yielding 3.5% that grows consistently is worth far more than one yielding 9% that's about to cut its distribution.
-      </div>
-      <div style={{ marginTop: 40 }}>
-        <h3 style={{ color: C.accent, marginBottom: 20 }}>✅ The REIT Health Checklist</h3>
-        <div className="card">
-          {[
-            "Gearing below 40%",
-            "Occupancy rate above 90%",
-            "Interest coverage above 3x",
-            "DPU has been stable or growing over 3–5 years",
-            "Debt maturities are spread out (not all due at once)",
-            "Sponsor is reputable (CapitaLand, Mapletree, Frasers)",
-            "No major tenant represents >20% of revenue",
-            "Foreign income is hedged (for cross-border REITs)",
-          ].map((item, i) => (
-            <label key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < 7 ? `1px solid ${C.border}` : "none", cursor: "pointer" }}>
-              <input type="checkbox" style={{ width: 18, height: 18, accentColor: C.accent }} />
-              <span style={{ fontSize: "0.9rem" }}>{item}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CalculatorsPage() {
-  const [tab, setTab] = useState("yield");
-  return (
-    <div className="section">
-      <h2 className="section-title">REIT Calculators</h2>
-      <p className="section-sub">Three practical tools to help you evaluate any Singapore REIT quickly.</p>
-      <div className="tabs">
-        {[
-          { id: "yield", label: "📊 Yield Calculator" },
-          { id: "pb", label: "📐 P/NAV Calculator" },
-          { id: "income", label: "💰 Passive Income" },
-        ].map(t => (
-          <button key={t.id} className={`tab ${tab === t.id ? "active" : ""}`} onClick={() => setTab(t.id)}>{t.label}</button>
-        ))}
-      </div>
-      {tab === "yield" && (
-        <div className="card">
-          <h4 style={{ marginBottom: 6 }}>Distribution Yield Calculator</h4>
-          <p style={{ fontSize: "0.85rem", color: C.muted, marginBottom: 20 }}>Tells you how much income you're earning per dollar invested. Compare this to CPF, bonds, or other REITs.</p>
-          <YieldCalc />
-          <div className="callout" style={{ marginTop: 20 }}>
-            <strong>What's a good yield?</strong> For S-REITs, 4–7% is typical. Below 4% might mean the REIT is overpriced. Above 8% — be suspicious, not excited. The market might be pricing in a distribution cut.
-          </div>
-        </div>
-      )}
-      {tab === "pb" && (
-        <div className="card">
-          <h4 style={{ marginBottom: 6 }}>Price-to-NAV Calculator</h4>
-          <p style={{ fontSize: "0.85rem", color: C.muted, marginBottom: 20 }}>NAV (Net Asset Value) = the book value of all the REIT's properties minus its debts, divided by the number of units. This tells you if you're getting a bargain.</p>
-          <PBCalc />
-          <div className="callout" style={{ marginTop: 20 }}>
-            <strong>Wesley's tip:</strong> Historical P/NAV is powerful. If a REIT historically trades at 1.0x but is currently at 0.75x during a market panic, that could be a buying opportunity — assuming the fundamentals are still solid.
-          </div>
-        </div>
-      )}
-      {tab === "income" && (
-        <div className="card">
-          <h4 style={{ marginBottom: 6 }}>Passive Income Calculator</h4>
-          <p style={{ fontSize: "0.85rem", color: C.muted, marginBottom: 20 }}>How much passive income could your investment generate? Enter the amount you plan to invest and the REIT's distribution yield. Most S-REITs pay out quarterly.</p>
-          <IncomeCalc />
-          <div className="callout" style={{ marginTop: 20 }}>
-            <strong>Fun math:</strong> To generate S$1,000/month (S$12,000/year) in passive income from a REIT yielding 6%, you'd need to invest approximately S$200,000. At 5%, you'd need S$240,000.
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function QuizPage() {
-  return (
-    <div className="section">
-      <h2 className="section-title">Test Your REIT Knowledge</h2>
-      <p className="section-sub">10 questions covering everything you've learned. How well do you know your REITs, Soon Lian?</p>
-      <QuizSection />
-    </div>
-  );
-}
-
-function AskAIPage() {
-  return (
-    <div className="section">
-      <h2 className="section-title">Ask AI Anything</h2>
-      <p className="section-sub">Got a REIT question that wasn't covered? Just ask — plain English answers, no jargon.</p>
-      <AskAI />
-    </div>
-  );
-}
-
-// ── APP ───────────────────────────────────────────────────────────────────────
-
-export default function App() {
-  const [page, setPage] = useState("Home");
-
-  const goTo = (p) => {
-    setPage(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const renderPage = () => {
-    switch (page) {
-      case "Home":              return <HomePage goTo={goTo} />;
-      case "What is a REIT?":   return <WhatIsREIT />;
-      case "Types of REITs":    return <TypesPage />;
-      case "REITs vs Others":   return <ComparisonPage />;
-      case "How to Analyse":    return <AnalysisPage />;
-      case "Pitfalls":          return <PitfallsPage />;
-      case "Calculators":       return <CalculatorsPage />;
-      case "Quiz":              return <QuizPage />;
-      case "Ask AI":            return <AskAIPage />;
-      default:                  return <HomePage goTo={goTo} />;
+      );
     }
-  };
 
-  return (
-    <>
-      <style>{styles}</style>
-      <nav className="nav">
-        <div className="nav-brand" onClick={() => goTo("Home")} style={{ cursor: "pointer" }}>
-          <span>🏢</span> Soon Lian's REIT Guide
+    // ── QUIZ ──
+    function QuizSection() {
+      const [current, setCurrent] = useState(0);
+      const [selected, setSelected] = useState(null);
+      const [score, setScore] = useState(0);
+      const [done, setDone] = useState(false);
+      const [answers, setAnswers] = useState([]);
+      const q = QUIZ_DATA[current];
+      const pick = i => {
+        if (selected!==null) return;
+        setSelected(i);
+        if (i===q.ans) setScore(s=>s+1);
+        setAnswers(a=>[...a,{correct:i===q.ans}]);
+      };
+      const next = () => { if (current+1>=QUIZ_DATA.length) setDone(true); else { setCurrent(c=>c+1); setSelected(null); } };
+      const restart = () => { setCurrent(0); setSelected(null); setScore(0); setDone(false); setAnswers([]); };
+      if (done) {
+        const pct = Math.round((score/QUIZ_DATA.length)*100);
+        const grade = pct>=80?{label:"REIT Pro! 🎉",color:C.accent}:pct>=60?{label:"Good Start! 📚",color:C.gold}:{label:"Keep Learning! 💪",color:C.muted};
+        return (
+          <div className="quiz-card fade-up" style={{textAlign:"center"}}>
+            <div style={{fontSize:"3.5rem",marginBottom:12}}>{pct>=80?"🏆":pct>=60?"📈":"📖"}</div>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.8rem",marginBottom:8,color:grade.color}}>{grade.label}</h3>
+            <p style={{color:C.muted,marginBottom:24}}>You scored <strong style={{color:C.text}}>{score} out of {QUIZ_DATA.length}</strong> ({pct}%)</p>
+            <div className="grid-3" style={{marginBottom:24}}>
+              {QUIZ_DATA.map((_,i)=><div key={i} style={{padding:"8px",borderRadius:"8px",background:answers[i]?.correct?C.accentXL:C.dangerL,color:answers[i]?.correct?C.accent:C.danger,fontSize:"0.82rem",fontWeight:600}}>Q{i+1}: {answers[i]?.correct?"✓":"✗"}</div>)}
+            </div>
+            <button className="btn-primary" onClick={restart}>Try Again</button>
+          </div>
+        );
+      }
+      return (
+        <div className="quiz-card">
+          <div className="quiz-progress">{QUIZ_DATA.map((_,i)=><div key={i} className={`quiz-dot ${i<current?"done":i===current?"current":""}`}/>)}</div>
+          <p style={{fontSize:"0.78rem",color:C.muted,marginBottom:16,fontWeight:600,letterSpacing:"0.5px"}}>QUESTION {current+1} OF {QUIZ_DATA.length}</p>
+          <div className="quiz-q">{q.q}</div>
+          {q.opts.map((o,i)=>{
+            let cls="quiz-opt";
+            if (selected!==null) { if (i===q.ans) cls+=" correct"; else if (i===selected&&selected!==q.ans) cls+=" wrong"; }
+            return <button key={i} className={cls} onClick={()=>pick(i)} disabled={selected!==null}>{o}</button>;
+          })}
+          {selected!==null && <div className="callout fade-up" style={{marginTop:16}}><strong>{selected===q.ans?"✅ Correct!":"❌ Not quite."}</strong> {q.exp}</div>}
+          {selected!==null && <button className="btn-primary" style={{marginTop:16}} onClick={next}>{current+1>=QUIZ_DATA.length?"See Results":"Next Question →"}</button>}
         </div>
-        <div className="nav-links">
-          {PAGES.filter(p => p !== "Home").map(p => (
-            <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => goTo(p)}>
-              {p === "What is a REIT?" ? "Basics" :
-               p === "Types of REITs" ? "Types" :
-               p === "REITs vs Others" ? "vs Others" :
-               p === "How to Analyse" ? "Analysis" :
-               p === "Pitfalls" ? "⚠️ Pitfalls" :
-               p === "Calculators" ? "🧮 Calc" :
-               p === "Quiz" ? "🧠 Quiz" :
-               p === "Ask AI" ? "🤖 Ask AI" : p}
-            </button>
+      );
+    }
+
+    // ── ASK AI ──
+    function AskAI() {
+      const [question, setQuestion] = useState("");
+      const [answer, setAnswer] = useState("");
+      const [loading, setLoading] = useState(false);
+      const ask = async () => {
+        if (!question.trim()) return;
+        setLoading(true); setAnswer("");
+        try {
+          const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000,
+              system:"You are a friendly, casual REIT educator helping a Singapore beginner named Soon Lian learn about S-REITs. Keep answers simple, jargon-free, Singapore-focused. Use SGD examples. Be warm and encouraging. Max 200 words. Short paragraphs only.",
+              messages:[{role:"user",content:question}] })
+          });
+          const data = await res.json();
+          setAnswer(data.content?.find(b=>b.type==="text")?.text || "Sorry, couldn't get an answer. Try again!");
+        } catch { setAnswer("Oops! Something went wrong. Please try again in a moment."); }
+        setLoading(false);
+      };
+      const suggestions = ["What's the difference between DPU and yield?","Is a P/NAV below 1 always a good buy?","How often do Singapore REITs pay distributions?","What happens if a REIT breaches the 50% gearing limit?"];
+      return (
+        <div>
+          <div className="card" style={{marginBottom:24}}>
+            <h4 style={{marginBottom:12,color:C.accent}}>💬 Try asking...</h4>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {suggestions.map(s=><button key={s} onClick={()=>setQuestion(s)} style={{background:C.accentXL,border:`1px solid ${C.border}`,borderRadius:20,padding:"6px 14px",fontSize:"0.82rem",cursor:"pointer",color:C.accent,fontWeight:500,fontFamily:"'DM Sans',sans-serif"}}>{s}</button>)}
+            </div>
+          </div>
+          <div style={{display:"flex",gap:10,marginBottom:20}}>
+            <textarea value={question} onChange={e=>setQuestion(e.target.value)} placeholder="Ask anything about Singapore REITs…"
+              style={{flex:1,padding:"12px 16px",borderRadius:8,border:`1.5px solid ${C.border}`,fontFamily:"'DM Sans',sans-serif",fontSize:"0.92rem",resize:"vertical",minHeight:70,outline:"none",background:C.bg}}
+              onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),ask())} />
+            <button className="btn-primary" style={{alignSelf:"flex-end",padding:"12px 20px"}} onClick={ask} disabled={loading}>{loading?"...":"Ask →"}</button>
+          </div>
+          {(loading||answer) && <div className="ai-chat-box fade-up">{loading?<span className="ai-thinking">Thinking about your question…</span>:answer}</div>}
+        </div>
+      );
+    }
+
+    // ── LIVE REIT TABLE ──
+    function LiveREITTable() {
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [loaded, setLoaded] = useState(false);
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000,
+              system:"Return ONLY a valid JSON array. No markdown, no backticks, no preamble.",
+              messages:[{role:"user",content:`Give me a JSON array of 10 major Singapore REITs as of May 2026. Each object: name, ticker, sector, price (SGD number), yield_pct (number), p_nav (number), gearing_pct (number), trend ("up","down","stable"). Include: CICT, Ascendas REIT, Mapletree Pan Asia, Keppel REIT, FCT, CDL Hospitality Trusts, Mapletree Logistics Trust, Suntec REIT, Parkway Life REIT, Frasers Logistics Trust. Return only the JSON array.`}] })
+          });
+          const json = await res.json();
+          const text = json.content?.find(b=>b.type==="text")?.text||"[]";
+          setData(JSON.parse(text.replace(/```json|```/g,"").trim()));
+        } catch { setData([]); }
+        setLoading(false); setLoaded(true);
+      };
+      const ti = t=>t==="up"?"📈":t==="down"?"📉":"➡️";
+      const pc = v=>v<0.9?C.accent:v>1.1?C.danger:C.gold;
+      const yc = v=>v>=6?C.accent:v<4?C.danger:C.gold;
+      return (
+        <div>
+          <div className="callout" style={{marginBottom:20}}><strong>📊 Indicative Data</strong> — AI-generated approximate figures for education only. Always verify on SGX or the REIT's investor relations page before investing.</div>
+          {!loaded && <div style={{textAlign:"center",padding:"30px 0"}}><button className="btn-primary" onClick={fetchData} disabled={loading}>{loading?"Loading REIT Data…":"📊 Load REIT Data Table"}</button></div>}
+          {loaded && data && data.length>0 && (
+            <div className="table-wrap fade-up">
+              <table><thead><tr><th>REIT</th><th>Ticker</th><th>Sector</th><th>Price (S$)</th><th>Yield (%)</th><th>P/NAV</th><th>Gearing (%)</th><th>Trend</th></tr></thead>
+              <tbody>{data.map((r,i)=><tr key={i}><td><strong>{r.name}</strong></td><td><span className="badge badge-blue">{r.ticker}</span></td><td>{r.sector}</td><td>S${parseFloat(r.price).toFixed(2)}</td><td style={{color:yc(r.yield_pct),fontWeight:600}}>{parseFloat(r.yield_pct).toFixed(1)}%</td><td style={{color:pc(r.p_nav),fontWeight:600}}>{parseFloat(r.p_nav).toFixed(2)}x</td><td style={{color:r.gearing_pct>45?C.danger:C.text}}>{parseFloat(r.gearing_pct).toFixed(1)}%</td><td>{ti(r.trend)}</td></tr>)}</tbody>
+              </table>
+            </div>
+          )}
+          {loaded && data && data.length===0 && <div className="callout callout-warn">Could not load data. Please try again.</div>}
+        </div>
+      );
+    }
+
+    // ── PAGE COMPONENTS ──
+    function HomePage({goTo}) {
+      return (
+        <div>
+          <div className="hero">
+            <div className="hero-pill">🇸🇬 Singapore REITs · A Beginner's Guide</div>
+            <h1>Hey Soon Lian,<br/>let's talk REITs 👋</h1>
+            <p>Your personal guide to understanding Singapore REITs — what they are, how to pick good ones, and how they could generate passive income for you.</p>
+            <button className="hero-cta" onClick={()=>goTo("What is a REIT?")}>Start Learning →</button>
+          </div>
+          <div className="section">
+            <h2 className="section-title">What's Inside</h2>
+            <p className="section-sub">Eight topics designed specifically for you — no finance degree required.</p>
+            <div className="grid-3">
+              {[
+                {icon:"🏢",title:"What is a REIT?",page:"What is a REIT?",desc:"The basics, how it works, and why Singapore REITs are special"},
+                {icon:"🗂️",title:"Types of REITs",page:"Types of REITs",desc:"Retail, industrial, healthcare — each one explained simply"},
+                {icon:"⚖️",title:"REITs vs Others",page:"REITs vs Others",desc:"How does a REIT compare to property, stocks, and bonds?"},
+                {icon:"🔍",title:"How to Analyse",page:"How to Analyse",desc:"8 simple steps to evaluate any S-REIT like a pro"},
+                {icon:"⚠️",title:"Pitfalls to Avoid",page:"Pitfalls",desc:"Common mistakes that trip up beginner REIT investors"},
+                {icon:"🧮",title:"Calculators",page:"Calculators",desc:"Yield, P/NAV, and passive income calculators — try them out!"},
+                {icon:"🧠",title:"Test Yourself",page:"Quiz",desc:"A 10-question quiz to check what you've learned"},
+                {icon:"🤖",title:"Ask AI",page:"Ask AI",desc:"Have a REIT question? Get a plain-English answer instantly"},
+              ].map(item=>(
+                <div key={item.title} className="card" style={{cursor:"pointer"}} onClick={()=>goTo(item.page)}>
+                  <div className="icon-box">{item.icon}</div>
+                  <h4 style={{marginBottom:8}}>{item.title}</h4>
+                  <p style={{fontSize:"0.85rem",color:C.muted}}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{marginTop:48}}>
+              <h2 className="section-title">Singapore REITs at a Glance</h2>
+              <p className="section-sub">Key facts about the S-REIT market today.</p>
+              <div className="grid-3">
+                {[{num:"40+",label:"REITs listed on SGX"},{num:"~S$100B",label:"Total market cap"},{num:"5–7%",label:"Typical distribution yield"},{num:"90%",label:"Min. income to be distributed"},{num:"50%",label:"Max gearing (MAS rule)"},{num:"#3",label:"REIT market in Asia Pacific"}].map(m=>(
+                  <div key={m.label} className="metric-card"><div className="num">{m.num}</div><div className="label">{m.label}</div></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function WhatIsREIT() {
+      return (
+        <div className="section">
+          <h2 className="section-title">What is a REIT?</h2>
+          <p className="section-sub">Let's start from the very beginning — no jargon, promise.</p>
+          <div className="callout"><strong>Simple definition:</strong> A REIT (Real Estate Investment Trust) is like a shared ownership scheme for properties. You buy units on the stock market, own a slice of real buildings like malls and offices, and collect rent as regular dividends — without the hassle of being a landlord.</div>
+          <div className="grid-2" style={{margin:"32px 0"}}>
+            <div className="card"><div className="icon-box">🏬</div><h4 style={{marginBottom:10}}>The Analogy That Makes It Click</h4><p style={{fontSize:"0.9rem",color:C.muted}}>Imagine 1,000 people pooling their money to buy Orchard Road's Paragon Mall. Each person owns a "unit" and gets a share of the rental income every quarter. That's essentially what a REIT is — except it's listed on the SGX, so you can buy and sell units as easily as stocks.</p></div>
+            <div className="card"><div className="icon-box">💸</div><h4 style={{marginBottom:10}}>Why REITs Pay High Dividends</h4><p style={{fontSize:"0.9rem",color:C.muted}}>Singapore law requires REITs to distribute <strong>at least 90% of their income</strong> to unit holders to enjoy tax transparency. That means most of what the properties earn — from tenants like Cold Storage, DBS, or Grab — flows directly to investors like you.</p></div>
+          </div>
+          <h3 style={{marginBottom:16,color:C.accent}}>🇸🇬 Why Singapore REITs are Special</h3>
+          <div className="grid-2" style={{marginBottom:32}}>
+            {[{icon:"🏛️",title:"Strong Regulation (MAS)",desc:"MAS regulates S-REITs strictly. Gearing is capped at 50%, protecting you from over-leveraged REITs that could go bust."},{icon:"🏷️",title:"Tax-Free Dividends",desc:"Individual investors pay zero tax on REIT distributions in Singapore. That 5.5% yield is what you actually get — unlike rental income from a condo."},{icon:"🌏",title:"World-Class Assets",desc:"You can co-own Raffles City, Marina Bay Financial Centre, or Gleneagles Hospital for as little as S$200. Try buying those outright!"},{icon:"📈",title:"Started in 2002",desc:"Singapore's first REIT (CapitaMall Trust) launched in 2002. Since then, the market has grown to 40+ REITs worth ~S$100 billion."}].map(i=>(
+              <div key={i.title} className="card"><span style={{fontSize:"1.8rem"}}>{i.icon}</span><h4 style={{margin:"10px 0 8px"}}>{i.title}</h4><p style={{fontSize:"0.88rem",color:C.muted}}>{i.desc}</p></div>
+            ))}
+          </div>
+          <h3 style={{marginBottom:16,color:C.accent}}>📐 How a REIT is Structured</h3>
+          <div className="card">
+            <div style={{display:"flex",flexDirection:"column",gap:16}}>
+              {[["You (Unit Holder)","Buy units on SGX → receive quarterly dividends"],["REIT Manager","Professional team that manages strategy, acquisitions & operations"],["Trustee","Independent party that holds the assets on your behalf, protecting your interests"],["Properties","The actual malls, offices, warehouses, hotels — where rent comes from"]].map(([a,b])=>(
+                <div key={a} style={{display:"flex",gap:12,alignItems:"center"}}><div style={{background:C.accent,color:"white",borderRadius:8,padding:"8px 12px",fontSize:"0.82rem",fontWeight:600,minWidth:140,textAlign:"center"}}>{a}</div><div style={{fontSize:"0.88rem",color:C.muted,flex:1}}>→ {b}</div></div>
+              ))}
+            </div>
+          </div>
+          <div className="callout" style={{marginTop:32}}><strong>💡 Real example:</strong> When you buy 5,000 units of CapitaLand Integrated Commercial Trust (CICT) at around S$2 each (S$10,000 investment), you effectively own a tiny slice of Raffles City Shopping Centre, Plaza Singapura, Junction 8, and many more malls. The rents paid by tenants like Uniqlo, NTUC FairPrice, and Starbucks flow to you as quarterly distributions.</div>
+        </div>
+      );
+    }
+
+    function TypesPage() {
+      const [active, setActive] = useState(0);
+      const t = REIT_TYPES[active];
+      return (
+        <div className="section">
+          <h2 className="section-title">Types of Singapore REITs</h2>
+          <p className="section-sub">Singapore has 5 main REIT sectors. Each one behaves differently — here's what you need to know.</p>
+          <div className="tabs">{REIT_TYPES.map((r,i)=><button key={r.name} className={`tab ${active===i?"active":""}`} onClick={()=>setActive(i)}>{r.icon} {r.name.replace(" REITs","")}</button>)}</div>
+          <div className="card fade-up" key={active}>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+              <span style={{fontSize:"2.5rem"}}>{t.icon}</span>
+              <div><h3 style={{color:C.accent}}>{t.name}</h3><span className={`badge ${t.badge}`}>{t.name.replace(" REITs","")} Sector</span></div>
+            </div>
+            <p style={{marginBottom:20,color:C.muted}}>{t.description}</p>
+            <div style={{marginBottom:16}}><strong style={{fontSize:"0.85rem",color:C.accent}}>🏦 Singapore Examples</strong><p style={{fontSize:"0.88rem",marginTop:4}}>{t.examples}</p></div>
+            <div className="grid-2">
+              <div><p style={{fontWeight:700,color:C.accent,marginBottom:8,fontSize:"0.85rem"}}>✅ Strengths</p>{t.pros.map(p=><p key={p} style={{fontSize:"0.88rem",marginBottom:6,color:C.muted}}>• {p}</p>)}</div>
+              <div><p style={{fontWeight:700,color:C.danger,marginBottom:8,fontSize:"0.85rem"}}>⚠️ Watch Out For</p>{t.cons.map(c=><p key={c} style={{fontSize:"0.88rem",marginBottom:6,color:C.muted}}>• {c}</p>)}</div>
+            </div>
+          </div>
+          <div style={{marginTop:40}}>
+            <h3 style={{marginBottom:20,color:C.accent}}>📊 Sector Snapshot</h3>
+            <div className="table-wrap"><table><thead><tr><th>Sector</th><th>Typical Yield</th><th>Stability</th><th>Growth Potential</th><th>Best For</th></tr></thead>
+            <tbody>{[["🛍️ Retail","4–6%","High","Medium","Steady income seekers"],["🏢 Office","4–5%","Medium","Medium","Singapore business hub believers"],["🏭 Industrial","5–7%","Medium-High","High (logistics)","E-commerce optimists"],["🏨 Hospitality","4–8%","Low","High (in good times)","Higher risk/reward"],["🏥 Healthcare","4–5%","Very High","Low-Medium","Ultra-conservative investors"]].map(r=><tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td><td style={{color:C.muted}}>{r[4]}</td></tr>)}</tbody></table></div>
+          </div>
+        </div>
+      );
+    }
+
+    function ComparisonPage() {
+      return (
+        <div className="section">
+          <h2 className="section-title">REITs vs Other Investments</h2>
+          <p className="section-sub">How does investing in S-REITs stack up against other popular options in Singapore?</p>
+          <div className="callout" style={{marginBottom:32}}><strong>Quick take:</strong> REITs sit in a sweet spot — higher yield than CPF and bonds, lower hassle than physical property, and more consistent income than most stocks. But no investment is perfect. Here's the full picture.</div>
+          <div className="table-wrap" style={{marginBottom:40}}>
+            <table className="compare-table">
+              <thead><tr><th style={{textAlign:"left"}}>Feature</th><th style={{background:C.accent}}>🏢 REITs</th><th>🏠 Property</th><th>📈 Stocks</th><th>📄 Bonds</th><th>🏦 CPF</th></tr></thead>
+              <tbody>{COMPARE_DATA.map(r=><tr key={r.feature}><td>{r.feature}</td><td className="highlight" style={{fontWeight:600,color:C.accent}}>{r.reit}</td><td>{r.property}</td><td>{r.stocks}</td><td>{r.bonds}</td><td>{r.cpf}</td></tr>)}</tbody>
+            </table>
+          </div>
+          <div className="grid-2">
+            <div className="card"><h4 style={{marginBottom:12,color:C.accent}}>🏠 REITs vs Physical Property</h4><p style={{fontSize:"0.88rem",color:C.muted}}>Buying a condo gives you a single asset, one tenant, and all the landlord headaches. A REIT gives you 20–100 properties, managed by professionals, for S$200. The rental yield on Singapore residential properties has been squeezed to 2–4%. S-REITs typically yield 5–7% with zero stamp duty and zero tenancy drama.</p></div>
+            <div className="card"><h4 style={{marginBottom:12,color:C.accent}}>📈 REITs vs High-Dividend Stocks</h4><p style={{fontSize:"0.88rem",color:C.muted}}>DBS and OCBC yield around 5–6% but they can cut dividends when profits fall. REITs are legally required to distribute 90%+ of income, making their payouts more predictable. The trade-off? REITs can't grow earnings as explosively as a tech company.</p></div>
+            <div className="card"><h4 style={{marginBottom:12,color:C.accent}}>📄 REITs vs Singapore Savings Bonds</h4><p style={{fontSize:"0.88rem",color:C.muted}}>SSBs are ultra-safe (government-backed) but currently yield 2.5–3.5%. REITs yield more (5–7%) but carry more risk. A good strategy: use SSBs as your emergency fund, and REITs for the growth/income portion of your portfolio.</p></div>
+            <div className="card"><h4 style={{marginBottom:12,color:C.accent}}>🏦 REITs vs CPF</h4><p style={{fontSize:"0.88rem",color:C.muted}}>CPF OA earns 2.5% and SA earns 4% — guaranteed. REITs yield more but unit prices fluctuate. You can actually use your CPF OA to invest in REITs through the CPFIS scheme, letting you potentially earn more while keeping liquidity.</p></div>
+          </div>
+        </div>
+      );
+    }
+
+    function AnalysisPage() {
+      const [activeStep, setActiveStep] = useState(null);
+      return (
+        <div className="section">
+          <h2 className="section-title">How to Analyse a REIT</h2>
+          <p className="section-sub">8 practical steps to evaluate any Singapore REIT — bookmark this page!</p>
+          <div className="callout" style={{marginBottom:32}}><strong>Where to find the numbers?</strong> Every SGX-listed REIT publishes quarterly/half-yearly financial statements. You can find them on the REIT's investor relations website, SGX.com, or Moomoo itself.</div>
+          {ANALYSIS_STEPS.map(s=>(
+            <div key={s.num} className="card" style={{marginBottom:16,cursor:"pointer",borderLeft:`4px solid ${activeStep===s.num?C.accent:C.border}`}} onClick={()=>setActiveStep(activeStep===s.num?null:s.num)}>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <div className="step-num">{s.num}</div>
+                <h4 style={{flex:1}}>{s.title}</h4>
+                <span style={{color:C.muted,fontSize:"1.2rem"}}>{activeStep===s.num?"▲":"▼"}</span>
+              </div>
+              {activeStep===s.num && <p style={{marginTop:14,fontSize:"0.9rem",color:C.muted,paddingLeft:48}}>{s.desc}</p>}
+            </div>
           ))}
+          <div style={{marginTop:48}}>
+            <h3 style={{marginBottom:20,color:C.accent}}>📊 Quick Reference: What the Numbers Mean</h3>
+            <div className="table-wrap"><table><thead><tr><th>Metric</th><th>What It Is</th><th>🟢 Healthy</th><th>🔴 Caution</th></tr></thead>
+            <tbody>{[["Distribution Yield","Annual DPU ÷ Price","4–7%",">9% (check why)"],["P/NAV","Price ÷ NAV per unit","0.8–1.1x",">1.3x (pricey)"],["Gearing","Debt ÷ Total Assets","<40%",">45%"],["Interest Coverage","NPI ÷ Interest Expense",">3x","<2x"],["Occupancy Rate","% of space rented out",">93%","<85%"],["DPU Trend (5yr)","Is income per unit growing?","Growing","Declining"]].map(r=><tr key={r[0]}><td><strong>{r[0]}</strong></td><td style={{color:C.muted}}>{r[1]}</td><td style={{color:C.accent,fontWeight:600}}>{r[2]}</td><td style={{color:C.danger,fontWeight:600}}>{r[3]}</td></tr>)}</tbody></table></div>
+          </div>
+          <div style={{marginTop:40}}><h3 style={{marginBottom:20,color:C.accent}}>📋 Live REIT Data (Indicative)</h3><LiveREITTable /></div>
         </div>
-      </nav>
-      <main>{renderPage()}</main>
-      <footer>
-        <strong>Soon Lian's REIT Guide</strong> · Crafted by Wesley & Claude 🤖✨ · Educational purposes only<br />
-        <span style={{ marginTop: 8, display: "block", opacity: 0.6 }}>Content based on "Building Wealth Through REITs" by Bobby Jayaraman · Always do your own research before investing</span>
-      </footer>
-    </>
-  );
-}
+      );
+    }
+
+    function PitfallsPage() {
+      return (
+        <div className="section">
+          <h2 className="section-title">Pitfalls to Avoid</h2>
+          <p className="section-sub">Beginner mistakes that even experienced investors make. Learn from others' losses!</p>
+          <div className="callout callout-warn" style={{marginBottom:32}}><strong>⚠️ Important:</strong> REITs are great investments — but they're not risk-free. These pitfalls have cost real investors real money. Read carefully.</div>
+          <div className="grid-2">{PITFALLS.map(p=><div key={p.title} className="pitfall-card"><h4>⚠️ {p.title}</h4><p style={{fontSize:"0.88rem"}}>{p.desc}</p></div>)}</div>
+          <div className="callout" style={{marginTop:40}}><strong>💡 The Golden Rule:</strong> Never buy a REIT just because the yield looks high. Always ask: Is the DPU sustainable? Is gearing manageable? Does the sponsor have a good track record? A REIT yielding 3.5% that grows consistently is worth far more than one yielding 9% that's about to cut its distribution.</div>
+          <div style={{marginTop:40}}>
+            <h3 style={{color:C.accent,marginBottom:20}}>✅ The REIT Health Checklist</h3>
+            <div className="card">{["Gearing below 40%","Occupancy rate above 90%","Interest coverage above 3x","DPU has been stable or growing over 3–5 years","Debt maturities are spread out (not all due at once)","Sponsor is reputable (CapitaLand, Mapletree, Frasers)","No major tenant represents >20% of revenue","Foreign income is hedged (for cross-border REITs)"].map((item,i)=>(
+              <label key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<7?`1px solid ${C.border}`:"none",cursor:"pointer"}}>
+                <input type="checkbox" style={{width:18,height:18,accentColor:C.accent}} />
+                <span style={{fontSize:"0.9rem"}}>{item}</span>
+              </label>
+            ))}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function CalculatorsPage() {
+      const [tab, setTab] = useState("yield");
+      return (
+        <div className="section">
+          <h2 className="section-title">REIT Calculators</h2>
+          <p className="section-sub">Three practical tools to help you evaluate any Singapore REIT quickly.</p>
+          <div className="tabs">
+            {[{id:"yield",label:"📊 Yield Calculator"},{id:"pb",label:"📐 P/NAV Calculator"},{id:"income",label:"💰 Passive Income"}].map(t=><button key={t.id} className={`tab ${tab===t.id?"active":""}`} onClick={()=>setTab(t.id)}>{t.label}</button>)}
+          </div>
+          {tab==="yield" && <div className="card"><h4 style={{marginBottom:6}}>Distribution Yield Calculator</h4><p style={{fontSize:"0.85rem",color:C.muted,marginBottom:20}}>Tells you how much income you're earning per dollar invested.</p><YieldCalc /><div className="callout" style={{marginTop:20}}><strong>What's a good yield?</strong> For S-REITs, 4–7% is typical. Below 4% might mean the REIT is overpriced. Above 8% — be suspicious, not excited.</div></div>}
+          {tab==="pb" && <div className="card"><h4 style={{marginBottom:6}}>Price-to-NAV Calculator</h4><p style={{fontSize:"0.85rem",color:C.muted,marginBottom:20}}>NAV = the book value of all properties minus debts, divided by units. This tells you if you're getting a bargain.</p><PBCalc /><div className="callout" style={{marginTop:20}}><strong>Wesley's tip:</strong> Historical P/NAV is powerful. If a REIT historically trades at 1.0x but is currently at 0.75x during a market panic, that could be a buying opportunity.</div></div>}
+          {tab==="income" && <div className="card"><h4 style={{marginBottom:6}}>Passive Income Calculator</h4><p style={{fontSize:"0.85rem",color:C.muted,marginBottom:20}}>How much passive income could your investment generate? Enter the amount you plan to invest and the REIT's distribution yield.</p><IncomeCalc /><div className="callout" style={{marginTop:20}}><strong>Fun math:</strong> To generate S$1,000/month (S$12,000/year) from a REIT yielding 6%, you'd need to invest approximately S$200,000.</div></div>}
+        </div>
+      );
+    }
+
+    function QuizPage() {
+      return (
+        <div className="section">
+          <h2 className="section-title">Test Your REIT Knowledge</h2>
+          <p className="section-sub">10 questions covering everything you've learned. How well do you know your REITs, Soon Lian?</p>
+          <QuizSection />
+        </div>
+      );
+    }
+
+    function AskAIPage() {
+      return (
+        <div className="section">
+          <h2 className="section-title">Ask AI Anything</h2>
+          <p className="section-sub">Got a REIT question that wasn't covered? Just ask — plain English answers, no jargon.</p>
+          <AskAI />
+        </div>
+      );
+    }
+
+    // ── APP ──
+    function App() {
+      const [page, setPage] = useState("Home");
+      const goTo = p => { setPage(p); window.scrollTo({top:0,behavior:"smooth"}); };
+      const renderPage = () => {
+        switch(page) {
+          case "Home": return <HomePage goTo={goTo}/>;
+          case "What is a REIT?": return <WhatIsREIT/>;
+          case "Types of REITs": return <TypesPage/>;
+          case "REITs vs Others": return <ComparisonPage/>;
+          case "How to Analyse": return <AnalysisPage/>;
+          case "Pitfalls": return <PitfallsPage/>;
+          case "Calculators": return <CalculatorsPage/>;
+          case "Quiz": return <QuizPage/>;
+          case "Ask AI": return <AskAIPage/>;
+          default: return <HomePage goTo={goTo}/>;
+        }
+      };
+      const navLabel = p => ({
+        "What is a REIT?":"Basics","Types of REITs":"Types","REITs vs Others":"vs Others",
+        "How to Analyse":"Analysis","Pitfalls":"⚠️ Pitfalls","Calculators":"🧮 Calc",
+        "Quiz":"🧠 Quiz","Ask AI":"🤖 Ask AI"
+      }[p]||p);
+      return (
+        <>
+          <nav className="nav">
+            <div className="nav-brand" onClick={()=>goTo("Home")}><span>🏢</span> Soon Lian's REIT Guide</div>
+            <div className="nav-links">
+              {PAGES.filter(p=>p!=="Home").map(p=><button key={p} className={`nav-btn ${page===p?"active":""}`} onClick={()=>goTo(p)}>{navLabel(p)}</button>)}
+            </div>
+          </nav>
+          <main>{renderPage()}</main>
+          <footer>
+            <strong>Soon Lian's REIT Guide</strong> · Crafted by Wesley &amp; Claude 🤖✨ · Educational purposes only<br/>
+            <span style={{marginTop:8,display:"block",opacity:0.6}}>Content based on "Building Wealth Through REITs" by Bobby Jayaraman · Always do your own research before investing</span>
+          </footer>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>
