@@ -1,1 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>象棋 Chinese Chess</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d1117;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-family:'Courier New',monospace;color:#fff;padding:10px;}
+h1{font-size:16px;letter-spacing:3px;color:#5bc8f5;margin-bottom:8px;text-transform:uppercase;}
+#status{font-size:13px;color:#f5d020;letter-spacing:1px;min-height:20px;margin-bottom:6px;text-align:center;}
+#board-wrap{position:relative;background:#131a26;border:3px solid #252d3d;border-radius:8px;padding:20px;touch-action:none;}
+canvas{display:block;cursor:pointer;}
+#btns{display:flex;gap:8px;margin-top:10px;}
+#btns button{padding:8px 20px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:1px;border:none;border-radius:6px;cursor:pointer;text-transform:uppercase;font-weight:bold;}
+#btn-new{background:#1e2433;color:#5bc8f5;border:1.5px solid #2e3a50;}
+#btn-new:hover{background:#2e3a50;}
+#btn-undo{background:#1e2433;color:#f5a623;border:1.5px solid #2e3a50;}
+#btn-undo:hover{background:#2e3a50;}
+#info{font-size:10px;color:#8899aa;margin-top:6px;letter-spacing:0.5px;text-align:center;}
+</style>
+</head>
+<body>
+<h1>象棋 Chinese Chess</h1>
+<div id="status">Your turn (Blue)</div>
+<div id="board-wrap"><canvas id="c"></canvas></div>
+<div id="btns">
+  <button id="btn-new" onclick="newGame()">New Game</button>
+  <button id="btn-undo" onclick="undoMove()">Undo</button>
+</div>
+<div id="info">You = Blue (bottom) · AI = Red (top) · Tap piece then tap destination</div>
 
+<script>
+// Board sizing
+const COLS=9,ROWS=10;
+const SZ=Math.min(Math.floor((Math.min(window.innerWidth,720)-60)/COLS),62);
+const PAD=SZ/2;
+const W=SZ*(COLS-1)+PAD*2, H=SZ*(ROWS-1)+PAD*2;
+const cvs=document.getElementById('c');
+cvs.width=W; cvs.height=H;
+const ctx=cvs.getContext('2d');
+
+// Colors
+const BG='#131a26', LINE='#2a3a54', RIVER='rgba(91,200,245,0.07)';
+const RED='#f5605b', BLUE='#5bc8f5', SEL='#f5d020', MOVE_DOT='rgba(245,208,32,0.5)';
+const PIECE_BG_R='#1e1520', PIECE_BG_B='#0f1a2e';
+
+// Piece types: K=general, A=advisor, E=elephant, H=horse, R=chariot, C=cannon, P=soldier
+// Side: 'r'=red(AI,top), 'b'=blue(player,bottom)
+const CHARS={
+  r:{K:'帥',A:'仕',E:'相',H:'馬',R:'車',C:'炮',P:'兵'},
+  b:{K:'將',A:'士',E:'象',H:'馬',R:'車',C:'砲',P:'卒'}
+};
+
+let board, selected, validMoves, turn, gameOver, history, audioCtx;
+
+function initBoard(){
+  // board[row][col] = {type, side} or null
+  board=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  // Red (AI) - top rows 0-4
+  const backRow=[
+    {type:'R',side:'r'},{type:'H',side:'r'},{type:'E',side:'r'},{type:'A',side:'r'},{type:'K',side:'r'},
+    {type:'A',side:'r'},{type:'E',side:'r'},{type:'H',side:'r'},{type:'R',side:'r'}
+  ];
+  backRow.forEach((p,c)=>board[0][c]=p);
+  board[2][1]={type:'C',side:'r'}; board[2][7]={type:'C',side:'r'};
+  for(let c=0;c<COLS;c+=2) board[3][c]={type:'P',side:'r'};
+  // Blue (player) - bottom rows 5-9
+  const frontRow=[
+    {type:'R',side:'b'},{type:'H',side:'b'},{type:'E',side:'b'},{type:'A',side:'b'},{type:'K',side:'b'},
+    {type:'A',side:'b'},{type:'E',side:'b'},{type:'H',side:'b'},{type:'R',side:'b'}
+  ];
+  frontRow.forEach((p,c)=>board[9][c]=p);
+  board[7][1]={type:'C',side:'b'}; board[7][7]={type:'C',side:'b'};
+  for(let c=0;c<COLS;c+=2) board[6][c]={type:'P',side:'b'};
+}
+
+function newGame(){
+  initBoard(); selected=null; validMoves=[]; turn='b'; gameOver=false; history=[];
+  setStatus("Your turn (Blue)");
+  draw();
+}
+
+// ---- Move generation ----
+function inBounds(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS;}
+function piece(r,c){return inBounds(r,c)?board[r][c]:null;}
+function enemy(p,side){return p&&p.side!==side;}
+function friendly(p,side){return p&&p.side===side;}
+
+function getMoves(r,c,brd){
+  brd=brd||board;
+  const p=brd[r][c]; if(!p) return [];
+  const {type,side}=p; const moves=[];
+  const fwd=side==='r'?1:-1; // red moves down, blue moves up
+
+  if(type==='R'){ // Chariot - rook
+    [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{
+      let nr=r+dr,nc=c+dc;
+      while(inBounds(nr,nc)){
+        if(brd[nr][nc]){if(enemy(brd[nr][nc],side))moves.push([nr,nc]);break;}
+        moves.push([nr,nc]);nr+=dr;nc+=dc;
+      }
+    });
+  }
+  if(type==='H'){ // Horse
+    [[1,0,2,1],[1,0,2,-1],[-1,0,-2,1],[-1,0,-2,-1],[0,1,1,2],[0,1,-1,2],[0,-1,1,-2],[0,-1,-1,-2]].forEach(([lr,lc,mr,mc])=>{
+      if(inBounds(r+lr,c+lc)&&!brd[r+lr][c+lc]&&inBounds(r+mr,c+mc)&&!friendly(brd[r+mr][c+mc],side))
+        moves.push([r+mr,c+mc]);
+    });
+  }
+  if(type==='E'){ // Elephant - stays on own side
+    const ownSide=side==='r'?[0,1,2,3,4]:[5,6,7,8,9];
+    [[-2,-2],[-2,2],[2,-2],[2,2]].forEach(([dr,dc])=>{
+      const br=r+dr/2,bc=c+dc/2,nr=r+dr,nc=c+dc;
+      if(ownSide.includes(nr)&&inBounds(nr,nc)&&!brd[br][bc]&&!friendly(brd[nr][nc],side))
+        moves.push([nr,nc]);
+    });
+  }
+  if(type==='A'){ // Advisor - stays in palace
+    const palace=side==='r'?{r1:0,r2:2,c1:3,c2:5}:{r1:7,r2:9,c1:3,c2:5};
+    [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc])=>{
+      const nr=r+dr,nc=c+dc;
+      if(nr>=palace.r1&&nr<=palace.r2&&nc>=palace.c1&&nc<=palace.c2&&!friendly(brd[nr][nc],side))
+        moves.push([nr,nc]);
+    });
+  }
+  if(type==='K'){ // General - stays in palace, no flying general
+    const palace=side==='r'?{r1:0,r2:2,c1:3,c2:5}:{r1:7,r2:9,c1:3,c2:5};
+    [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{
+      const nr=r+dr,nc=c+dc;
+      if(nr>=palace.r1&&nr<=palace.r2&&nc>=palace.c1&&nc<=palace.c2&&!friendly(brd[nr][nc],side))
+        moves.push([nr,nc]);
+    });
+  }
+  if(type==='C'){ // Cannon - moves like rook, captures by jumping exactly one
+    [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{
+      let nr=r+dr,nc=c+dc,jumped=false;
+      while(inBounds(nr,nc)){
+        if(!jumped){
+          if(brd[nr][nc]) jumped=true;
+          else moves.push([nr,nc]);
+        } else {
+          if(brd[nr][nc]){if(enemy(brd[nr][nc],side))moves.push([nr,nc]);break;}
+        }
+        nr+=dr;nc+=dc;
+      }
+    });
+  }
+  if(type==='P'){ // Soldier
+    const crossed=side==='r'?r>4:r<5;
+    // Forward
+    const nr=r+fwd;
+    if(inBounds(nr,c)&&!friendly(brd[nr][c],side)) moves.push([nr,c]);
+    // Sideways after crossing river
+    if(crossed){
+      [[0,1],[0,-1]].forEach(([dr,dc])=>{
+        const nr2=r+dr,nc2=c+dc;
+        if(inBounds(nr2,nc2)&&!friendly(brd[nr2][nc2],side)) moves.push([nr2,nc2]);
+      });
+    }
+  }
+  return moves;
+}
+
+function findKing(side,brd){
+  brd=brd||board;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(brd[r][c]&&brd[r][c].type==='K'&&brd[r][c].side===side) return [r,c];
+  return null;
+}
+
+function isInCheck(side,brd){
+  brd=brd||board;
+  const kg=findKing(side,brd); if(!kg) return true;
+  const [kr,kc]=kg;
+  const opp=side==='r'?'b':'r';
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(brd[r][c]&&brd[r][c].side===opp){
+      const ms=getMoves(r,c,brd);
+      if(ms.some(([mr,mc])=>mr===kr&&mc===kc)) return true;
+    }
+  }
+  // Flying general check
+  const [oKg]=findKing(opp,brd)||[null];
+  if(oKg!==null){
+    const [okr,okc]=findKing(opp,brd);
+    if(okc===kc){
+      let blocked=false;
+      const minR=Math.min(kr,okr),maxR=Math.max(kr,okr);
+      for(let row=minR+1;row<maxR;row++) if(brd[row][kc]){blocked=true;break;}
+      if(!blocked) return true;
+    }
+  }
+  return false;
+}
+
+function applyMove(brd,fr,fc,tr,tc){
+  const nb=brd.map(row=>row.map(p=>p?{...p}:null));
+  nb[tr][tc]=nb[fr][fc]; nb[fr][fc]=null;
+  return nb;
+}
+
+function getLegalMoves(r,c,brd){
+  brd=brd||board;
+  const p=brd[r][c]; if(!p) return [];
+  const raw=getMoves(r,c,brd);
+  return raw.filter(([tr,tc])=>{
+    const nb=applyMove(brd,r,c,tr,tc);
+    return !isInCheck(p.side,nb);
+  });
+}
+
+function hasAnyMoves(side,brd){
+  brd=brd||board;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++)
+    if(brd[r][c]&&brd[r][c].side===side&&getLegalMoves(r,c,brd).length>0) return true;
+  return false;
+}
+
+// ---- AI ----
+const PIECE_VAL={K:10000,R:900,C:450,H:400,E:200,A:200,P:100};
+const POS_BONUS={
+  P:(r,c,side)=>{
+    const crossed=side==='r'?r>4:r<5;
+    return crossed?(side==='r'?r*8:(9-r)*8):0;
+  },
+  H:(r,c)=>([4,5].includes(r)?20:0),
+  R:(r,c)=>(r===4||r===5?15:0),
+};
+
+function evalBoard(brd){
+  let score=0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const p=brd[r][c]; if(!p) continue;
+    let v=PIECE_VAL[p.type]||0;
+    if(POS_BONUS[p.type]) v+=POS_BONUS[p.type](r,c,p.side);
+    score+=p.side==='r'?v:-v;
+  }
+  return score;
+}
+
+function minimax(brd,depth,alpha,beta,maximizing){
+  const side=maximizing?'r':'b';
+  if(depth===0) return evalBoard(brd);
+  if(!hasAnyMoves(side,brd)) return maximizing?-9000:9000;
+  let best=maximizing?-Infinity:Infinity;
+  outer:
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(!brd[r][c]||brd[r][c].side!==side) continue;
+    const moves=getLegalMoves(r,c,brd);
+    for(const [tr,tc] of moves){
+      const nb=applyMove(brd,r,c,tr,tc);
+      const val=minimax(nb,depth-1,alpha,beta,!maximizing);
+      if(maximizing){best=Math.max(best,val);alpha=Math.max(alpha,val);}
+      else{best=Math.min(best,val);beta=Math.min(beta,val);}
+      if(beta<=alpha) break outer;
+    }
+  }
+  return best;
+}
+
+function aiMove(){
+  let bestVal=-Infinity,bestMove=null;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(!board[r][c]||board[r][c].side!=='r') continue;
+    const moves=getLegalMoves(r,c);
+    for(const [tr,tc] of moves){
+      const nb=applyMove(board,r,c,tr,tc);
+      const val=minimax(nb,2,-Infinity,Infinity,false);
+      if(val>bestVal){bestVal=val;bestMove={fr:r,fc:c,tr,tc};}
+    }
+  }
+  if(bestMove){
+    const {fr,fc,tr,tc}=bestMove;
+    const captured=board[tr][tc];
+    history.push({board:board.map(row=>row.map(p=>p?{...p}:null)),turn:'r'});
+    board=applyMove(board,fr,fc,tr,tc);
+    if(captured) playCapture(); else playMove();
+    turn='b';
+    checkGameState();
+    draw();
+  }
+}
+
+function checkGameState(){
+  if(!hasAnyMoves(turn)){
+    const inCheck=isInCheck(turn);
+    gameOver=true;
+    if(turn==='b') setStatus(inCheck?'Checkmate! AI wins 🤖':'Stalemate — Draw');
+    else setStatus(inCheck?'Checkmate! You win! 🎉':'Stalemate — Draw');
+    return;
+  }
+  if(isInCheck(turn)){
+    setStatus(turn==='b'?'You are in Check! ⚠️':'AI is in Check! ⚠️','#f5605b');
+  } else {
+    setStatus(turn==='b'?'Your turn (Blue)':'AI thinking...');
+  }
+}
+
+// ---- Drawing ----
+function bx(c){return PAD+c*SZ;}
+function by(r){return PAD+r*SZ;}
+
+function draw(){
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+  drawGrid();
+  drawPieces();
+}
+
+function drawGrid(){
+  ctx.strokeStyle=LINE; ctx.lineWidth=1;
+  // Horizontal lines
+  for(let r=0;r<ROWS;r++){
+    ctx.beginPath();ctx.moveTo(bx(0),by(r));ctx.lineTo(bx(COLS-1),by(r));ctx.stroke();
+  }
+  // Vertical lines — break at river
+  for(let c=0;c<COLS;c++){
+    ctx.beginPath();ctx.moveTo(bx(c),by(0));ctx.lineTo(bx(c),by(4));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(bx(c),by(5));ctx.lineTo(bx(c),by(9));ctx.stroke();
+  }
+  // River
+  ctx.fillStyle=RIVER;
+  ctx.fillRect(bx(0),by(4)+1,bx(COLS-1)-bx(0),SZ-2);
+  ctx.fillStyle='rgba(91,200,245,0.4)';
+  ctx.font=`${Math.max(10,SZ*0.38)}px serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  const ry=by(4)+SZ/2;
+  ctx.fillText('楚 河',bx(1.8),ry);
+  ctx.fillText('漢 界',bx(6.2),ry);
+
+  // Palace diagonals
+  function palace(r1,c1,r2,c2){
+    ctx.strokeStyle='rgba(91,200,245,0.3)';ctx.lineWidth=0.8;
+    ctx.beginPath();ctx.moveTo(bx(c1),by(r1));ctx.lineTo(bx(c2),by(r2));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(bx(c2),by(r1));ctx.lineTo(bx(c1),by(r2));ctx.stroke();
+  }
+  palace(0,3,2,5); palace(7,3,9,5);
+
+  // Soldier & cannon marks
+  function mark(r,c){
+    const x=bx(c),y=by(r),d=5;
+    ctx.strokeStyle='rgba(91,200,245,0.5)';ctx.lineWidth=1;
+    if(c>0){ctx.beginPath();ctx.moveTo(x-d,y-d);ctx.lineTo(x-d,y-2);ctx.moveTo(x-d,y+2);ctx.lineTo(x-d,y+d);ctx.stroke();}
+    if(c<COLS-1){ctx.beginPath();ctx.moveTo(x+d,y-d);ctx.lineTo(x+d,y-2);ctx.moveTo(x+d,y+2);ctx.lineTo(x+d,y+d);ctx.stroke();}
+    ctx.beginPath();ctx.moveTo(x-2,y-d);ctx.lineTo(x+2,y-d);ctx.moveTo(x-2,y+d);ctx.lineTo(x+2,y+d);ctx.stroke();
+  }
+  [[3,0],[3,2],[3,4],[3,6],[3,8],[6,0],[6,2],[6,4],[6,6],[6,8],[2,1],[2,7],[7,1],[7,7]].forEach(([r,c])=>mark(r,c));
+}
+
+function drawPieces(){
+  const R=SZ*0.42;
+  // Valid move dots
+  if(validMoves.length>0){
+    validMoves.forEach(([r,c])=>{
+      if(board[r][c]){
+        ctx.strokeStyle='rgba(245,208,32,0.7)';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(bx(c),by(r),R+2,0,Math.PI*2);ctx.stroke();
+      } else {
+        ctx.fillStyle=MOVE_DOT;
+        ctx.beginPath();ctx.arc(bx(c),by(r),R*0.38,0,Math.PI*2);ctx.fill();
+      }
+    });
+  }
+
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const p=board[r][c]; if(!p) continue;
+    const x=bx(c),y=by(r);
+    const isSelected=selected&&selected[0]===r&&selected[1]===c;
+    const col=p.side==='r'?RED:BLUE;
+    const bgCol=p.side==='r'?PIECE_BG_R:PIECE_BG_B;
+
+    // Glow for selected
+    if(isSelected){
+      ctx.shadowColor=col;ctx.shadowBlur=12;
+    }
+    // Outer ring
+    ctx.strokeStyle=col;ctx.lineWidth=isSelected?2.5:1.5;
+    ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.stroke();
+    // Inner fill
+    ctx.fillStyle=bgCol;ctx.beginPath();ctx.arc(x,y,R-1,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    // Inner ring
+    ctx.strokeStyle=col+'88';ctx.lineWidth=0.8;
+    ctx.beginPath();ctx.arc(x,y,R-4,0,Math.PI*2);ctx.stroke();
+    // Character
+    ctx.fillStyle=col;
+    ctx.font=`bold ${Math.max(10,SZ*0.38)}px serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(CHARS[p.side][p.type],x,y+1);
+  }
+}
+
+// ---- Input ----
+function getBoardPos(ex,ey){
+  const rect=cvs.getBoundingClientRect();
+  const x=ex-rect.left,y=ey-rect.top;
+  const c=Math.round((x-PAD)/SZ),r=Math.round((y-PAD)/SZ);
+  if(r>=0&&r<ROWS&&c>=0&&c<COLS) return [r,c];
+  return null;
+}
+
+function handleClick(ex,ey){
+  if(gameOver||turn!=='b') return;
+  const pos=getBoardPos(ex,ey); if(!pos) return;
+  const [r,c]=pos;
+
+  if(selected){
+    const [sr,sc]=selected;
+    // Try to move
+    if(validMoves.some(([mr,mc])=>mr===r&&mc===c)){
+      const captured=board[r][c];
+      history.push({board:board.map(row=>row.map(p=>p?{...p}:null)),turn:'b'});
+      board=applyMove(board,sr,sc,r,c);
+      selected=null;validMoves=[];
+      if(captured) playCapture(); else playMove();
+      turn='r';
+      checkGameState();
+      draw();
+      if(!gameOver) setTimeout(()=>{aiMove();},350);
+      return;
+    }
+    // Select different own piece
+    if(board[r][c]&&board[r][c].side==='b'){
+      selected=[r,c];
+      validMoves=getLegalMoves(r,c);
+      draw();return;
+    }
+    selected=null;validMoves=[];draw();return;
+  }
+
+  if(board[r][c]&&board[r][c].side==='b'){
+    selected=[r,c];
+    validMoves=getLegalMoves(r,c);
+    draw();
+  }
+}
+
+cvs.addEventListener('click',e=>handleClick(e.clientX,e.clientY));
+cvs.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];handleClick(t.clientX,t.clientY);},{passive:false});
+
+function undoMove(){
+  if(gameOver){gameOver=false;}
+  // Undo 2 moves (player + AI)
+  const undos=Math.min(2,history.length);
+  for(let i=0;i<undos;i++){
+    const h=history.pop();
+    board=h.board;turn=h.turn;
+  }
+  selected=null;validMoves=[];
+  checkGameState();draw();
+}
+
+function setStatus(msg,col='#f5d020'){
+  const s=document.getElementById('status');
+  s.textContent=msg;s.style.color=col;
+}
+
+// Audio
+function getAC(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playMove(){
+  try{const a=getAC(),o=a.createOscillator(),g=a.createGain();
+  o.type='triangle';o.frequency.setValueAtTime(700,a.currentTime);o.frequency.linearRampToValueAtTime(500,a.currentTime+0.06);
+  g.gain.setValueAtTime(0.12,a.currentTime);g.gain.linearRampToValueAtTime(0,a.currentTime+0.08);
+  o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+0.09);}catch(e){}
+}
+function playCapture(){
+  try{const a=getAC();
+  [500,350].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();
+  o.type='sawtooth';o.frequency.value=f;
+  g.gain.setValueAtTime(0.12,a.currentTime+i*0.07);g.gain.linearRampToValueAtTime(0,a.currentTime+i*0.07+0.09);
+  o.connect(g);g.connect(a.destination);o.start(a.currentTime+i*0.07);o.stop(a.currentTime+i*0.07+0.1);});}catch(e){}
+}
+
+newGame();
+</script>
+</body>
+</html>
