@@ -44,6 +44,12 @@ main{padding:16px;max-width:900px;margin:0 auto}
 .price-ticker{font-size:12px;font-weight:800;color:#94a3b8;margin-bottom:4px}
 .price-val{font-size:18px;font-weight:800;color:#f1f5f9}
 .price-chg{font-size:12px;font-weight:700;margin-top:2px}
+.watch-price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:18px}
+.watch-price-tile{background:#1e293b;border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center}
+.wpt-left{display:flex;flex-direction:column;gap:2px}
+.wpt-ticker{font-size:11px;font-weight:800;color:#94a3b8}
+.wpt-price{font-size:13px;font-weight:800;color:#f1f5f9}
+.wpt-chg{font-size:11px;font-weight:700;white-space:nowrap}
 .news-card{background:#1e293b;border-radius:10px;padding:14px;border-left:3px solid #334155;margin-bottom:10px}
 .news-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .news-ticker{font-weight:800;font-size:15px}
@@ -59,12 +65,11 @@ main{padding:16px;max-width:900px;margin:0 auto}
 .watch-note{font-size:12px;color:#94a3b8;line-height:1.6}
 .hint{font-size:12px;color:#475569;margin-bottom:12px}
 .section-label{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
-.live-tag{font-size:10px;color:#475569}
+.live-tag{font-size:10px;color:#475569;font-weight:400;text-transform:none;letter-spacing:0}
 footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-top:1px solid #1e293b;margin-top:24px;line-height:1.6}
 </style>
 </head>
 <body>
-
 <header>
   <div>
     <h1>Morning Market Brief for Wesley</h1>
@@ -73,7 +78,6 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
   <button id="refresh-btn" onclick="refreshAll()">Refresh Live Data</button>
 </header>
 <div id="status-bar">Ready.</div>
-
 <nav>
   <button class="active" onclick="switchTab('overview',this)">Overview</button>
   <button onclick="switchTab('us',this)">US Tech</button>
@@ -81,7 +85,6 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
   <button onclick="switchTab('crypto',this)">Crypto</button>
   <button onclick="switchTab('watchlist',this)">Watchlist</button>
 </nav>
-
 <main>
   <div id="tab-overview" class="tab-panel active">
     <div class="overview-top">
@@ -102,7 +105,6 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
     </div>
     <div class="mini-grid" id="mini-grid"></div>
   </div>
-
   <div id="tab-us" class="tab-panel">
     <p class="hint">W Portfolio: ASTS, AMZN, CRWD, GOOG, MSFT, PLTR, ZS, NOW, QQQ</p>
     <div class="section-label">Live Prices</div>
@@ -110,40 +112,34 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
     <div class="section-label">Latest News <span class="live-tag">(Live via Finnhub)</span></div>
     <div id="us-news"></div>
   </div>
-
   <div id="tab-sg" class="tab-panel">
     <p class="hint">W Portfolio: DBS, OCBC, CICT</p>
-    <div class="section-label">Live Prices</div>
+    <div class="section-label">Live Prices <span class="live-tag">(via Twelve Data)</span></div>
     <div class="price-grid" id="sg-prices"></div>
     <div class="section-label">News (Manual)</div>
     <div id="sg-news"></div>
   </div>
-
   <div id="tab-crypto" class="tab-panel">
     <p class="hint">W Portfolio: BTC (0.2), ETH (8), DOT (1000)</p>
     <div class="section-label">Live Prices</div>
     <div class="price-grid" id="crypto-prices"></div>
-    <div class="section-label">News (Manual)</div>
+    <div class="section-label">Latest News <span class="live-tag">(Live via CoinDesk RSS)</span></div>
     <div id="crypto-news"></div>
   </div>
-
   <div id="tab-watchlist" class="tab-panel">
-    <p class="hint">Watchlist: KTOS, RKLB, OUST + S&amp;P 500 Top 10</p>
-    <div class="section-label">Live Prices + Notes</div>
+    <p class="hint">KTOS, RKLB, OUST + S&amp;P 500 Top 10</p>
+    <div class="section-label">Price Snapshot</div>
+    <div class="watch-price-grid" id="watch-price-grid"></div>
+    <div class="section-label">Notes</div>
     <div id="watch-list"></div>
   </div>
 </main>
-
 <footer>
   SG stock prices are unavailable as this dashboard runs on free-tier APIs which do not support SGX data. To enable live SG prices, Wesley needs to upgrade to a paid data provider which he refuses.
 </footer>
-
 <script>
-
-/* ============================================================
-   EDIT ONLY THIS BLOCK — update sentiment, SG and crypto news daily
-   ============================================================ */
 var FINNHUB_KEY = "d86jmmpr01qgiu45ni4gd86jmmpr01qgiu45ni50";
+var TWELVE_KEY  = "a0d8abc1a6244ab9a97722d4e4b94ca1";
 
 var NEWS_DATA = {
   sentiment: {
@@ -157,14 +153,9 @@ var NEWS_DATA = {
     ]
   },
   sgNews: [
-    { ticker:"D05",  name:"DBS Group",  impact:"positive", headline:"DBS reports record net profit; raises dividend to S$0.60 per quarter",  detail:"NIM compression slowing; wealth management AUM up 12% with strong inflows from Southeast Asia." },
-    { ticker:"O39",  name:"OCBC",       impact:"positive", headline:"OCBC exceeds earnings forecast on insurance and trading income",          detail:"Great Eastern integration adds fee income; loan growth steady at 4%." },
-    { ticker:"C38U", name:"CICT",       impact:"neutral",  headline:"CICT maintains DPU; suburban malls outperform Orchard belt",             detail:"Shopper traffic recovered to pre-COVID levels; rental reversion of 6.3% on new leases." }
-  ],
-  cryptoNews: [
-    { ticker:"BTC", impact:"positive", headline:"Bitcoin breaks $108K as institutional ETF inflows hit weekly record", detail:"BlackRock IBIT sees $900M single-day inflow; funding rates suggest measured optimism." },
-    { ticker:"ETH", impact:"positive", headline:"Ethereum EIP-7702 upgrade boosts smart-account adoption",             detail:"Gas fees at 6-month lows post-Dencun; staking yield at 3.8% attracting institutional allocators." },
-    { ticker:"DOT", impact:"neutral",  headline:"Polkadot JAM upgrade testnet goes live; community vote passes 91%",   detail:"JAM aims to replace the relay chain with a more scalable architecture; mainnet Q4 2025." }
+    { ticker:"D05",  name:"DBS Group", impact:"positive", headline:"DBS reports record net profit; raises dividend to S$0.60 per quarter",  detail:"NIM compression slowing; wealth management AUM up 12% with strong inflows from Southeast Asia." },
+    { ticker:"O39",  name:"OCBC",      impact:"positive", headline:"OCBC exceeds earnings forecast on insurance and trading income",          detail:"Great Eastern integration adds fee income; loan growth steady at 4%." },
+    { ticker:"C38U", name:"CICT",      impact:"neutral",  headline:"CICT maintains DPU; suburban malls outperform Orchard belt",             detail:"Shopper traffic recovered to pre-COVID levels; rental reversion of 6.3% on new leases." }
   ],
   watchlist: [
     { ticker:"KTOS",  action:"watch", note:"Kratos Defense benefits from increased US defense spending; drone and directed energy programs gaining traction." },
@@ -182,19 +173,21 @@ var NEWS_DATA = {
     { ticker:"JPM",   action:"hold",  note:"Best-in-class US bank; benefits from higher-for-longer rates and strong investment banking pipeline." }
   ]
 };
-/* ============================================================
-   END OF EDIT BLOCK
-   ============================================================ */
 
-var US_TICKERS       = ["ASTS","AMZN","CRWD","GOOG","MSFT","PLTR","ZS","NOW","QQQ"];
-var SG_TICKERS       = ["D05:SP","O39:SP","C38U:SP"];
-var WATCH_TICKERS    = ["KTOS","RKLB","OUST","AAPL","MSFT","NVDA","AMZN","META","GOOG","TSLA","AVGO","BRK-B","JPM"];
+var US_TICKERS    = ["ASTS","AMZN","CRWD","GOOG","MSFT","PLTR","ZS","NOW","QQQ"];
+var SG_TICKERS    = ["D05","O39","C38U"];
+var WATCH_TICKERS = ["KTOS","RKLB","OUST","AAPL","MSFT","NVDA","AMZN","META","GOOG","TSLA","AVGO","BRK-B","JPM"];
+var CRYPTO_COINS  = [
+  { sym:"BTC", cg:"bitcoin" },
+  { sym:"ETH", cg:"ethereum" },
+  { sym:"DOT", cg:"polkadot-2" }
+];
 
 var iColor = { positive:"#22c55e", negative:"#ef4444", neutral:"#94a3b8" };
 var iIcon  = { positive:"(+)", negative:"(-)", neutral:"(o)" };
 var aColor = { buy:"#22c55e", sell:"#ef4444", hold:"#6366f1", watch:"#f59e0b" };
 
-var liveData = { fg:null, prices:{}, crypto:{}, usNews:[] };
+var liveData = { fg:null, prices:{}, sgPrices:{}, crypto:{}, usNews:[], cryptoNews:[] };
 
 function ge(id) { return document.getElementById(id); }
 function setStatus(msg) { ge("status-bar").textContent = msg; }
@@ -225,7 +218,7 @@ function switchTab(id, btn) {
 }
 
 function priceTile(sym, price, chg) {
-  var chgColor = chg >= 0 ? "#22c55e" : "#ef4444";
+  var chgColor = (chg >= 0) ? "#22c55e" : "#ef4444";
   var chgStr = (chg >= 0 ? "+" : "") + chg.toFixed(2) + "%";
   var priceStr = price < 10 ? "$" + price.toFixed(4) : "$" + price.toFixed(2);
   return "<div class='price-tile'><div class='price-ticker'>" + sym + "</div><div class='price-val'>" + priceStr + "</div><div class='price-chg' style='color:" + chgColor + "'>" + chgStr + "</div></div>";
@@ -235,105 +228,149 @@ function emptyTile(sym) {
   return "<div class='price-tile'><div class='price-ticker'>" + sym + "</div><div style='font-size:11px;color:#64748b;margin-top:6px'>--</div></div>";
 }
 
+function watchPriceTile(sym, price, chg) {
+  var hasData = (price !== null && price !== undefined);
+  var chgColor = hasData ? (chg >= 0 ? "#22c55e" : "#ef4444") : "#64748b";
+  var chgStr   = hasData ? ((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%") : "--";
+  var priceStr = hasData ? (price < 10 ? "$" + price.toFixed(4) : "$" + price.toFixed(2)) : "--";
+  return "<div class='watch-price-tile'><div class='wpt-left'><span class='wpt-ticker'>" + sym + "</span><span class='wpt-price'>" + priceStr + "</span></div><span class='wpt-chg' style='color:" + chgColor + "'>" + chgStr + "</span></div>";
+}
+
 function newsCardHtml(ticker, tickerColor, impact, headline, detail, url) {
   var h = "<div class='news-card' style='border-left-color:" + iColor[impact] + "'>";
   h += "<div class='news-top'><span class='news-ticker' style='color:" + tickerColor + "'>" + ticker + "</span>";
   h += "<span style='font-size:11px;font-weight:700;color:" + iColor[impact] + "'>" + iIcon[impact] + " " + impact + "</span></div>";
   h += "<div class='news-headline'>" + headline + "</div>";
   h += "<div class='news-detail'>" + detail + "</div>";
-  if (url) { h += "<a class='news-link' href='" + url + "' target='_blank'>Read more &rarr;</a>"; }
+  if (url) { h += "<a class='news-link' href='" + url + "' target='_blank'>Read more</a>"; }
   h += "</div>";
   return h;
 }
 
-/* ---- Fetch: Fear & Greed ---- */
 function fetchFearGreed(cb) {
   var url = "https://corsproxy.io/?" + encodeURIComponent("https://production.dataviz.cnn.io/index/fearandgreed/graphdata");
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        try { var j = JSON.parse(xhr.responseText); cb(null, Math.round(j.fear_and_greed.score)); }
-        catch(e) { cb("parse error"); }
-      } else { cb("status " + xhr.status); }
+    if (xhr.readyState !== 4) { return; }
+    if (xhr.status === 200) {
+      try { var j = JSON.parse(xhr.responseText); cb(null, Math.round(j.fear_and_greed.score)); return; } catch(e) {}
     }
+    cb("failed");
   };
-  xhr.onerror = function() { cb("network error"); };
+  xhr.onerror = function() { cb("error"); };
   xhr.send();
 }
 
-/* ---- Fetch: Single Finnhub quote ---- */
-function fetchQuote(ticker, allResults, onDone) {
+function fetchFinnhubQuote(ticker, results, done) {
   var url = "https://finnhub.io/api/v1/quote?symbol=" + ticker + "&token=" + FINNHUB_KEY;
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        try {
-          var j = JSON.parse(xhr.responseText);
-          if (j.c && j.c > 0) {
-            allResults[ticker] = { price: j.c, chg: ((j.c - j.pc) / j.pc) * 100 };
-          }
-        } catch(e) {}
-      }
-      onDone();
+    if (xhr.readyState !== 4) { return; }
+    if (xhr.status === 200) {
+      try {
+        var j = JSON.parse(xhr.responseText);
+        if (j.c && j.c > 0) { results[ticker] = { price:j.c, chg:((j.c - j.pc) / j.pc) * 100 }; }
+      } catch(e) {}
     }
+    done();
   };
-  xhr.onerror = function() { onDone(); };
+  xhr.onerror = function() { done(); };
   xhr.send();
 }
 
-/* ---- Fetch: All quotes ---- */
-function fetchAllQuotes(tickers, cb) {
+function fetchAllFinnhub(tickers, cb) {
   var results = {};
   var remaining = tickers.length;
   if (remaining === 0) { cb(results); return; }
   for (var i = 0; i < tickers.length; i++) {
-    fetchQuote(tickers[i], results, function() {
+    fetchFinnhubQuote(tickers[i], results, function() {
       remaining--;
       if (remaining === 0) { cb(results); }
     });
   }
 }
 
-/* ---- Fetch: Finnhub company news ---- */
+function fetchTwelveQuote(ticker, results, done) {
+  var url = "https://api.twelvedata.com/price?symbol=" + ticker + "&exchange=SGX&apikey=" + TWELVE_KEY;
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    if (xhr.status === 200) {
+      try {
+        var j = JSON.parse(xhr.responseText);
+        if (j.price) { results[ticker] = { price:parseFloat(j.price), chg:0 }; }
+      } catch(e) {}
+    }
+    done();
+  };
+  xhr.onerror = function() { done(); };
+  xhr.send();
+}
+
+function fetchAllSG(cb) {
+  var results = {};
+  var remaining = SG_TICKERS.length;
+  if (remaining === 0) { cb(results); return; }
+  for (var i = 0; i < SG_TICKERS.length; i++) {
+    fetchTwelveQuote(SG_TICKERS[i], results, function() {
+      remaining--;
+      if (remaining === 0) { cb(results); }
+    });
+  }
+}
+
+function fetchCrypto(cb) {
+  var url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,polkadot-2&vs_currencies=usd&include_24hr_change=true";
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    if (xhr.status === 200) {
+      try { cb(null, JSON.parse(xhr.responseText)); return; } catch(e) {}
+    }
+    cb("failed");
+  };
+  xhr.onerror = function() { cb("error"); };
+  xhr.send();
+}
+
 function getDateStr(daysAgo) {
   var d = new Date();
   d.setDate(d.getDate() - daysAgo);
   return d.toISOString().slice(0, 10);
 }
 
-function fetchNewsForTicker(ticker, onDone) {
+function fetchFinnhubNews(ticker, done) {
   var url = "https://finnhub.io/api/v1/company-news?symbol=" + ticker + "&from=" + getDateStr(7) + "&to=" + getDateStr(0) + "&token=" + FINNHUB_KEY;
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        try {
-          var articles = JSON.parse(xhr.responseText);
-          if (articles && articles.length > 0) {
-            var a = articles[0];
-            onDone({ ticker: ticker, headline: a.headline, detail: a.summary ? a.summary.slice(0, 140) + "..." : "", url: a.url, impact: "neutral" });
-            return;
-          }
-        } catch(e) {}
-      }
-      onDone(null);
+    if (xhr.readyState !== 4) { return; }
+    if (xhr.status === 200) {
+      try {
+        var arr = JSON.parse(xhr.responseText);
+        if (arr && arr.length > 0) {
+          var a = arr[0];
+          done({ ticker:ticker, headline:a.headline, detail:a.summary ? a.summary.slice(0,140) + "..." : "", url:a.url, impact:"neutral" });
+          return;
+        }
+      } catch(e) {}
     }
+    done(null);
   };
-  xhr.onerror = function() { onDone(null); };
+  xhr.onerror = function() { done(null); };
   xhr.send();
 }
 
-function fetchAllNews(tickers, cb) {
+function fetchAllUSNews(tickers, cb) {
   var results = [];
   var remaining = tickers.length;
   if (remaining === 0) { cb([]); return; }
   for (var i = 0; i < tickers.length; i++) {
-    fetchNewsForTicker(tickers[i], function(item) {
+    fetchFinnhubNews(tickers[i], function(item) {
       if (item) { results.push(item); }
       remaining--;
       if (remaining === 0) { cb(results); }
@@ -341,24 +378,54 @@ function fetchAllNews(tickers, cb) {
   }
 }
 
-/* ---- Fetch: Crypto ---- */
-function fetchCrypto(cb) {
-  var url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,polkadot-2&vs_currencies=usd&include_24hr_change=true";
+function fetchCoinDeskNews(cb) {
+  var url = "https://corsproxy.io/?" + encodeURIComponent("https://www.coindesk.com/arc/outboundfeeds/rss/");
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        try { cb(null, JSON.parse(xhr.responseText)); }
-        catch(e) { cb("parse error"); }
-      } else { cb("status " + xhr.status); }
-    }
+    if (xhr.readyState !== 4) { return; }
+    if (xhr.status !== 200) { cb([]); return; }
+    try {
+      var raw = xhr.responseText;
+      var keywords = { BTC:["bitcoin","btc"], ETH:["ethereum","eth"], DOT:["polkadot","dot"] };
+      var found = {};
+      var results = [];
+      var itemRe = /<item[\s\S]*?<\/item>/gi;
+      var titleRe = /<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>|<title>([\s\S]*?)<\/title>/i;
+      var descRe  = /<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i;
+      var linkRe  = /<link>([\s\S]*?)<\/link>/i;
+      var itemMatches = raw.match(itemRe) || [];
+      var coins = ["BTC","ETH","DOT"];
+      for (var i = 0; i < itemMatches.length; i++) {
+        var block = itemMatches[i];
+        var tm = block.match(titleRe);
+        var dm = block.match(descRe);
+        var lm = block.match(linkRe);
+        var title = tm ? (tm[1] || tm[2] || "") : "";
+        var desc  = dm ? (dm[1] || dm[2] || "") : "";
+        var link  = lm ? lm[1] : "";
+        var combined = (title + " " + desc).toLowerCase();
+        for (var c = 0; c < coins.length; c++) {
+          var coin = coins[c];
+          if (found[coin]) { continue; }
+          var kws = keywords[coin];
+          for (var k = 0; k < kws.length; k++) {
+            if (combined.indexOf(kws[k]) !== -1) {
+              found[coin] = true;
+              results.push({ ticker:coin, headline:title, detail:desc.replace(/<[^>]+>/g,"").slice(0,140) + "...", url:link, impact:"neutral" });
+              break;
+            }
+          }
+        }
+        if (found["BTC"] && found["ETH"] && found["DOT"]) { break; }
+      }
+      cb(results);
+    } catch(e) { cb([]); }
   };
-  xhr.onerror = function() { cb("network error"); };
+  xhr.onerror = function() { cb([]); };
   xhr.send();
 }
 
-/* ---- Render ---- */
 function renderFG() {
   var v = liveData.fg;
   if (!v) { return; }
@@ -371,7 +438,18 @@ function renderFG() {
   ge("gauge-dot").style.background = fgColor(v);
 }
 
-function renderPrices() {
+function renderAll() {
+  var nd = NEWS_DATA;
+
+  ge("sent-overall").textContent = nd.sentiment.overall;
+  ge("sent-summary").textContent = nd.sentiment.summary;
+  var fh = "";
+  for (var i = 0; i < nd.sentiment.funds.length; i++) {
+    var f = nd.sentiment.funds[i];
+    fh += "<div class='fund-row'><span class='fund-name'>" + f.name + "</span><span class='fund-view'>" + f.view + "</span><span class='fund-note'>-- " + f.note + "</span></div>";
+  }
+  ge("sent-funds").innerHTML = fh;
+
   var uh = "";
   for (var i = 0; i < US_TICKERS.length; i++) {
     var sym = US_TICKERS[i];
@@ -381,35 +459,58 @@ function renderPrices() {
   ge("us-prices").innerHTML = uh;
 
   var sh = "";
-  var sgDisp = ["D05","O39","C38U"];
   for (var i = 0; i < SG_TICKERS.length; i++) {
     var sym = SG_TICKERS[i];
-    var d = liveData.prices[sym];
-    sh += d ? priceTile(sgDisp[i], d.price, d.chg) : emptyTile(sgDisp[i]);
+    var d = liveData.sgPrices[sym];
+    sh += d ? priceTile(sym, d.price, d.chg) : emptyTile(sym);
   }
   ge("sg-prices").innerHTML = sh;
 
-  var cryptoMap = [
-    { sym:"BTC", id:"bitcoin" },
-    { sym:"ETH", id:"ethereum" },
-    { sym:"DOT", id:"polkadot-2" }
-  ];
   var ch = "";
-  for (var i = 0; i < cryptoMap.length; i++) {
-    var entry = cryptoMap[i];
-    var d = liveData.crypto[entry.id];
-    ch += d ? priceTile(entry.sym, d.usd, d.usd_24h_change) : emptyTile(entry.sym);
+  for (var i = 0; i < CRYPTO_COINS.length; i++) {
+    var coin = CRYPTO_COINS[i];
+    var d = liveData.crypto[coin.cg];
+    ch += d ? priceTile(coin.sym, d.usd, d.usd_24h_change) : emptyTile(coin.sym);
   }
   ge("crypto-prices").innerHTML = ch;
 
+  var unh = "";
+  for (var i = 0; i < liveData.usNews.length; i++) {
+    var n = liveData.usNews[i];
+    unh += newsCardHtml(n.ticker, "#38bdf8", n.impact, n.headline, n.detail, n.url);
+  }
+  ge("us-news").innerHTML = unh || "<div style='color:#64748b;font-size:13px;padding:10px'>No recent news found. Try refreshing.</div>";
+
+  var snh = "";
+  for (var i = 0; i < nd.sgNews.length; i++) {
+    var n = nd.sgNews[i];
+    var label = n.ticker + " <span style='font-size:11px;color:#64748b;font-weight:400'>" + n.name + "</span>";
+    snh += newsCardHtml(label, "#a78bfa", n.impact, n.headline, n.detail, null);
+  }
+  ge("sg-news").innerHTML = snh;
+
+  var cnh = "";
+  for (var i = 0; i < liveData.cryptoNews.length; i++) {
+    var n = liveData.cryptoNews[i];
+    cnh += newsCardHtml(n.ticker, "#f59e0b", n.impact, n.headline, n.detail, n.url);
+  }
+  ge("crypto-news").innerHTML = cnh || "<div style='color:#64748b;font-size:13px;padding:10px'>No crypto news found. Try refreshing.</div>";
+
+  var wpg = "";
+  for (var i = 0; i < nd.watchlist.length; i++) {
+    var w = nd.watchlist[i];
+    var pd = liveData.prices[w.ticker];
+    wpg += watchPriceTile(w.ticker, pd ? pd.price : null, pd ? pd.chg : null);
+  }
+  ge("watch-price-grid").innerHTML = wpg;
+
   var wh = "";
-  var nd = NEWS_DATA;
   for (var i = 0; i < nd.watchlist.length; i++) {
     var w = nd.watchlist[i];
     var ac = aColor[w.action] || "#64748b";
     var pd = liveData.prices[w.ticker];
-    var priceStr = pd ? ("$" + pd.price.toFixed(2)) : "--";
-    var chgStr = pd ? ((pd.chg >= 0 ? "+" : "") + pd.chg.toFixed(2) + "%") : "";
+    var priceStr = pd ? "$" + pd.price.toFixed(2) : "--";
+    var chgStr   = pd ? ((pd.chg >= 0 ? "+" : "") + pd.chg.toFixed(2) + "%") : "";
     var chgColor = pd ? (pd.chg >= 0 ? "#22c55e" : "#ef4444") : "#64748b";
     wh += "<div class='watch-card'>";
     wh += "<div class='watch-badge' style='background:" + ac + "33;border:2px solid " + ac + "'>";
@@ -422,48 +523,13 @@ function renderPrices() {
     wh += "</div></div>";
   }
   ge("watch-list").innerHTML = wh;
-}
 
-function renderNews() {
-  var nd = NEWS_DATA;
-
-  ge("sent-overall").textContent = nd.sentiment.overall;
-  ge("sent-summary").textContent = nd.sentiment.summary;
-
-  var fh = "";
-  for (var i = 0; i < nd.sentiment.funds.length; i++) {
-    var f = nd.sentiment.funds[i];
-    fh += "<div class='fund-row'><span class='fund-name'>" + f.name + "</span><span class='fund-view'>" + f.view + "</span><span class='fund-note'>-- " + f.note + "</span></div>";
-  }
-  ge("sent-funds").innerHTML = fh;
-
-  var usSource = (liveData.usNews && liveData.usNews.length > 0) ? liveData.usNews : [];
-  var uh = "";
-  for (var i = 0; i < usSource.length; i++) {
-    var n = usSource[i];
-    uh += newsCardHtml(n.ticker, "#38bdf8", n.impact, n.headline, n.detail, n.url);
-  }
-  ge("us-news").innerHTML = uh || "<div style='color:#64748b;font-size:13px;padding:10px'>No recent news found. Try refreshing.</div>";
-
-  var sh = "";
-  for (var i = 0; i < nd.sgNews.length; i++) {
-    var n = nd.sgNews[i];
-    var label = n.ticker + " <span style='font-size:11px;color:#64748b;font-weight:400'>" + n.name + "</span>";
-    sh += newsCardHtml(label, "#a78bfa", n.impact, n.headline, n.detail, null);
-  }
-  ge("sg-news").innerHTML = sh;
-
-  var cryh = "";
-  for (var i = 0; i < nd.cryptoNews.length; i++) {
-    var n = nd.cryptoNews[i];
-    cryh += newsCardHtml(n.ticker, "#f59e0b", n.impact, n.headline, n.detail, null);
-  }
-  ge("crypto-news").innerHTML = cryh;
-
+  var usOv  = liveData.usNews.length > 0 ? liveData.usNews : [];
+  var cryOv = liveData.cryptoNews.length > 0 ? liveData.cryptoNews : [];
   var cats = [
-    { label:"US Tech",   items: usSource.length > 0 ? usSource : [], key:"ticker" },
-    { label:"SG Stocks", items: nd.sgNews,     key:"ticker" },
-    { label:"Crypto",    items: nd.cryptoNews, key:"ticker" }
+    { label:"US Tech",   items:usOv,       key:"ticker" },
+    { label:"SG Stocks", items:nd.sgNews,  key:"ticker" },
+    { label:"Crypto",    items:cryOv,      key:"ticker" }
   ];
   var mg = "";
   for (var c = 0; c < cats.length; c++) {
@@ -480,44 +546,52 @@ function renderNews() {
   ge("mini-grid").innerHTML = mg;
 }
 
-/* ---- Main refresh ---- */
 function refreshAll() {
   var btn = ge("refresh-btn");
   btn.disabled = true;
   btn.textContent = "Refreshing...";
-  setStatus("Fetching Fear and Greed index...");
 
+  setStatus("Fetching Fear and Greed...");
   fetchFearGreed(function(err, val) {
     if (!err) { liveData.fg = val; renderFG(); }
-    setStatus("Fetching stock prices...");
 
-    var allTickers = US_TICKERS.concat(SG_TICKERS).concat(WATCH_TICKERS);
-    fetchAllQuotes(allTickers, function(prices) {
+    setStatus("Fetching US and watchlist prices...");
+    fetchAllFinnhub(US_TICKERS.concat(WATCH_TICKERS), function(prices) {
       liveData.prices = prices;
-      renderPrices();
-      setStatus("Fetching crypto prices...");
+      renderAll();
 
-      fetchCrypto(function(err2, cdata) {
-        if (!err2) { liveData.crypto = cdata; }
-        renderPrices();
-        setStatus("Fetching US stock news...");
+      setStatus("Fetching SG prices...");
+      fetchAllSG(function(sgp) {
+        liveData.sgPrices = sgp;
+        renderAll();
 
-        fetchAllNews(US_TICKERS, function(newsItems) {
-          liveData.usNews = newsItems;
-          renderNews();
-          setStatus("All data loaded. Last updated: " + new Date().toLocaleTimeString("en-SG"));
-          btn.disabled = false;
-          btn.textContent = "Refresh Live Data";
+        setStatus("Fetching crypto prices...");
+        fetchCrypto(function(err2, cdata) {
+          if (!err2) { liveData.crypto = cdata; }
+          renderAll();
+
+          setStatus("Fetching US stock news...");
+          fetchAllUSNews(US_TICKERS, function(usNews) {
+            liveData.usNews = usNews;
+            renderAll();
+
+            setStatus("Fetching crypto news...");
+            fetchCoinDeskNews(function(cryptoNews) {
+              liveData.cryptoNews = cryptoNews;
+              renderAll();
+              setStatus("All data loaded. Last updated: " + new Date().toLocaleTimeString("en-SG"));
+              btn.disabled = false;
+              btn.textContent = "Refresh Live Data";
+            });
+          });
         });
       });
     });
   });
 }
 
-/* ---- Init ---- */
 ge("date-label").textContent = new Date().toLocaleDateString("en-SG", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
 refreshAll();
-
 </script>
 </body>
 </html>
