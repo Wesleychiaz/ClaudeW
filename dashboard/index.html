@@ -130,7 +130,7 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
     <p class="hint">KTOS, RKLB, OUST + S&amp;P 500 Top 10</p>
     <div class="section-label">Price Snapshot</div>
     <div class="watch-price-grid" id="watch-price-grid"></div>
-    <div class="section-label">Notes</div>
+    <div class="section-label">Latest News <span class="live-tag">(Live via Finnhub)</span></div>
     <div id="watch-list"></div>
   </div>
 </main>
@@ -187,7 +187,7 @@ var iColor = { positive:"#22c55e", negative:"#ef4444", neutral:"#94a3b8" };
 var iIcon  = { positive:"(+)", negative:"(-)", neutral:"(o)" };
 var aColor = { buy:"#22c55e", sell:"#ef4444", hold:"#6366f1", watch:"#f59e0b" };
 
-var liveData = { fg:null, prices:{}, sgPrices:{}, crypto:{}, usNews:[], cryptoNews:[] };
+var liveData = { fg:null, prices:{}, sgPrices:{}, crypto:{}, usNews:[], cryptoNews:[], watchNews:{} };
 
 function ge(id) { return document.getElementById(id); }
 function setStatus(msg) { ge("status-bar").textContent = msg; }
@@ -282,14 +282,16 @@ function fetchFinnhubQuote(ticker, results, done) {
 
 function fetchAllFinnhub(tickers, cb) {
   var results = {};
-  var remaining = tickers.length;
-  if (remaining === 0) { cb(results); return; }
-  for (var i = 0; i < tickers.length; i++) {
-    fetchFinnhubQuote(tickers[i], results, function() {
-      remaining--;
-      if (remaining === 0) { cb(results); }
+  var index = 0;
+  function next() {
+    if (index >= tickers.length) { cb(results); return; }
+    var ticker = tickers[index];
+    index++;
+    fetchFinnhubQuote(ticker, results, function() {
+      setTimeout(next, 150);
     });
   }
+  next();
 }
 
 function fetchTwelveQuote(ticker, results, done) {
@@ -378,7 +380,20 @@ function fetchAllUSNews(tickers, cb) {
   }
 }
 
-function fetchCoinDeskNews(cb) {
+function fetchAllWatchNews(tickers, cb) {
+  var results = {};
+  var index = 0;
+  function next() {
+    if (index >= tickers.length) { cb(results); return; }
+    var ticker = tickers[index];
+    index++;
+    fetchFinnhubNews(ticker, function(item) {
+      if (item) { results[ticker] = item; }
+      setTimeout(next, 150);
+    });
+  }
+  next();
+}
   var url = "https://corsproxy.io/?" + encodeURIComponent("https://www.coindesk.com/arc/outboundfeeds/rss/");
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
@@ -512,6 +527,10 @@ function renderAll() {
     var priceStr = pd ? "$" + pd.price.toFixed(2) : "--";
     var chgStr   = pd ? ((pd.chg >= 0 ? "+" : "") + pd.chg.toFixed(2) + "%") : "";
     var chgColor = pd ? (pd.chg >= 0 ? "#22c55e" : "#ef4444") : "#64748b";
+    var wn = liveData.watchNews[w.ticker];
+    var newsHtml = wn
+      ? "<div class='news-headline' style='margin-bottom:4px'>" + wn.headline + "</div><div class='news-detail'>" + wn.detail + "</div>" + (wn.url ? "<a class='news-link' href='" + wn.url + "' target='_blank'>Read more</a>" : "")
+      : "<div style='font-size:12px;color:#475569'>" + w.note + "</div>";
     wh += "<div class='watch-card'>";
     wh += "<div class='watch-badge' style='background:" + ac + "33;border:2px solid " + ac + "'>";
     wh += "<span style='font-size:11px;font-weight:800;color:" + ac + "'>" + w.ticker + "</span>";
@@ -519,7 +538,7 @@ function renderAll() {
     wh += "</div>";
     wh += "<div class='watch-right'>";
     wh += "<div class='watch-price-row'><span class='watch-price'>" + priceStr + "</span><span class='watch-chg' style='color:" + chgColor + "'>" + chgStr + "</span></div>";
-    wh += "<div class='watch-note'>" + w.note + "</div>";
+    wh += newsHtml;
     wh += "</div></div>";
   }
   ge("watch-list").innerHTML = wh;
@@ -579,9 +598,15 @@ function refreshAll() {
             fetchCoinDeskNews(function(cryptoNews) {
               liveData.cryptoNews = cryptoNews;
               renderAll();
-              setStatus("All data loaded. Last updated: " + new Date().toLocaleTimeString("en-SG"));
-              btn.disabled = false;
-              btn.textContent = "Refresh Live Data";
+
+              setStatus("Fetching watchlist news...");
+              fetchAllWatchNews(WATCH_TICKERS, function(watchNews) {
+                liveData.watchNews = watchNews;
+                renderAll();
+                setStatus("All data loaded. Last updated: " + new Date().toLocaleTimeString("en-SG"));
+                btn.disabled = false;
+                btn.textContent = "Refresh Live Data";
+              });
             });
           });
         });
