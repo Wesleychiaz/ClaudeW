@@ -42,6 +42,7 @@ main{padding:16px;max-width:900px;margin:0 auto}
 .price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
 .price-tile{background:#1e293b;border-radius:10px;padding:12px;text-align:center}
 .price-ticker{font-size:12px;font-weight:800;color:#94a3b8;margin-bottom:4px}
+.price-val覆{font-size:18px;font-weight:800;color:#f1f5f9}
 .price-val{font-size:18px;font-weight:800;color:#f1f5f9}
 .price-chg{font-size:12px;font-weight:700;margin-top:2px}
 .watch-price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:18px}
@@ -394,6 +395,9 @@ function fetchAllWatchNews(tickers, cb) {
   }
   next();
 }
+
+// FIXED: Added the missing function declaration text here
+function fetchCoinDeskNews(cb) {
   var url = "https://corsproxy.io/?" + encodeURIComponent("https://www.coindesk.com/arc/outboundfeeds/rss/");
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
