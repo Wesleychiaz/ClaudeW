@@ -616,7 +616,13 @@ function refreshAll() {
 }
 
 ge("date-label").textContent = new Date().toLocaleDateString("en-SG", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
-refreshAll();
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function() { renderAll(); refreshAll(); });
+} else {
+  renderAll();
+  refreshAll();
+}
 </script>
 </body>
 </html>
