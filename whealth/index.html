@@ -451,7 +451,7 @@
       }
       vals.push(cur.trim());
       const obj = {};
-      headers.forEach((h, i) => obj[h] = (vals[i] || '').trim().replace(/\r/g,''));
+      headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
       // Also store with original header as fallback key
       rawHeaders.forEach((h, i) => obj['_raw_' + i] = (vals[i] || '').trim());
       obj['_headers'] = headers;
@@ -474,17 +474,7 @@
   }
 
   // Raw index is primary — sheet order: 0=Date,1=Day,2=Weight,3=Supplement,4=FastStart,5=FastEnd,6=HRBS,7=Notes
-  function getWeight(row) {
-    // Try parsed header name first (most reliable)
-    const byName = row['weight_kg'] || row['weight_kg_'] || row['weight'];
-    if (byName && !isNaN(parseFloat(byName))) return byName;
-    // Try raw indices 2 and 3 as fallback
-    for (const i of [2,3,4]) {
-      const v = row['_raw_' + i];
-      if (v && !isNaN(parseFloat(v)) && parseFloat(v) > 30 && parseFloat(v) < 300) return v;
-    }
-    return '';
-  }
+  function getWeight(row) { return row['weight_kg'] || row['weight_kg_'] || row['weight'] || ''; }
   function getHRBS(row)   { const v = getByIndex(row,6); return (v && !isNaN(parseInt(v)))   ? v : getCol(row,'hrbs_bpm','hrbs'); }
   function getSupp(row)   { const v = getByIndex(row,3); return v || getCol(row,'supplement_yes_no','supplement'); }
   function getDate(row)   { return getByIndex(row,0) || getCol(row,'date'); }
@@ -499,11 +489,14 @@
     icon.innerHTML = '<span class="spinning">↻</span>';
     document.getElementById('last-updated').textContent = 'Loading...';
 
+    // Direct fetch only - CORS proxy can return stale cached data
     let text = null;
     try {
-      const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+      const res = await fetch(SHEET_CSV_URL + '&cachebust=' + Date.now());
       if (res.ok) text = await res.text();
-    } catch(e) { console.error(e); }
+    } catch (e) {
+      console.error('Fetch failed:', e);
+    }
 
     if (!text) {
       document.getElementById('last-updated').textContent = 'Error — check sheet is published as CSV';
