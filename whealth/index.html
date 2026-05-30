@@ -434,7 +434,7 @@
 
   // ── PARSE CSV ────────────────────────────────────────────
   function parseCSV(text) {
-    const lines = text.trim().split('\n');
+    const lines = text.trim().replace(/\r/g, '').split('\n');
     const rawHeaders = lines[0].split(',').map(h => h.trim());
     const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''));
     console.log('CSV Headers (raw):', rawHeaders);
@@ -451,7 +451,7 @@
       }
       vals.push(cur.trim());
       const obj = {};
-      headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
+      headers.forEach((h, i) => obj[h] = (vals[i] || '').trim().replace(/\r/g,''));
       // Also store with original header as fallback key
       rawHeaders.forEach((h, i) => obj['_raw_' + i] = (vals[i] || '').trim());
       obj['_headers'] = headers;
