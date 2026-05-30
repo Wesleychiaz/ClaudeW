@@ -527,7 +527,7 @@
     // Weight
     const weightRows = rows.filter(r => r['weight_kg'] && !isNaN(parseFloat(r['weight_kg'])));
     if (weightRows.length) {
-      const latest = parseFloat(getCol(weightRows[weightRows.length - 1],'weight','weight_kg_'));
+      const latest = parseFloat(weightRows[weightRows.length - 1]['weight_kg']);
       const toGo = (latest - 76).toFixed(1);
       const pct = Math.max(0, Math.min(100, ((86 - latest) / (86 - 76)) * 100));
       document.getElementById('kpi-weight').textContent = latest + ' kg';
