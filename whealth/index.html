@@ -435,14 +435,51 @@
   // ── PARSE CSV ────────────────────────────────────────────
   function parseCSV(text) {
     const lines = text.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g,'_'));
+    const rawHeaders = lines[0].split(',').map(h => h.trim());
+    const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''));
+    console.log('CSV Headers (raw):', rawHeaders);
+    console.log('CSV Headers (parsed):', headers);
     return lines.slice(1).map(line => {
-      const vals = line.split(',');
+      // Handle quoted CSV values
+      const vals = [];
+      let cur = '', inQ = false;
+      for (let c of line) {
+        if (c === '"') inQ = !inQ;
+        else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+        else cur += c;
+      }
+      vals.push(cur.trim());
       const obj = {};
       headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
+      // Also store with original header as fallback key
+      rawHeaders.forEach((h, i) => obj['_raw_' + i] = (vals[i] || '').trim());
+      obj['_headers'] = headers;
       return obj;
     }).filter(r => r[headers[0]]); // filter empty rows
   }
+
+  // Helper: get value by possible header variations
+  function getCol(row, ...names) {
+    for (const n of names) {
+      if (row[n] !== undefined && row[n] !== '') return row[n];
+    }
+    return '';
+  }
+
+  // Column index map based on actual sheet order:
+  // 0=Date, 1=Day, 2=Weight(kg), 3=Supplement(Yes/No), 4=Fast Start, 5=Fast End, 6=HRBS(bpm), 7=Notes
+  function getByIndex(row, idx) {
+    return row['_raw_' + idx] || '';
+  }
+
+  function getWeight(row) { return getCol(row,'weight_kg_','weight') || getByIndex(row, 2); }
+  function getHRBS(row)   { return getCol(row,'hrbs_bpm_','hrbs') || getByIndex(row, 6); }
+  function getSupp(row)   { return getCol(row,'supplement_yes_no_','supplement') || getByIndex(row, 3); }
+  function getDate(row)   { return getCol(row,'date') || getByIndex(row, 0); }
+  function getDay(row)    { return getCol(row,'day') || getByIndex(row, 1); }
+  function getFastStart(row) { return getCol(row,'fast_start') || getByIndex(row, 4); }
+  function getFastEnd(row)   { return getCol(row,'fast_end') || getByIndex(row, 5); }
+  function getNotes(row)  { return getCol(row,'notes') || getByIndex(row, 7); }
 
   // ── LOAD SHEET DATA ──────────────────────────────────────
   async function loadSheetData() {
@@ -474,7 +511,7 @@
 
     try {
       const rows = parseCSV(text);
-      const dataRows = rows.filter(r => r.weight || r.hrbs_bpm_ || r.supplement_yes_no_);
+      const dataRows = rows.filter(r => getWeight(r) || getHRBS(r) || getSupp(r));
       updateKPIs(dataRows);
       renderCharts(dataRows);
       renderTable(rows);
@@ -491,9 +528,9 @@
   // ── KPI UPDATES ──────────────────────────────────────────
   function updateKPIs(rows) {
     // Weight
-    const weightRows = rows.filter(r => r.weight && !isNaN(parseFloat(r.weight)));
+    const weightRows = rows.filter(r => getWeight(r) && !isNaN(parseFloat(getWeight(r))));
     if (weightRows.length) {
-      const latest = parseFloat(weightRows[weightRows.length - 1].weight);
+      const latest = parseFloat(getCol(weightRows[weightRows.length - 1],'weight','weight_kg_'));
       const toGo = (latest - 76).toFixed(1);
       const pct = Math.max(0, Math.min(100, ((86 - latest) / (86 - 76)) * 100));
       document.getElementById('kpi-weight').textContent = latest + ' kg';
@@ -502,9 +539,9 @@
     }
 
     // HRBS
-    const hrbsRows = rows.filter(r => r.hrbs_bpm_ && !isNaN(parseInt(r.hrbs_bpm_)));
+    const hrbsRows = rows.filter(r => getHRBS(r) && !isNaN(parseInt(getHRBS(r))));
     if (hrbsRows.length) {
-      const latest = parseInt(hrbsRows[hrbsRows.length - 1].hrbs_bpm_);
+      const latest = parseInt(getCol(hrbsRows[hrbsRows.length - 1],'hrbs_bpm_','hrbs','hrbs_bpm'));
       const el = document.getElementById('kpi-hrbs');
       el.textContent = latest + ' bpm';
       el.style.color = latest <= 55 ? 'var(--accent)' : latest <= 70 ? 'var(--accent2)' : 'var(--danger)';
@@ -513,24 +550,24 @@
     }
 
     // Supplement streak
-    const suppRows = rows.filter(r => r.supplement_yes_no_);
+    const suppRows = rows.filter(r => getSupp(r));
     if (suppRows.length) {
       let streak = 0;
       for (let i = suppRows.length - 1; i >= 0; i--) {
-        if (suppRows[i].supplement_yes_no_.toLowerCase() === 'yes') streak++;
+        if (getCol(suppRows[i],'supplement_yes_no_','supplement','supplement_yes_no').toLowerCase() === 'yes') streak++;
         else break;
       }
-      const total = suppRows.filter(r => r.supplement_yes_no_.toLowerCase() === 'yes').length;
+      const total = suppRows.filter(r => getSupp(r).toLowerCase() === 'yes').length;
       const pct = Math.round((total / suppRows.length) * 100);
       document.getElementById('kpi-streak').textContent = streak + ' days';
       document.getElementById('kpi-supp-pct').textContent = `${pct}% overall (${total}/${suppRows.length})`;
     }
 
     // Fast window avg last 7 days
-    const fastRows = rows.filter(r => r.fast_start && r.fast_end);
+    const fastRows = rows.filter(r => getFastStart(r) && getFastEnd(r));
     const last7 = fastRows.slice(-7);
     if (last7.length) {
-      const hrs = last7.map(r => calcFastHours(r.fast_start, r.fast_end)).filter(h => h !== null);
+      const hrs = last7.map(r => calcFastHours(getFastStart(r), getFastEnd(r))).filter(h => h !== null);
       if (hrs.length) {
         const avg = (hrs.reduce((a,b) => a+b, 0) / hrs.length).toFixed(1);
         document.getElementById('kpi-fast').textContent = avg + 'h';
@@ -542,35 +579,35 @@
 
   // ── CHARTS ───────────────────────────────────────────────
   function renderCharts(rows) {
-    const weightData = rows.filter(r => r.weight && !isNaN(parseFloat(r.weight)));
-    const hrbsData = rows.filter(r => r.hrbs_bpm_ && !isNaN(parseInt(r.hrbs_bpm_)));
-    const fastData = rows.filter(r => r.fast_start && r.fast_end);
-    const suppData = rows.filter(r => r.supplement_yes_no_);
+    const weightData = rows.filter(r => getWeight(r) && !isNaN(parseFloat(getWeight(r))));
+    const hrbsData = rows.filter(r => getHRBS(r) && !isNaN(parseInt(getHRBS(r))));
+    const fastData = rows.filter(r => getFastStart(r) && getFastEnd(r));
+    const suppData = rows.filter(r => getSupp(r));
 
     if (weightData.length) {
       makeLineChart('chart-weight',
-        weightData.map(r => r.date),
-        weightData.map(r => parseFloat(r.weight)),
+        weightData.map(r => getDate(r)),
+        weightData.map(r => parseFloat(getWeight(r))),
         '#f0c46a', 76);
     }
 
     if (hrbsData.length) {
       makeLineChart('chart-hrbs',
-        hrbsData.map(r => r.date),
-        hrbsData.map(r => parseInt(r.hrbs_bpm_)),
+        hrbsData.map(r => getDate(r)),
+        hrbsData.map(r => parseInt(getHRBS(r))),
         '#f07a7a', 60);
     }
 
     if (fastData.length) {
-      const hrs = fastData.map(r => calcFastHours(r.fast_start, r.fast_end));
+      const hrs = fastData.map(r => calcFastHours(getFastStart(r), getFastEnd(r)));
       makeLineChart('chart-fast',
-        fastData.map(r => r.date), hrs, '#7ad4f0', 16);
+        fastData.map(r => getDate(r)), hrs, '#7ad4f0', 16);
     }
 
     if (suppData.length) {
-      const vals = suppData.map(r => r.supplement_yes_no_.toLowerCase() === 'yes' ? 1 : 0);
+      const vals = suppData.map(r => getSupp(r).toLowerCase() === 'yes' ? 1 : 0);
       const colors = vals.map(v => v ? 'rgba(184,240,122,0.7)' : 'rgba(240,122,122,0.5)');
-      makeBarChart('chart-supp', suppData.map(r => r.date), vals, colors);
+      makeBarChart('chart-supp', suppData.map(r => getDate(r)), vals, colors);
     }
   }
 
@@ -588,23 +625,26 @@
     }
 
     tbody.innerHTML = display.map(r => {
-      const hrbs = parseInt(r.hrbs_bpm_);
-      const hrbsBadge = !r.hrbs_bpm_ ? '—' : hrbs <= 55 ? `<span class="badge good">${hrbs} bpm</span>` : hrbs <= 70 ? `<span class="badge ok">${hrbs} bpm</span>` : `<span class="badge poor">${hrbs} bpm</span>`;
-      const supp = r.supplement_yes_no_ || '';
+      const hrbsVal = getHRBS(r);
+      const hrbs = parseInt(hrbsVal);
+      const hrbsBadge = !hrbsVal ? '—' : hrbs <= 55 ? `<span class="badge good">${hrbs} bpm</span>` : hrbs <= 70 ? `<span class="badge ok">${hrbs} bpm</span>` : `<span class="badge poor">${hrbs} bpm</span>`;
+      const supp = getSupp(r);
       const suppBadge = supp.toLowerCase() === 'yes' ? '<span class="badge yes">✓ Yes</span>' : supp.toLowerCase() === 'no' ? '<span class="badge no">✗ No</span>' : '—';
-      const fastHrs = r.fast_start && r.fast_end ? (calcFastHours(r.fast_start, r.fast_end) + 'h') : '—';
-      const weight = r.weight ? r.weight + ' kg' : '—';
+      const fs = getFastStart(r); const fe = getFastEnd(r);
+      const fastHrs = fs && fe ? (calcFastHours(fs, fe) + 'h') : '—';
+      const weight = getWeight(r);
+      const weightDisplay = weight ? weight + ' kg' : '—';
 
       return `<tr>
-        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;">${r.date || '—'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--muted);">${r.day || '—'}</td>
-        <td>${weight}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;">${getDate(r) || '—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--muted);">${getDay(r) || '—'}</td>
+        <td>${weightDisplay}</td>
         <td>${hrbsBadge}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:0.72rem;">${r.fast_start || '—'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:0.72rem;">${r.fast_end || '—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.72rem;">${fs || '—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.72rem;">${fe || '—'}</td>
         <td style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--accent3);">${fastHrs}</td>
         <td>${suppBadge}</td>
-        <td style="color:var(--muted);font-size:0.78rem;max-width:160px;">${r.notes || '—'}</td>
+        <td style="color:var(--muted);font-size:0.78rem;max-width:160px;">${getNotes(r) || '—'}</td>
       </tr>`;
     }).join('');
   }
