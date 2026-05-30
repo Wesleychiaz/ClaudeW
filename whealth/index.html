@@ -489,19 +489,11 @@
     icon.innerHTML = '<span class="spinning">↻</span>';
     document.getElementById('last-updated').textContent = 'Loading...';
 
-    // Try direct first, fall back to CORS proxy (needed for local file testing)
-    const urls = [
-      SHEET_CSV_URL,
-      'https://corsproxy.io/?' + encodeURIComponent(SHEET_CSV_URL)
-    ];
-
     let text = null;
-    for (const url of urls) {
-      try {
-        const res = await fetch(url);
-        if (res.ok) { text = await res.text(); break; }
-      } catch (e) { /* try next */ }
-    }
+    try {
+      const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+      if (res.ok) text = await res.text();
+    } catch(e) { console.error(e); }
 
     if (!text) {
       document.getElementById('last-updated').textContent = 'Error — check sheet is published as CSV';
