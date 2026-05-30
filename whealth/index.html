@@ -511,7 +511,7 @@
 
     try {
       const rows = parseCSV(text);
-      const dataRows = rows.filter(r => getWeight(r) || getHRBS(r) || getSupp(r));
+      const dataRows = rows.filter(r => (getWeight(r) || getHRBS(r) || getSupp(r)) && getDate(r));
       updateKPIs(dataRows);
       renderCharts(dataRows);
       renderTable(rows);
@@ -618,7 +618,8 @@
     table.style.display = 'table';
     const tbody = document.getElementById('log-body');
 
-    const display = rows.slice().reverse();
+    // Only show rows with actual data, newest first
+    const display = rows.filter(r => getWeight(r) || getHRBS(r) || getSupp(r) || getFastStart(r)).reverse();
     if (display.length === 0) {
       tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No data yet in your sheet.</td></tr>';
       return;
