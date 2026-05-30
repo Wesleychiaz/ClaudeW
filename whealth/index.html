@@ -438,6 +438,7 @@
     const rawHeaders = lines[0].split(',').map(h => h.trim());
     const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''));
     console.log('CSV Headers (raw):', rawHeaders);
+    console.log('First data row raw values:', Array.from({length: 9}, (_, i) => i + ': ' + (lines[1]?.split(',')[i] || '')));
     console.log('CSV Headers (parsed):', headers);
     return lines.slice(1).map(line => {
       // Handle quoted CSV values
@@ -472,9 +473,14 @@
     return row['_raw_' + idx] || '';
   }
 
-  function getWeight(row) { return getCol(row,'weight_kg_','weight') || getByIndex(row, 2); }
-  function getHRBS(row)   { return getCol(row,'hrbs_bpm_','hrbs') || getByIndex(row, 6); }
-  function getSupp(row)   { return getCol(row,'supplement_yes_no_','supplement') || getByIndex(row, 3); }
+  function getWeight(row) {
+    // Try all possible variations of the weight column name
+    const val = getCol(row,'weight_kg_','weight','weight_kg','weight__kg_') || getByIndex(row, 2);
+    const num = parseFloat(val);
+    return isNaN(num) ? '' : val;
+  }
+  function getHRBS(row)   { return getCol(row,'hrbs_bpm','hrbs_bpm_','hrbs') || getByIndex(row, 6); }
+  function getSupp(row)   { return getCol(row,'supplement_yes_no','supplement_yes_no_','supplement') || getByIndex(row, 3); }
   function getDate(row)   { return getCol(row,'date') || getByIndex(row, 0); }
   function getDay(row)    { return getCol(row,'day') || getByIndex(row, 1); }
   function getFastStart(row) { return getCol(row,'fast_start') || getByIndex(row, 4); }
