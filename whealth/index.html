@@ -525,7 +525,7 @@
   // ── KPI UPDATES ──────────────────────────────────────────
   function updateKPIs(rows) {
     // Weight
-    const weightRows = rows.filter(r => getWeight(r) && !isNaN(parseFloat(getWeight(r))));
+    const weightRows = rows.filter(r => r['weight_kg'] && !isNaN(parseFloat(r['weight_kg'])));
     if (weightRows.length) {
       const latest = parseFloat(getCol(weightRows[weightRows.length - 1],'weight','weight_kg_'));
       const toGo = (latest - 76).toFixed(1);
