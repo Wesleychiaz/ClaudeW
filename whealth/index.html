@@ -139,10 +139,10 @@
     <h1>One metric.<br>One habit.<br><em>Every day.</em></h1>
     <p class="hero-subtitle">I'm Wesley — post-surgery, 86kg, and done making excuses. This site tracks my honest attempt to get healthier, one science-backed habit at a time.</p>
     <div class="hero-stats">
-      <div class="stat-card"><div class="stat-label">Current Weight</div><div class="stat-value accent">86 kg</div></div>
-      <div class="stat-card"><div class="stat-label">Height</div><div class="stat-value">177 cm</div></div>
+      <div class="stat-card"><div class="stat-label">Starting Weight</div><div class="stat-value accent">86 kg</div></div>
+      <div class="stat-card"><div class="stat-label">Current Weight</div><div class="stat-value accent" id="hero-current-weight">— kg</div></div>
       <div class="stat-card"><div class="stat-label">Target Weight</div><div class="stat-value target">76 kg</div></div>
-      <div class="stat-card"><div class="stat-label">BMI</div><div class="stat-value accent">27.5</div></div>
+      <div class="stat-card"><div class="stat-label">Current BMI</div><div class="stat-value accent" id="hero-bmi">—</div></div>
     </div>
   </div>
 </section>
@@ -510,6 +510,7 @@
       const rows = parseCSV(text);
       const dataRows = rows.filter(r => (getWeight(r) || getHRBS(r) || getSupp(r)) && getDate(r));
       updateKPIs(dataRows);
+      updateHeroStats(dataRows);
       renderCharts(dataRows);
       renderTable(rows);
       const now = new Date();
@@ -522,12 +523,25 @@
     icon.innerHTML = '↻';
   }
 
+  // ── HERO STATS (live) ───────────────────────────────────────
+  function updateHeroStats(rows) {
+    const weightRows = rows.filter(r => r['weight_kg'] && !isNaN(parseFloat(r['weight_kg'])));
+    if (weightRows.length) {
+      const current = parseFloat(weightRows[weightRows.length - 1]['weight_kg']);
+      const bmi = (current / (1.77 * 1.77)).toFixed(1);
+      const heroWeight = document.getElementById('hero-current-weight');
+      const heroBmi = document.getElementById('hero-bmi');
+      if (heroWeight) heroWeight.textContent = current + ' kg';
+      if (heroBmi) heroBmi.textContent = bmi;
+    }
+  }
+
   // ── KPI UPDATES ──────────────────────────────────────────
   function updateKPIs(rows) {
     // Weight
-    const weightRows = rows.filter(r => r['weight_kg'] && !isNaN(parseFloat(r['weight_kg'])));
+    const weightRows = rows.filter(r => getWeight(r) && !isNaN(parseFloat(getWeight(r))));
     if (weightRows.length) {
-      const latest = parseFloat(weightRows[weightRows.length - 1]['weight_kg']);
+      const latest = parseFloat(getCol(weightRows[weightRows.length - 1],'weight','weight_kg_'));
       const toGo = (latest - 76).toFixed(1);
       const pct = Math.max(0, Math.min(100, ((86 - latest) / (86 - 76)) * 100));
       document.getElementById('kpi-weight').textContent = latest + ' kg';
