@@ -1,1 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Paw Patrol Academy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--blue:#1565c0;--lb:#42a5f5;--sky:#e3f2fd;--red:#e53935;--yellow:#fdd835;--green:#43a047;--dark:#1a237e;--purple:#7b1fa2;}
+body{min-height:100vh;font-family:'Nunito',sans-serif;display:flex;flex-direction:column;align-items:center;padding:8px 8px 80px;overflow-x:hidden;position:relative;background:linear-gradient(180deg,#87CEEB 0%,#b0e0ff 54%,#4caf50 54%,#388e3c 68%,#2e7d32 100%);}
+.cloud{position:fixed;background:#fff;border-radius:50px;opacity:0.8;pointer-events:none;z-index:0;}
+.cloud::before,.cloud::after{content:'';position:absolute;background:#fff;border-radius:50%;}
+.cloud::before{width:60%;height:140%;top:-70%;left:15%;}
+.cloud::after{width:40%;height:120%;top:-60%;left:50%;}
+#cl1{width:110px;height:38px;top:3%;left:2%;animation:fc 18s linear infinite;}
+#cl2{width:85px;height:28px;top:9%;left:52%;animation:fc 23s linear infinite 5s;}
+#cl3{width:65px;height:22px;top:6%;right:5%;animation:fc 20s linear infinite 9s;}
+@keyframes fc{0%,100%{transform:translateX(0);}50%{transform:translateX(28px);}}
+#sun{position:fixed;top:16px;right:16px;font-size:48px;z-index:0;animation:spin 22s linear infinite;pointer-events:none;}
+@keyframes spin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+.paw{position:fixed;font-size:20px;opacity:0.16;pointer-events:none;z-index:0;animation:sway 4s ease-in-out infinite;}
+@keyframes sway{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+.gd{position:fixed;bottom:0;font-size:26px;pointer-events:none;z-index:0;opacity:0.7;}
 
+#app{position:relative;z-index:1;width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+
+/* Tab switcher */
+#lang-tabs{display:flex;gap:6px;background:rgba(255,255,255,0.85);border-radius:16px;padding:5px;backdrop-filter:blur(4px);border:2px solid rgba(255,255,255,0.9);}
+.lang-tab{flex:1;padding:8px 16px;border:none;border-radius:12px;font-family:'Fredoka One',cursive;font-size:15px;cursor:pointer;transition:all 0.2s;}
+.lang-tab.active{background:var(--dark);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,0.2);}
+.lang-tab:not(.active){background:transparent;color:var(--dark);}
+
+#header{text-align:center;background:rgba(255,255,255,0.85);border-radius:18px;padding:8px 18px;backdrop-filter:blur(4px);border:2px solid rgba(255,255,255,0.9);width:100%;}
+#header h1{font-family:'Fredoka One',cursive;font-size:clamp(18px,5vw,30px);color:var(--dark);text-shadow:2px 2px 0 var(--lb);}
+#header p{font-size:11px;color:var(--blue);font-weight:700;}
+#stars-bar{display:flex;align-items:center;gap:8px;background:var(--dark);border-radius:18px;padding:6px 16px;}
+#stars-bar span{font-size:12px;color:#fff;font-weight:700;}
+#star-count{font-size:17px;color:var(--yellow);}
+
+/* Screens */
+.screen{display:none;width:100%;flex-direction:column;align-items:center;gap:8px;}
+.screen.active{display:flex;}
+.lang-page{display:none;width:100%;flex-direction:column;align-items:center;gap:8px;}
+.lang-page.active{display:flex;}
+
+/* Cards */
+.mission-card{background:rgba(255,255,255,0.93);border-radius:18px;padding:12px;width:100%;border:3px solid var(--lb);cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;display:flex;align-items:center;gap:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.mission-card:hover,.mission-card:active{transform:scale(1.03);}
+.mission-card .icon{font-size:38px;flex-shrink:0;}
+.mission-card .info{text-align:left;flex:1;}
+.mission-card h3{font-family:'Fredoka One',cursive;color:var(--dark);font-size:15px;}
+.mission-card p{font-size:11px;color:#555;margin-top:1px;}
+.mbadge{font-size:10px;background:var(--lb);color:var(--dark);border-radius:8px;padding:2px 7px;font-weight:700;margin-top:3px;display:inline-block;}
+.pb-wrap{width:100%;background:#e0e0e0;border-radius:8px;height:7px;margin-top:5px;}
+.pb{height:7px;border-radius:8px;background:linear-gradient(90deg,var(--lb),var(--blue));transition:width 0.4s;}
+#home-badges,#cn-home-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.badge-item{font-size:36px;background:rgba(255,255,255,0.9);border-radius:12px;padding:7px;border:3px solid var(--yellow);box-shadow:0 3px 8px rgba(0,0,0,0.1);}
+.badge-item.locked{filter:grayscale(1);opacity:0.4;border-color:#ccc;}
+
+/* Game area */
+#game-area{background:rgba(255,255,255,0.95);border-radius:22px;padding:16px;width:100%;box-shadow:0 4px 18px rgba(0,0,0,0.12);border:3px solid var(--lb);text-align:center;}
+#mission-label{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:3px;}
+#guide-char{font-size:46px;margin-bottom:2px;animation:bounce 2s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+#guide-text{font-family:'Fredoka One',cursive;font-size:14px;color:var(--dark);margin-bottom:8px;line-height:1.4;}
+#word-pic{font-size:64px;margin-bottom:5px;}
+#level-badge{font-size:10px;background:var(--yellow);color:var(--dark);border-radius:8px;padding:2px 9px;font-weight:800;margin-bottom:7px;display:inline-block;}
+#word-display{font-family:'Fredoka One',cursive;font-size:32px;color:var(--dark);letter-spacing:5px;margin:7px 0;}
+#word-display .blank{color:var(--red);border-bottom:3px solid var(--red);min-width:24px;display:inline-block;}
+#vowel-btns{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:7px;}
+.vowel-btn{width:50px;height:50px;border-radius:13px;font-family:'Fredoka One',cursive;font-size:22px;border:none;cursor:pointer;background:var(--dark);color:#fff;box-shadow:0 4px 0 #0d1257;transition:transform 0.1s;}
+.vowel-btn:active{transform:scale(0.92);}
+.vowel-btn.correct{background:var(--green);box-shadow:0 4px 0 #2e7d32;}
+.vowel-btn.wrong{background:var(--red);box-shadow:0 4px 0 #b71c1c;animation:shake 0.3s;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+#letter-slots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:7px 0;min-height:50px;}
+.slot{width:42px;height:50px;border-radius:11px;border:3px dashed var(--lb);display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:22px;color:var(--dark);background:#f0f8ff;}
+.slot.filled{border-style:solid;border-color:var(--blue);background:var(--sky);}
+#letter-choices{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:7px;}
+.letter-btn{width:46px;height:50px;border-radius:13px;font-family:'Fredoka One',cursive;font-size:22px;border:none;cursor:pointer;background:#e53935;color:#fff;box-shadow:0 4px 0 #bf360c;transition:transform 0.1s;}
+.letter-btn:active{transform:scale(0.92);}
+.letter-btn.used{opacity:0.3;pointer-events:none;}
+#builder-feedback{min-height:20px;font-weight:800;font-size:14px;color:var(--green);}
+#clear-btn{padding:6px 16px;border-radius:10px;border:none;background:#e0e0e0;color:#555;font-family:'Fredoka One',cursive;font-size:13px;cursor:pointer;margin-top:5px;}
+#trace-wrap{position:relative;display:inline-block;}
+#trace-canvas{border:3px solid var(--lb);border-radius:14px;background:#f0f8ff;touch-action:none;cursor:crosshair;}
+#trace-letter-show{font-family:'Fredoka One',cursive;font-size:110px;color:rgba(21,101,192,0.12);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;user-select:none;}
+#trace-progress{font-size:12px;color:var(--blue);font-weight:700;margin-top:4px;}
+#trace-btns{display:flex;gap:9px;margin-top:7px;}
+#trace-btns button{padding:7px 16px;border-radius:11px;border:none;font-family:'Fredoka One',cursive;font-size:13px;cursor:pointer;}
+#clear-trace{background:#e0e0e0;color:#555;}
+#check-trace{background:var(--blue);color:#fff;}
+
+/* Chinese game */
+#cn-game-area{background:rgba(255,255,255,0.95);border-radius:22px;padding:16px;width:100%;box-shadow:0 4px 18px rgba(0,0,0,0.12);border:3px solid #ce93d8;text-align:center;}
+#cn-mission-label{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--purple);text-transform:uppercase;margin-bottom:3px;}
+#cn-guide-char{font-size:46px;margin-bottom:2px;animation:bounce 2s infinite;}
+#cn-guide-text{font-family:'Fredoka One',cursive;font-size:14px;color:var(--dark);margin-bottom:8px;}
+#cn-level-badge{font-size:10px;background:var(--yellow);color:var(--dark);border-radius:8px;padding:2px 9px;font-weight:800;margin-bottom:7px;display:inline-block;}
+
+/* Flashcard */
+.flashcard-wrap{perspective:800px;width:200px;height:200px;margin:0 auto 10px;cursor:pointer;}
+.flashcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.5s;}
+.flashcard.flipped{transform:rotateY(180deg);}
+.fc-front,.fc-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:3px solid var(--lb);}
+.fc-front{background:linear-gradient(135deg,#e3f2fd,#bbdefb);}
+.fc-back{background:linear-gradient(135deg,#f3e5f5,#e1bee7);transform:rotateY(180deg);}
+.fc-emoji{font-size:64px;}
+.fc-en{font-family:'Fredoka One',cursive;font-size:20px;color:var(--dark);}
+.fc-zh{font-size:38px;color:var(--purple);font-weight:bold;}
+.fc-py{font-size:14px;color:#888;font-style:italic;}
+.fc-tap{font-size:11px;color:#aaa;margin-top:4px;}
+#fc-nav{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:4px;}
+#fc-nav button{padding:7px 16px;border-radius:10px;border:none;font-family:'Fredoka One',cursive;font-size:13px;cursor:pointer;}
+#fc-prev{background:#e0e0e0;color:#555;}
+#fc-next{background:var(--purple);color:#fff;}
+#fc-start-quiz{background:var(--green);color:#fff;padding:10px 24px;border-radius:13px;border:none;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-top:8px;display:none;}
+#fc-counter{font-size:12px;color:#888;font-weight:700;}
+
+/* Quiz */
+#cn-quiz-section{display:none;}
+#quiz-pic{font-size:64px;margin-bottom:6px;}
+#quiz-en{font-family:'Fredoka One',cursive;font-size:20px;color:var(--dark);margin-bottom:10px;}
+#quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{padding:12px;border-radius:14px;border:2.5px solid #ce93d8;background:#f3e5f5;cursor:pointer;font-size:20px;display:flex;align-items:center;gap:10px;transition:all 0.15s;}
+.quiz-opt:active{transform:scale(0.97);}
+.quiz-opt .opt-zh{font-size:24px;font-weight:bold;color:var(--purple);}
+.quiz-opt .opt-py{font-size:12px;color:#888;font-style:italic;}
+.quiz-opt.correct{background:#e8f5e9;border-color:var(--green);}
+.quiz-opt.wrong{background:#ffebee;border-color:var(--red);animation:shake 0.3s;}
+#cn-quiz-progress{font-size:11px;color:#888;font-weight:700;margin-bottom:6px;}
+
+/* Feedback */
+#feedback{position:fixed;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:200;}
+#feedback-box{background:#fff;border-radius:26px;padding:24px 28px;text-align:center;max-width:290px;animation:popIn 0.3s;border:3px solid var(--yellow);}
+@keyframes popIn{from{transform:scale(0.6);}to{transform:scale(1);}}
+#feedback-emoji{font-size:64px;}
+#feedback-msg{font-family:'Fredoka One',cursive;font-size:21px;color:var(--dark);margin:7px 0;}
+#feedback-sub{font-size:12px;color:#555;margin-bottom:12px;}
+#feedback-btn{padding:10px 28px;border-radius:13px;border:none;background:var(--blue);color:#fff;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;}
+
+/* Complete */
+#complete-screen,#cn-complete-screen{text-align:center;}
+.big-emoji{font-size:74px;animation:bounce 1s infinite;}
+#complete-screen h2,#cn-complete-screen h2{font-family:'Fredoka One',cursive;font-size:24px;color:var(--dark);margin:7px 0;}
+#complete-badges,#cn-complete-badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0;}
+.home-btn{padding:10px 28px;border-radius:13px;border:none;background:var(--red);color:#fff;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-top:6px;}
+#back-btn,#cn-back-btn{align-self:flex-start;background:var(--dark);color:#fff;border:none;border-radius:9px;padding:5px 13px;font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer;}
+#next-btn{padding:10px 28px;border-radius:13px;border:none;background:var(--blue);color:#fff;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-top:7px;display:none;}
+
+#parade{position:fixed;bottom:0;left:0;width:100%;height:60px;pointer-events:none;overflow:hidden;z-index:50;}
+.vehicle{position:absolute;font-size:34px;bottom:5px;animation:drive linear forwards;}
+@keyframes drive{from{left:-65px;}to{left:110%;}}
+</style>
+</head>
+<body>
+<div class="cloud" id="cl1"></div><div class="cloud" id="cl2"></div><div class="cloud" id="cl3"></div>
+<div id="sun">☀️</div>
+<div class="paw" style="top:14%;left:1%;">🐾</div><div class="paw" style="top:28%;right:2%;animation-delay:1s;">🐾</div>
+<div class="paw" style="top:45%;left:1%;animation-delay:2s;">🐾</div><div class="paw" style="top:62%;right:2%;animation-delay:0.5s;">🐾</div>
+<div class="gd" style="left:1%;">🌻</div><div class="gd" style="left:10%;">🌿</div><div class="gd" style="left:20%;">🌸</div>
+<div class="gd" style="right:1%;">🌻</div><div class="gd" style="right:10%;">🌿</div><div class="gd" style="right:20%;">🌸</div>
+
+<div id="app">
+<div id="header">
+  <h1>🐾 PAW PATROL ACADEMY</h1>
+  <p>Help the pups on their rescue missions!</p>
+</div>
+
+<!-- Language tabs -->
+<div id="lang-tabs">
+  <button class="lang-tab active" onclick="switchLang('en')">🇬🇧 English</button>
+  <button class="lang-tab" onclick="switchLang('cn')">🇨🇳 Chinese 中文</button>
+</div>
+
+<div id="stars-bar">
+  <span>⭐</span><span id="star-count">0</span>
+  <span style="margin-left:10px;">🐾</span><span id="badge-count" style="color:#f48fb1;">0/6</span>
+</div>
+
+<!-- ===== ENGLISH PAGE ===== -->
+<div class="lang-page active" id="en-page">
+
+  <!-- EN HOME -->
+  <div id="home-screen" class="screen active">
+    <div id="home-badges">
+      <div class="badge-item locked" id="badge0">🚒</div>
+      <div class="badge-item locked" id="badge1">🚓</div>
+      <div class="badge-item locked" id="badge2">🚁</div>
+    </div>
+    <div class="mission-card" onclick="startMission(0)">
+      <div class="icon">🚒</div>
+      <div class="info"><h3>Marshall's Fire Rescue</h3><p>Fill in the missing vowel!</p><span class="mbadge">Mission 1</span><div class="pb-wrap"><div class="pb" id="m0-bar" style="width:0%"></div></div></div>
+    </div>
+    <div class="mission-card" onclick="startMission(1)">
+      <div class="icon">🚓</div>
+      <div class="info"><h3>Chase's Police Patrol</h3><p>Build the word from letters!</p><span class="mbadge">Mission 2</span><div class="pb-wrap"><div class="pb" id="m1-bar" style="width:0%"></div></div></div>
+    </div>
+    <div class="mission-card" onclick="startMission(2)">
+      <div class="icon">🚁</div>
+      <div class="info"><h3>Skye's Sky Patrol</h3><p>Trace the letter!</p><span class="mbadge">Mission 3</span><div class="pb-wrap"><div class="pb" id="m2-bar" style="width:0%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- EN GAME -->
+  <div id="game-screen" class="screen">
+    <button id="back-btn" onclick="goHome()">← Home</button>
+    <div id="game-area">
+      <div id="mission-label"></div><div id="guide-char"></div><div id="guide-text"></div>
+      <div id="word-pic"></div><div id="level-badge"></div>
+      <div id="vowel-section" style="display:none;"><div id="word-display"></div><div id="vowel-btns"></div></div>
+      <div id="builder-section" style="display:none;">
+        <div id="letter-slots"></div><div id="builder-feedback"></div>
+        <div id="letter-choices"></div><button id="clear-btn" onclick="clearBuilder()">Clear ↺</button>
+      </div>
+      <div id="trace-section" style="display:none;">
+        <div id="trace-wrap"><canvas id="trace-canvas" width="200" height="200"></canvas><div id="trace-letter-show"></div></div>
+        <div id="trace-progress"></div>
+        <div id="trace-btns"><button id="clear-trace" onclick="clearTrace()">Clear ↺</button><button id="check-trace" onclick="checkTrace()">Done ✓</button></div>
+      </div>
+      <button id="next-btn" onclick="nextQuestion()">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- EN COMPLETE -->
+  <div id="complete-screen" class="screen">
+    <div class="big-emoji" id="complete-emoji">🎉</div>
+    <h2 id="complete-msg">Mission Complete!</h2>
+    <p id="complete-sub" style="color:#333;font-size:13px;margin-bottom:7px;"></p>
+    <div id="complete-badges"></div>
+    <button class="home-btn" onclick="goHome()">🏠 Back to HQ</button>
+  </div>
+
+</div><!-- end en-page -->
+
+<!-- ===== CHINESE PAGE ===== -->
+<div class="lang-page" id="cn-page">
+
+  <!-- CN HOME -->
+  <div id="cn-home-screen" class="screen active">
+    <div id="cn-home-badges">
+      <div class="badge-item locked" id="cn-badge0">🔢</div>
+      <div class="badge-item locked" id="cn-badge1">🎨</div>
+      <div class="badge-item locked" id="cn-badge2">💬</div>
+      <div class="badge-item locked" id="cn-badge3">🐉</div>
+    </div>
+    <div class="mission-card" onclick="startCNMission(0)" style="border-color:#ce93d8;">
+      <div class="icon">🚒</div>
+      <div class="info"><h3>Marshall's Numbers 数字</h3><p>Learn numbers 1-10!</p><span class="mbadge" style="background:#f3e5f5;">Mission 1</span><div class="pb-wrap"><div class="pb" id="cn-m0-bar" style="width:0%;background:linear-gradient(90deg,#ce93d8,#9c27b0)"></div></div></div>
+    </div>
+    <div class="mission-card" onclick="startCNMission(1)" style="border-color:#ce93d8;">
+      <div class="icon">🚓</div>
+      <div class="info"><h3>Chase's Colors 颜色</h3><p>Learn colors in Chinese!</p><span class="mbadge" style="background:#f3e5f5;">Mission 2</span><div class="pb-wrap"><div class="pb" id="cn-m1-bar" style="width:0%;background:linear-gradient(90deg,#ce93d8,#9c27b0)"></div></div></div>
+    </div>
+    <div class="mission-card" onclick="startCNMission(2)" style="border-color:#ce93d8;">
+      <div class="icon">🚁</div>
+      <div class="info"><h3>Skye's Phrases 日常用语</h3><p>Learn common phrases!</p><span class="mbadge" style="background:#f3e5f5;">Mission 3</span><div class="pb-wrap"><div class="pb" id="cn-m2-bar" style="width:0%;background:linear-gradient(90deg,#ce93d8,#9c27b0)"></div></div></div>
+    </div>
+    <div class="mission-card" onclick="startCNMission(3)" style="border-color:#ce93d8;">
+      <div class="icon">🐾</div>
+      <div class="info"><h3>Rubble's Zodiac 十二生肖</h3><p>Learn Chinese zodiac animals!</p><span class="mbadge" style="background:#f3e5f5;">Mission 4</span><div class="pb-wrap"><div class="pb" id="cn-m3-bar" style="width:0%;background:linear-gradient(90deg,#ce93d8,#9c27b0)"></div></div></div>
+    </div>
+  </div>
+
+  <!-- CN GAME -->
+  <div id="cn-game-screen" class="screen">
+    <button id="cn-back-btn" onclick="goCNHome()">← Home</button>
+    <div id="cn-game-area">
+      <div id="cn-mission-label"></div>
+      <div id="cn-guide-char"></div>
+      <div id="cn-guide-text"></div>
+      <div id="cn-level-badge"></div>
+
+      <!-- Flashcard mode -->
+      <div id="cn-learn-section">
+        <div class="flashcard-wrap" onclick="flipCard()">
+          <div class="flashcard" id="flashcard">
+            <div class="fc-front">
+              <div class="fc-emoji" id="fc-emoji">🔢</div>
+              <div class="fc-en" id="fc-en">One</div>
+              <div class="fc-tap">👆 Tap to flip!</div>
+            </div>
+            <div class="fc-back">
+              <div class="fc-emoji" id="fc-emoji-b">🔢</div>
+              <div class="fc-zh" id="fc-zh">一</div>
+              <div class="fc-py" id="fc-py">yī</div>
+              <div class="fc-tap">👆 Tap to flip back</div>
+            </div>
+          </div>
+        </div>
+        <div id="fc-counter">Card 1 of 1</div>
+        <div id="fc-nav">
+          <button id="fc-prev" onclick="fcNav(-1)">◀ Prev</button>
+          <button id="fc-speak" onclick="speakCurrent()" style="background:var(--lb);color:#fff;padding:7px 14px;border-radius:10px;border:none;font-family:'Fredoka One',cursive;font-size:13px;cursor:pointer;">🔊 Listen</button>
+          <button id="fc-next" onclick="fcNav(1)">Next ▶</button>
+        </div>
+        <button id="fc-start-quiz" onclick="startQuiz()">🎯 Start Quiz!</button>
+      </div>
+
+      <!-- Quiz mode -->
+      <div id="cn-quiz-section">
+        <div id="cn-quiz-progress"></div>
+        <div id="quiz-pic"></div>
+        <div id="quiz-en"></div>
+        <div id="quiz-options"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CN COMPLETE -->
+  <div id="cn-complete-screen" class="screen">
+    <div class="big-emoji" id="cn-complete-emoji">🎉</div>
+    <h2 id="cn-complete-msg">Mission Complete!</h2>
+    <p id="cn-complete-sub" style="color:#333;font-size:13px;margin-bottom:7px;"></p>
+    <div id="cn-complete-badges"></div>
+    <button class="home-btn" onclick="goCNHome()" style="background:var(--purple);">🏠 Back to HQ</button>
+  </div>
+
+</div><!-- end cn-page -->
+</div><!-- end app -->
+
+<div id="feedback">
+  <div id="feedback-box">
+    <div id="feedback-emoji"></div><div id="feedback-msg"></div>
+    <div id="feedback-sub"></div>
+    <button id="feedback-btn" onclick="closeFeedback()">Continue ▶</button>
+  </div>
+</div>
+<div id="parade"></div>
+
+<script>
+// ============ CHINESE DATA ============
+const CN_DATA={
+  numbers:[
+    {emoji:'1️⃣',en:'One',zh:'一',py:'yī'},
+    {emoji:'2️⃣',en:'Two',zh:'二',py:'èr'},
+    {emoji:'3️⃣',en:'Three',zh:'三',py:'sān'},
+    {emoji:'4️⃣',en:'Four',zh:'四',py:'sì'},
+    {emoji:'5️⃣',en:'Five',zh:'五',py:'wǔ'},
+    {emoji:'6️⃣',en:'Six',zh:'六',py:'liù'},
+    {emoji:'7️⃣',en:'Seven',zh:'七',py:'qī'},
+    {emoji:'8️⃣',en:'Eight',zh:'八',py:'bā'},
+    {emoji:'9️⃣',en:'Nine',zh:'九',py:'jiǔ'},
+    {emoji:'🔟',en:'Ten',zh:'十',py:'shí'},
+  ],
+  colors:[
+    {emoji:'🔴',en:'Red',zh:'红色',py:'hóng sè'},
+    {emoji:'🔵',en:'Blue',zh:'蓝色',py:'lán sè'},
+    {emoji:'🟢',en:'Green',zh:'绿色',py:'lǜ sè'},
+    {emoji:'🟡',en:'Yellow',zh:'黄色',py:'huáng sè'},
+    {emoji:'🟠',en:'Orange',zh:'橙色',py:'chéng sè'},
+    {emoji:'🟣',en:'Purple',zh:'紫色',py:'zǐ sè'},
+    {emoji:'⚫',en:'Black',zh:'黑色',py:'hēi sè'},
+    {emoji:'⚪',en:'White',zh:'白色',py:'bái sè'},
+    {emoji:'🩷',en:'Pink',zh:'粉红色',py:'fěn hóng sè'},
+    {emoji:'🟤',en:'Brown',zh:'棕色',py:'zōng sè'},
+  ],
+  phrases:[
+    {emoji:'👋',en:'Hello',zh:'你好',py:'nǐ hǎo'},
+    {emoji:'🌅',en:'Good Morning',zh:'早安',py:'zǎo ān'},
+    {emoji:'🌙',en:'Good Night',zh:'晚安',py:'wǎn ān'},
+    {emoji:'🙏',en:'Please',zh:'请',py:'qǐng'},
+    {emoji:'😊',en:'Thank You',zh:'谢谢',py:'xiè xie'},
+    {emoji:'😔',en:'Sorry',zh:'对不起',py:'duì bu qǐ'},
+    {emoji:'👋',en:'Bye Bye',zh:'再见',py:'zài jiàn'},
+    {emoji:'🌞',en:'Good Job',zh:'做得好',py:'zuò de hǎo'},
+    {emoji:'❤️',en:'I Love You',zh:'我爱你',py:'wǒ ài nǐ'},
+  ],
+  zodiac:[
+    {emoji:'🐭',en:'Rat',zh:'鼠',py:'shǔ'},
+    {emoji:'🐮',en:'Ox',zh:'牛',py:'niú'},
+    {emoji:'🐯',en:'Tiger',zh:'虎',py:'hǔ'},
+    {emoji:'🐰',en:'Rabbit',zh:'兔',py:'tù'},
+    {emoji:'🐲',en:'Dragon',zh:'龙',py:'lóng'},
+    {emoji:'🐍',en:'Snake',zh:'蛇',py:'shé'},
+    {emoji:'🐴',en:'Horse',zh:'马',py:'mǎ'},
+    {emoji:'🐑',en:'Goat',zh:'羊',py:'yáng'},
+    {emoji:'🐵',en:'Monkey',zh:'猴',py:'hóu'},
+    {emoji:'🐓',en:'Rooster',zh:'鸡',py:'jī'},
+    {emoji:'🐶',en:'Dog',zh:'狗',py:'gǒu'},
+    {emoji:'🐷',en:'Pig',zh:'猪',py:'zhū'},
+  ],
+};
+
+const CN_MISSIONS=[
+  {name:"Marshall's Numbers 数字",guide:'🚒',key:'numbers',badge:'🔢',color:'#e53935'},
+  {name:"Chase's Colors 颜色",guide:'🚓',key:'colors',badge:'🎨',color:'#1565c0'},
+  {name:"Skye's Phrases 日常用语",guide:'🚁',key:'phrases',badge:'💬',color:'#7b1fa2'},
+  {name:"Rubble's Zodiac 十二生肖",guide:'🐾',key:'zodiac',badge:'🐉',color:'#e65100'},
+];
+
+let cnMission=0,cnCards=[],cnCardIdx=0,cnQuizIdx=0,cnQuizData=[],cnEarnedBadges=[false,false,false,false],cnProgress=[0,0,0,0];
+let feedbackCallback=null,audioCtx;
+let totalStars=0,earnedBadges=[false,false,false];
+let curMission=0,curQ=0,curData=[],missionProgress=[0,0,0];
+let builderAnswer=[],builderWord='',builderChoices=[];
+let traceCtx,traceDrawing=false,traceStrokes=0;
+let playerLevel=1;
+
+// ============ SPEECH ============
+function speak(text,lang,cb){
+  if(!window.speechSynthesis) return cb&&cb();
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.85;u.pitch=1.2;u.volume=1;
+  if(lang==='zh'){u.lang='zh-CN';u.rate=0.8;}
+  u.onend=()=>cb&&cb();
+  window.speechSynthesis.speak(u);
+}
+
+// ============ AUDIO ============
+function getAC(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playTone(f,d,t='sine',v=0.12){try{const a=getAC(),o=a.createOscillator(),g=a.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,a.currentTime);g.gain.linearRampToValueAtTime(0,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}}
+function playCorrect(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,0.14,'square',0.1),i*65));}
+function playWrong(){playTone(180,0.3,'sawtooth',0.1);}
+function playSiren(){[880,660,880,660].forEach((f,i)=>setTimeout(()=>playTone(f,0.18,'sawtooth',0.1),i*170));}
+function playSuccess(){[523,587,659,698,784,880,988,1047].forEach((f,i)=>setTimeout(()=>playTone(f,0.15,'square',0.09),i*52));}
+
+// ============ LANG SWITCH ============
+function switchLang(lang){
+  document.querySelectorAll('.lang-tab').forEach((t,i)=>t.classList.toggle('active',i===(lang==='en'?0:1)));
+  document.getElementById('en-page').classList.toggle('active',lang==='en');
+  document.getElementById('cn-page').classList.toggle('active',lang==='cn');
+}
+
+// ============ SHARED UI ============
+function updateStarsBar(){
+  document.getElementById('star-count').textContent=totalStars;
+  document.getElementById('badge-count').textContent=(earnedBadges.filter(Boolean).length+cnEarnedBadges.filter(Boolean).length)+'/6';
+}
+
+function spawnVehicle(emoji){
+  const v=['🚒','🚓','🚑','🚁','🚐'];
+  const el=document.createElement('div');el.className='vehicle';
+  el.textContent=emoji||v[Math.floor(Math.random()*v.length)];
+  el.style.animationDuration=(2+Math.random()*2)+'s';
+  el.style.bottom=(4+Math.random()*16)+'px';
+  document.getElementById('parade').appendChild(el);
+  setTimeout(()=>el.remove(),4500);
+}
+
+function addStar(){totalStars++;updateStarsBar();spawnVehicle();}
+
+function showFeedback(correct,cb){
+  feedbackCallback=cb;
+  const msgs=correct?['🎉 Amazing!','🌟 Super!','🐾 Paw-some!','👏 Brilliant!','🚒 Hero!']:['💪 Try again!','🤔 Almost!'];
+  const subs=correct?["You're a Paw Patrol hero!",'Marshall is so proud!','Chase says Ruff Ruff!','Keep it up!']:['Give it another go!','You can do it!'];
+  document.getElementById('feedback-emoji').textContent=correct?['🎉','⭐','🐾','🚒','🚓','🚁'][Math.floor(Math.random()*6)]:'💪';
+  document.getElementById('feedback-msg').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('feedback-sub').textContent=subs[Math.floor(Math.random()*subs.length)];
+  document.getElementById('feedback').style.display='flex';
+}
+function closeFeedback(){document.getElementById('feedback').style.display='none';if(feedbackCallback)feedbackCallback();feedbackCallback=null;}
+
+// ============ ENGLISH GAME ============
+const VOWEL_WORDS=[
+  {pic:'🐱',word:'cat',blank:1,vowel:'a',hint:'cat',level:1},
+  {pic:'🐷',word:'pig',blank:1,vowel:'i',hint:'pig',level:1},
+  {pic:'🐶',word:'dog',blank:1,vowel:'o',hint:'dog',level:1},
+  {pic:'☀️',word:'sun',blank:1,vowel:'u',hint:'sun',level:1},
+  {pic:'🐜',word:'ant',blank:0,vowel:'a',hint:'ant',level:1},
+  {pic:'🦊',word:'fox',blank:1,vowel:'o',hint:'fox',level:1},
+  {pic:'🐓',word:'hen',blank:1,vowel:'e',hint:'hen',level:1},
+  {pic:'🛏️',word:'bed',blank:1,vowel:'e',hint:'bed',level:1},
+  {pic:'🎩',word:'hat',blank:1,vowel:'a',hint:'hat',level:1},
+  {pic:'🍳',word:'pot',blank:1,vowel:'o',hint:'pot',level:1},
+  {pic:'🪣',word:'bin',blank:1,vowel:'i',hint:'bin',level:1},
+  {pic:'🐛',word:'bug',blank:1,vowel:'u',hint:'bug',level:1},
+  {pic:'🐟',word:'fish',blank:1,vowel:'i',hint:'fish',level:2},
+  {pic:'🚌',word:'bus',blank:1,vowel:'u',hint:'bus',level:2},
+  {pic:'🏃',word:'run',blank:1,vowel:'u',hint:'run',level:2},
+  {pic:'🌞',word:'hot',blank:1,vowel:'o',hint:'hot',level:2},
+  {pic:'✈️',word:'jet',blank:1,vowel:'e',hint:'jet',level:2},
+  {pic:'🦆',word:'duck',blank:1,vowel:'u',hint:'duck',level:2},
+  {pic:'🍎',word:'apple',blank:0,vowel:'a',hint:'apple',level:2},
+  {pic:'🐘',word:'elephant',blank:2,vowel:'e',hint:'elephant',level:2},
+  {pic:'🔔',word:'bell',blank:1,vowel:'e',hint:'bell',level:3},
+  {pic:'🐸',word:'frog',blank:2,vowel:'o',hint:'frog',level:3},
+  {pic:'🥛',word:'milk',blank:1,vowel:'i',hint:'milk',level:3},
+  {pic:'🏕️',word:'camp',blank:1,vowel:'a',hint:'camp',level:3},
+  {pic:'🚂',word:'train',blank:2,vowel:'a',hint:'train',level:3},
+  {pic:'🌊',word:'ocean',blank:0,vowel:'o',hint:'ocean',level:3},
+];
+const BUILD_WORDS=[
+  {pic:'🐱',word:'cat',hint:'a furry pet',level:1},
+  {pic:'🐶',word:'dog',hint:"man's best friend",level:1},
+  {pic:'🐷',word:'pig',hint:'oink oink!',level:1},
+  {pic:'☀️',word:'sun',hint:'it shines bright',level:1},
+  {pic:'🐟',word:'fish',hint:'swims in water',level:1},
+  {pic:'🦆',word:'duck',hint:'quack quack!',level:1},
+  {pic:'🚒',word:'hose',hint:'fire truck hose',level:2},
+  {pic:'🚑',word:'help',hint:'ambulance brings help',level:2},
+  {pic:'🦁',word:'lion',hint:'king of the jungle',level:2},
+  {pic:'🐸',word:'frog',hint:'jumps and croaks',level:2},
+  {pic:'🌧️',word:'rain',hint:'falls from the sky',level:2},
+  {pic:'🚁',word:'wing',hint:'Skye flies with wings',level:3},
+  {pic:'🌊',word:'wave',hint:'in the ocean',level:3},
+  {pic:'⭐',word:'star',hint:'shines at night',level:3},
+  {pic:'🐾',word:'paws',hint:'paw patrol paws!',level:3},
+  {pic:'🏠',word:'home',hint:'where you live',level:3},
+];
+const TRACE_LETTERS=[
+  {letter:'A',word:'Ant 🐜',level:1},{letter:'B',word:'Bug 🐛',level:1},{letter:'C',word:'Cat 🐱',level:1},
+  {letter:'D',word:'Dog 🐶',level:1},{letter:'E',word:'Elephant 🐘',level:1},
+  {letter:'F',word:'Fox 🦊',level:2},{letter:'G',word:'Go 🚦',level:2},{letter:'H',word:'Hen 🐓',level:2},
+  {letter:'I',word:'Ice 🧊',level:2},{letter:'J',word:'Jet ✈️',level:2},
+  {letter:'K',word:'King 👑',level:3},{letter:'L',word:'Lion 🦁',level:3},{letter:'M',word:'Milk 🥛',level:3},
+  {letter:'N',word:'Night 🌃',level:3},{letter:'O',word:'Ocean 🌊',level:3},
+];
+const MISSIONS=[
+  {name:"Marshall's Fire Rescue",guide:'🚒',data:VOWEL_WORDS,type:'vowel',qPerSession:5},
+  {name:"Chase's Police Patrol",guide:'🚓',data:BUILD_WORDS,type:'builder',qPerSession:5},
+  {name:"Skye's Sky Patrol",guide:'🚁',data:TRACE_LETTERS,type:'trace',qPerSession:5},
+];
+
+function showENScreen(id){['home-screen','game-screen','complete-screen'].forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goHome(){showENScreen('home-screen');updateHomeUI();}
+function updateHomeUI(){
+  earnedBadges.forEach((e,i)=>document.getElementById('badge'+i).classList.toggle('locked',!e));
+  missionProgress.forEach((p,i)=>document.getElementById('m'+i+'-bar').style.width=Math.min(100,p*20)+'%');
+  updateStarsBar();
+}
+function startMission(idx){
+  curMission=idx;const m=MISSIONS[idx];
+  curData=m.data.filter(d=>(d.level||1)<=playerLevel).sort(()=>Math.random()-0.5).slice(0,m.qPerSession);
+  curQ=0;showENScreen('game-screen');
+  document.getElementById('mission-label').textContent='🐾 '+m.name;
+  document.getElementById('guide-char').textContent=m.guide;
+  document.getElementById('next-btn').style.display='none';
+  loadQuestion();
+}
+function loadQuestion(){
+  const m=MISSIONS[curMission],q=curData[curQ];
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('level-badge').textContent='⭐ Level '+playerLevel+' · Q'+(curQ+1)+'/'+curData.length;
+  ['vowel-section','builder-section','trace-section'].forEach(id=>document.getElementById(id).style.display='none');
+  if(m.type==='vowel') loadVowel(q);
+  else if(m.type==='builder') loadBuilder(q);
+  else loadTrace(q);
+}
+function loadVowel(q){
+  document.getElementById('word-pic').textContent=q.pic;
+  document.getElementById('guide-text').textContent='Find the missing vowel for: '+q.hint+'!';
+  document.getElementById('vowel-section').style.display='block';
+  let html='';q.word.split('').forEach((l,i)=>{html+=i===q.blank?'<span class="blank" id="blank-span">_</span>':l;});
+  document.getElementById('word-display').innerHTML=html;
+  const btns=document.getElementById('vowel-btns');btns.innerHTML='';
+  ['a','e','i','o','u'].forEach(v=>{const b=document.createElement('button');b.className='vowel-btn';b.textContent=v;b.onclick=()=>checkVowel(v,q,b);btns.appendChild(b);});
+}
+function checkVowel(chosen,q,btn){
+  document.querySelectorAll('.vowel-btn').forEach(b=>b.onclick=null);
+  if(chosen===q.vowel){
+    btn.classList.add('correct');
+    document.getElementById('blank-span').textContent=chosen;
+    document.getElementById('blank-span').style.color='#43a047';
+    playCorrect();addStar();
+    setTimeout(()=>speak(q.word,'en',()=>speak('Great job!','en')),300);
+    setTimeout(()=>showFeedback(true,()=>advanceQ()),1800);
+  } else {
+    btn.classList.add('wrong');playWrong();speak('Try again!','en');
+    setTimeout(()=>{btn.classList.remove('wrong');document.querySelectorAll('.vowel-btn').forEach(b=>b.onclick=()=>checkVowel(b.textContent,q,b));},600);
+  }
+}
+function loadBuilder(q){
+  builderWord=q.word;builderAnswer=[];
+  document.getElementById('word-pic').textContent=q.pic;
+  document.getElementById('guide-text').textContent='Spell the word: '+q.hint+'!';
+  document.getElementById('builder-section').style.display='block';
+  document.getElementById('builder-feedback').textContent='';
+  renderSlots();
+  const letters=q.word.split('');
+  const extras='aeioulnrst';
+  for(let i=0;i<Math.max(1,5-letters.length);i++) letters.push(extras[Math.floor(Math.random()*extras.length)]);
+  builderChoices=letters.sort(()=>Math.random()-0.5);
+  renderLetterChoices();
+}
+function renderSlots(){
+  const el=document.getElementById('letter-slots');el.innerHTML='';
+  builderAnswer.forEach(l=>{const s=document.createElement('div');s.className='slot filled';s.textContent=l;el.appendChild(s);});
+  for(let i=builderAnswer.length;i<builderWord.length;i++){const s=document.createElement('div');s.className='slot';el.appendChild(s);}
+}
+function renderLetterChoices(){
+  const el=document.getElementById('letter-choices');el.innerHTML='';
+  builderChoices.forEach((l,i)=>{
+    const b=document.createElement('button');b.className='letter-btn';b.textContent=l;b.dataset.idx=i;
+    b.onclick=()=>{if(b.classList.contains('used'))return;builderAnswer.push(l);b.classList.add('used');renderSlots();playTone(600,0.07,'triangle');if(builderAnswer.length===builderWord.length)checkBuilder();};
+    el.appendChild(b);
+  });
+}
+function checkBuilder(){
+  if(builderAnswer.join('')===builderWord){
+    playCorrect();addStar();
+    document.getElementById('builder-feedback').textContent='🎉 Amazing!';
+    document.getElementById('builder-feedback').style.color='#43a047';
+    setTimeout(()=>speak(builderWord,'en',()=>speak('Well done!','en')),300);
+    setTimeout(()=>showFeedback(true,()=>advanceQ()),1800);
+  } else {
+    playWrong();speak('Try again!','en');
+    document.getElementById('builder-feedback').textContent='Try again! 💪';
+    document.getElementById('builder-feedback').style.color='#e53935';
+    setTimeout(()=>{builderAnswer=[];renderSlots();document.getElementById('builder-feedback').textContent='';document.querySelectorAll('.letter-btn').forEach(b=>b.classList.remove('used'));},700);
+  }
+}
+function clearBuilder(){builderAnswer=[];renderSlots();document.getElementById('builder-feedback').textContent='';document.querySelectorAll('.letter-btn').forEach(b=>b.classList.remove('used'));}
+function loadTrace(q){
+  document.getElementById('word-pic').textContent='✏️';
+  document.getElementById('guide-text').textContent='Trace the letter '+q.letter+' for '+q.word+'!';
+  document.getElementById('trace-section').style.display='block';
+  document.getElementById('trace-letter-show').textContent=q.letter;
+  document.getElementById('trace-progress').textContent='Draw over the letter with your finger!';
+  traceStrokes=0;
+  const tc=document.getElementById('trace-canvas');traceCtx=tc.getContext('2d');clearTrace();
+  speak('Trace the letter '+q.letter,'en');
+  tc.onmousedown=e=>{traceDrawing=true;traceCtx.beginPath();const r=tc.getBoundingClientRect();traceCtx.moveTo(e.clientX-r.left,e.clientY-r.top);};
+  tc.onmousemove=e=>{if(!traceDrawing)return;const r=tc.getBoundingClientRect();traceCtx.lineTo(e.clientX-r.left,e.clientY-r.top);traceCtx.stroke();};
+  tc.onmouseup=()=>{traceDrawing=false;traceStrokes++;};
+  tc.ontouchstart=e=>{e.preventDefault();traceDrawing=true;const r=tc.getBoundingClientRect(),t=e.touches[0];traceCtx.beginPath();traceCtx.moveTo(t.clientX-r.left,t.clientY-r.top);};
+  tc.ontouchmove=e=>{e.preventDefault();if(!traceDrawing)return;const r=tc.getBoundingClientRect(),t=e.touches[0];traceCtx.lineTo(t.clientX-r.left,t.clientY-r.top);traceCtx.stroke();};
+  tc.ontouchend=e=>{e.preventDefault();traceDrawing=false;traceStrokes++;};
+}
+function clearTrace(){const tc=document.getElementById('trace-canvas');traceCtx=tc.getContext('2d');traceCtx.clearRect(0,0,tc.width,tc.height);traceCtx.strokeStyle='#1565c0';traceCtx.lineWidth=9;traceCtx.lineCap='round';traceCtx.lineJoin='round';traceStrokes=0;}
+function checkTrace(){
+  const tc=document.getElementById('trace-canvas'),data=traceCtx.getImageData(0,0,tc.width,tc.height).data;
+  let drawn=0;for(let i=3;i<data.length;i+=4)if(data[i]>10)drawn++;
+  if(traceStrokes>=1&&drawn>400){playCorrect();addStar();const q=curData[curQ];speak(q.letter,'en',()=>speak('Brilliant!','en'));showFeedback(true,()=>advanceQ());}
+  else{playWrong();document.getElementById('trace-progress').textContent="Keep tracing! You're doing great 💪";speak('Keep going, you can do it!','en');}
+}
+function advanceQ(){missionProgress[curMission]++;curQ++;if(curQ>=curData.length)missionComplete();else loadQuestion();}
+function nextQuestion(){advanceQ();}
+function missionComplete(){
+  earnedBadges[curMission]=true;
+  if(earnedBadges.every(Boolean)&&playerLevel<3){playerLevel++;speak('Level up! Great work!','en');}
+  playSiren();setTimeout(playSuccess,500);
+  setTimeout(()=>speak('Mission complete! You are a Paw Patrol hero!','en'),600);
+  showENScreen('complete-screen');
+  const m=MISSIONS[curMission];
+  document.getElementById('complete-emoji').textContent=['🚒','🚓','🚁'][curMission];
+  document.getElementById('complete-msg').textContent='Mission Complete! 🎉';
+  document.getElementById('complete-sub').textContent='Amazing work, hero!';
+  const cb=document.getElementById('complete-badges');cb.innerHTML='';
+  earnedBadges.forEach((e,i)=>{const d=document.createElement('div');d.className='badge-item'+(e?'':' locked');d.textContent=['🚒','🚓','🚁'][i];cb.appendChild(d);});
+  for(let i=0;i<5;i++) setTimeout(()=>spawnVehicle(m.guide),i*320);
+  updateHomeUI();
+}
+
+// ============ CHINESE GAME ============
+function showCNScreen(id){['cn-home-screen','cn-game-screen','cn-complete-screen'].forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goCNHome(){showCNScreen('cn-home-screen');updateCNHomeUI();}
+function updateCNHomeUI(){
+  cnEarnedBadges.forEach((e,i)=>document.getElementById('cn-badge'+i).classList.toggle('locked',!e));
+  cnProgress.forEach((p,i)=>document.getElementById('cn-m'+i+'-bar').style.width=Math.min(100,p*20)+'%');
+  updateStarsBar();
+}
+
+function startCNMission(idx){
+  cnMission=idx;const m=CN_MISSIONS[idx];
+  cnCards=CN_DATA[m.key];cnCardIdx=0;
+  showCNScreen('cn-game-screen');
+  document.getElementById('cn-mission-label').textContent='🐾 '+m.name;
+  document.getElementById('cn-guide-char').textContent=m.guide;
+  document.getElementById('cn-guide-text').textContent='Learn the flashcards, then take the quiz!';
+  document.getElementById('cn-level-badge').textContent='📚 Learn Mode · '+cnCards.length+' cards';
+  document.getElementById('cn-learn-section').style.display='block';
+  document.getElementById('cn-quiz-section').style.display='none';
+  document.getElementById('fc-start-quiz').style.display='none';
+  showCard();
+}
+
+function showCard(){
+  const c=cnCards[cnCardIdx];
+  document.getElementById('fc-emoji').textContent=c.emoji;
+  document.getElementById('fc-emoji-b').textContent=c.emoji;
+  document.getElementById('fc-en').textContent=c.en;
+  document.getElementById('fc-zh').textContent=c.zh;
+  document.getElementById('fc-py').textContent=c.py;
+  document.getElementById('fc-counter').textContent='Card '+(cnCardIdx+1)+' of '+cnCards.length;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-start-quiz').style.display=cnCardIdx===cnCards.length-1?'block':'none';
+}
+
+function flipCard(){
+  const fc=document.getElementById('flashcard');
+  fc.classList.toggle('flipped');
+  if(fc.classList.contains('flipped')) speakCurrent();
+}
+
+function speakCurrent(){
+  const c=cnCards[cnCardIdx];
+  speak(c.en,'en',()=>setTimeout(()=>speak(c.zh,'zh'),400));
+}
+
+function fcNav(dir){
+  cnCardIdx=Math.max(0,Math.min(cnCards.length-1,cnCardIdx+dir));
+  showCard();
+}
+
+function startQuiz(){
+  cnQuizData=[...cnCards].sort(()=>Math.random()-0.5);
+  cnQuizIdx=0;
+  document.getElementById('cn-learn-section').style.display='none';
+  document.getElementById('cn-quiz-section').style.display='block';
+  document.getElementById('cn-guide-text').textContent='Pick the correct Chinese word!';
+  document.getElementById('cn-level-badge').textContent='🎯 Quiz Mode · '+cnQuizData.length+' questions';
+  loadCNQuiz();
+}
+
+function loadCNQuiz(){
+  const q=cnQuizData[cnQuizIdx];
+  document.getElementById('cn-quiz-progress').textContent='Q'+(cnQuizIdx+1)+' of '+cnQuizData.length;
+  document.getElementById('quiz-pic').textContent=q.emoji;
+  document.getElementById('quiz-en').textContent=q.en;
+  // Pick 3 options: correct + 2 wrong
+  const others=cnCards.filter(c=>c.zh!==q.zh).sort(()=>Math.random()-0.5).slice(0,2);
+  const opts=[q,...others].sort(()=>Math.random()-0.5);
+  const el=document.getElementById('quiz-options');el.innerHTML='';
+  opts.forEach(o=>{
+    const d=document.createElement('div');d.className='quiz-opt';
+    d.innerHTML='<span class="opt-zh">'+o.zh+'</span><span class="opt-py">'+o.py+'</span>';
+    d.onclick=()=>checkCNQuiz(o,q,d);
+    el.appendChild(d);
+  });
+}
+
+function checkCNQuiz(chosen,q,el){
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.onclick=null);
+  if(chosen.zh===q.zh){
+    el.classList.add('correct');playCorrect();addStar();
+    speak(q.en,'en',()=>setTimeout(()=>speak(q.zh,'zh',()=>speak('Great job!','en')),300));
+    setTimeout(()=>showFeedback(true,()=>advanceCNQuiz()),2000);
+  } else {
+    el.classList.add('wrong');playWrong();speak('Try again!','en');
+    setTimeout(()=>{
+      el.classList.remove('wrong');
+      document.querySelectorAll('.quiz-opt').forEach(o=>o.onclick=()=>checkCNQuiz(chosen.zh===o.querySelector('.opt-zh').textContent?chosen:{zh:o.querySelector('.opt-zh').textContent},q,o));
+      // re-bind properly
+      rebindQuizOpts(q);
+    },700);
+  }
+}
+
+function rebindQuizOpts(q){
+  const opts=document.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>{
+    const zh=o.querySelector('.opt-zh').textContent;
+    const py=o.querySelector('.opt-py').textContent;
+    o.onclick=()=>checkCNQuiz({zh,py},q,o);
+  });
+}
+
+function advanceCNQuiz(){
+  cnProgress[cnMission]++;cnQuizIdx++;
+  if(cnQuizIdx>=cnQuizData.length) cnMissionComplete();
+  else loadCNQuiz();
+}
+
+function cnMissionComplete(){
+  cnEarnedBadges[cnMission]=true;
+  playSiren();setTimeout(playSuccess,500);
+  setTimeout(()=>speak('Mission complete! You are a Paw Patrol hero!','en'),600);
+  showCNScreen('cn-complete-screen');
+  const m=CN_MISSIONS[cnMission];
+  document.getElementById('cn-complete-emoji').textContent=m.badge;
+  document.getElementById('cn-complete-msg').textContent='任务完成! Mission Complete! 🎉';
+  document.getElementById('cn-complete-sub').textContent='Amazing work learning Chinese! 太棒了!';
+  const cb=document.getElementById('cn-complete-badges');cb.innerHTML='';
+  cnEarnedBadges.forEach((e,i)=>{const d=document.createElement('div');d.className='badge-item'+(e?'':' locked');d.textContent=CN_MISSIONS[i].badge;cb.appendChild(d);});
+  for(let i=0;i<5;i++) setTimeout(()=>spawnVehicle(m.guide),i*320);
+  updateCNHomeUI();
+}
+
+// Init
+goHome();goCNHome();
+document.getElementById('en-page').classList.add('active');
+document.getElementById('cn-page').classList.remove('active');
+updateStarsBar();
+</script>
+</body>
+</html>
