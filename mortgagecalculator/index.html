@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesley's Property Dashboard</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -35,6 +36,30 @@ body.dark .range-hint{color:#64748b}
 body.dark .stress-head{color:#94a3b8}
 body.dark .sec-title-text{color:#f1f5f9}
 body.dark .stress-divider{border-top-color:rgba(255,255,255,0.07)}
+body.dark .main-nav-tab{color:#94a3b8;border-bottom-color:transparent}
+body.dark .main-nav-tab.active{color:#60a5fa;border-bottom-color:#60a5fa}
+body.dark .main-nav-tab:hover{color:#e2e8f0}
+body.dark .nav-bar{border-bottom-color:rgba(255,255,255,0.08)}
+body.dark .ct-card{background:#1e2130;border-color:rgba(255,255,255,0.08)}
+body.dark .ct-metric{background:#2a2f45}
+body.dark .ct-ml{color:#94a3b8}
+body.dark .ct-mv{color:#e2e8f0}
+body.dark .ct-ms{color:#64748b}
+body.dark .ct-row{border-bottom-color:rgba(255,255,255,0.07)}
+body.dark .ct-rl{color:#94a3b8}
+body.dark .ct-rv{color:#e2e8f0}
+body.dark .ct-section-label{color:#64748b}
+body.dark .ct-badge-blue{background:#1e3a5f;color:#60a5fa}
+body.dark .ct-badge-green{background:#14291a;color:#4ade80}
+body.dark .ct-badge-amber{background:#2d2010;color:#fbbf24}
+body.dark .ct-badge-red{background:#2d1414;color:#f87171}
+body.dark .ct-stack-card{background:#1e2130;border-color:rgba(255,255,255,0.08)}
+body.dark .ct-stack-preferred{border-color:#1D9E75}
+body.dark .ct-stack-name{color:#e2e8f0}
+body.dark .ct-stack-detail{color:#94a3b8}
+body.dark .ct-divider{border-top-color:rgba(255,255,255,0.07)}
+body.dark .ct-info{background:#2a2f45;color:#94a3b8}
+body.dark .ct-tag{border-color:rgba(255,255,255,0.15);color:#94a3b8}
 body.light{color:#1a1a2e;background:#f4f6fb}
 body.light .section{background:#ffffff;border-color:rgba(0,0,0,0.1)}
 body.light .sec-title{color:#64748b}
@@ -65,8 +90,32 @@ body.light .sec-title-text{color:#0f172a}
 body.light .stress-divider{border-top-color:rgba(0,0,0,0.08)}
 body.light .bg{background:#dcfce7;color:#166534}
 body.light .ba{background:#fef3c7;color:#92400e}
+body.light .main-nav-tab{color:#64748b;border-bottom-color:transparent}
+body.light .main-nav-tab.active{color:#2563eb;border-bottom-color:#2563eb}
+body.light .main-nav-tab:hover{color:#1a1a2e}
+body.light .nav-bar{border-bottom-color:rgba(0,0,0,0.1)}
+body.light .ct-card{background:#ffffff;border-color:rgba(0,0,0,0.1)}
+body.light .ct-metric{background:#f1f5f9}
+body.light .ct-ml{color:#64748b}
+body.light .ct-mv{color:#1a1a2e}
+body.light .ct-ms{color:#94a3b8}
+body.light .ct-row{border-bottom-color:rgba(0,0,0,0.07)}
+body.light .ct-rl{color:#64748b}
+body.light .ct-rv{color:#1a1a2e}
+body.light .ct-section-label{color:#94a3b8}
+body.light .ct-badge-blue{background:#dbeafe;color:#1d4ed8}
+body.light .ct-badge-green{background:#dcfce7;color:#166534}
+body.light .ct-badge-amber{background:#fef3c7;color:#92400e}
+body.light .ct-badge-red{background:#fee2e2;color:#991b1b}
+body.light .ct-stack-card{background:#ffffff;border-color:rgba(0,0,0,0.1)}
+body.light .ct-stack-preferred{border-color:#1D9E75}
+body.light .ct-stack-name{color:#1a1a2e}
+body.light .ct-stack-detail{color:#64748b}
+body.light .ct-divider{border-top-color:rgba(0,0,0,0.08)}
+body.light .ct-info{background:#f1f5f9;color:#64748b}
+body.light .ct-tag{border-color:rgba(0,0,0,0.15);color:#64748b}
 .section{border:0.5px solid;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem}
 h1{font-size:22px;font-weight:600;margin-bottom:4px;letter-spacing:-0.3px}
 .sub{font-size:13px}
 .toggle-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid;transition:all .2s;white-space:nowrap;flex-shrink:0}
@@ -99,6 +148,37 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
 .sir label{font-size:12px;white-space:nowrap}
 .sir input{width:110px;font-size:13px;padding:4px 8px;text-align:right;border:0.5px solid;border-radius:8px}
 .stress-divider{border:none;border-top:0.5px solid;margin:12px 0}
+/* Nav tabs */
+.nav-bar{display:flex;gap:0;border-bottom:1.5px solid;margin-bottom:1.25rem;overflow-x:auto}
+.main-nav-tab{padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;border:none;background:transparent;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px}
+.main-page{display:none}.main-page.active{display:block}
+/* CT Analysis styles */
+.ct-card{border:0.5px solid;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.ct-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1rem}
+.ct-metric{border-radius:8px;padding:12px 14px}
+.ct-ml{font-size:12px;margin-bottom:4px}
+.ct-mv{font-size:17px;font-weight:600}
+.ct-ms{font-size:11px;margin-top:2px}
+.ct-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:0.5px solid;font-size:13px;gap:8px}
+.ct-row:last-child{border-bottom:none}
+.ct-rl{color:#94a3b8;flex-shrink:0}
+.ct-rv{font-weight:500;text-align:right}
+.ct-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin:1.25rem 0 .6rem}
+.ct-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;margin-left:6px;vertical-align:middle}
+.ct-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.ct-stack-card{border:0.5px solid;border-radius:12px;padding:1rem}
+.ct-stack-preferred{border-width:2px;border-style:solid}
+.ct-stack-name{font-size:14px;font-weight:600;margin-bottom:8px}
+.ct-stack-detail{font-size:12px;margin:3px 0;line-height:1.5;display:flex;align-items:flex-start;gap:6px}
+.ct-stack-detail i{font-size:13px;margin-top:1px;flex-shrink:0}
+.ct-tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ct-tag{font-size:11px;padding:3px 9px;border-radius:20px;border:0.5px solid}
+.ct-divider{border:none;border-top:0.5px solid;margin:10px 0}
+.ct-info{font-size:13px;border-radius:8px;padding:10px 14px;line-height:1.6}
+.ct-watchout-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid;font-size:13px;gap:12px}
+.ct-watchout-row:last-child{border-bottom:none}
+.ct-wl{flex-shrink:0;min-width:140px}
+.ct-wr{text-align:right;line-height:1.5}
 </style>
 </head>
 <body class="dark">
@@ -106,11 +186,20 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
 <div style="padding:1rem 1.25rem">
   <div class="header-row">
     <div>
-      <h1>Wesley's Property Purchase Calculator</h1>
-      <p class="sub">Singapore private property — upfront costs, loan scenarios &amp; monthly cash flow</p>
+      <h1>Wesley's Property Dashboard</h1>
+      <p class="sub">Singapore private property — purchase calculator &amp; analysis</p>
     </div>
-    <button class="toggle-btn" onclick="toggleMode()" id="modeBtn"><i class="ti ti-moon" id="modeIcon"></i> Dark mode</button>
+    <button class="toggle-btn" onclick="toggleMode()" id="modeBtn"><i class="ti ti-moon"></i> Dark mode</button>
   </div>
+
+  <!-- Main nav -->
+  <div class="nav-bar">
+    <button class="main-nav-tab active" onclick="switchMainTab('calc',this)"><i class="ti ti-calculator" style="font-size:15px"></i> Purchase calculator</button>
+    <button class="main-nav-tab" onclick="switchMainTab('ct',this)"><i class="ti ti-building" style="font-size:15px"></i> Commonwealth Towers — 904 sqft analysis</button>
+  </div>
+
+  <!-- PAGE 1: Calculator -->
+  <div class="main-page active" id="page-calc">
 
   <div class="section">
     <div class="sec-title"><i class="ti ti-home"></i><span class="sec-title-text">Property &amp; loan inputs</span></div>
@@ -156,7 +245,6 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
 
   <div class="section">
     <div class="sec-title"><i class="ti ti-alert-triangle"></i><span class="sec-title-text">Stress test</span></div>
-    <!-- Stress inputs: rendered once, never re-rendered -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div>
         <div class="stress-head" style="font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Best case inputs</div>
@@ -176,7 +264,194 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
     <hr class="stress-divider">
     <div id="stressResults"></div>
   </div>
-</div>
+
+  </div><!-- end page-calc -->
+
+  <!-- PAGE 2: CT Analysis -->
+  <div class="main-page" id="page-ct">
+
+    <!-- Key metrics -->
+    <div class="ct-card">
+      <div class="ct-metrics">
+        <div class="ct-metric hi">
+          <div class="ct-ml">Unit</div>
+          <div class="ct-mv">904 sqft</div>
+          <div class="ct-ms">Type (3)a · 84 sqm · Block 230 / 232</div>
+        </div>
+        <div class="ct-metric hi">
+          <div class="ct-ml">Target PSF</div>
+          <div class="ct-mv">$2,520–$2,600</div>
+          <div class="ct-ms">Q4 2026 fair value range</div>
+        </div>
+        <div class="ct-metric good">
+          <div class="ct-ml">Target quantum</div>
+          <div class="ct-mv">$2.28M–$2.35M</div>
+          <div class="ct-ms">Best negotiation anchor</div>
+        </div>
+        <div class="ct-metric warn">
+          <div class="ct-ml">Walk away above</div>
+          <div class="ct-mv">&gt; $2.38M</div>
+          <div class="ct-ms">Optimistic end, thin buffer</div>
+        </div>
+        <div class="ct-metric">
+          <div class="ct-ml">Annualised ROI</div>
+          <div class="ct-mv">4.10%</div>
+          <div class="ct-ms">2018–2026 · 98.3% profitable txns</div>
+        </div>
+        <div class="ct-metric">
+          <div class="ct-ml">Current rental yield</div>
+          <div class="ct-mv">3.9%</div>
+          <div class="ct-ms">Natural price floor for investors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price scenarios -->
+    <div class="ct-section-label">Price scenarios — Q4 2026 (904 sqft)</div>
+    <div class="ct-card">
+      <div class="ct-row">
+        <span class="ct-rl">Conservative — 0% growth</span>
+        <span class="ct-rv">$2,535 psf · <strong>S$2.29M</strong></span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Moderate — 3% growth <span class="ct-badge ct-badge-blue">Most likely</span></span>
+        <span class="ct-rv">$2,611 psf · <strong>S$2.36M</strong></span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Optimistic — 5% growth <span class="ct-badge ct-badge-amber">Over budget risk</span></span>
+        <span class="ct-rv" style="color:#d97706">$2,662 psf · S$2.41M</span>
+      </div>
+    </div>
+
+    <!-- Penrith comparison -->
+    <div class="ct-section-label">Vs Penrith — lease-adjusted comparison</div>
+    <div class="ct-card">
+      <div class="ct-row">
+        <span class="ct-rl">Lease gap</span>
+        <span class="ct-rv">12 years · CT: 2013, Penrith: 2025</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Lease adjustment rule</span>
+        <span class="ct-rv">$50 × 12 yrs = $600 psf premium for Penrith</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">CT current PSF</span>
+        <span class="ct-rv" style="color:#16a34a">$2,535 psf — fairly priced ✓</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Penrith theoretical fair value</span>
+        <span class="ct-rv">$3,135 psf</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Penrith actual launch avg</span>
+        <span class="ct-rv">$2,796 psf — $339 below fair value</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Penrith 3BR quantum (subsale now)</span>
+        <span class="ct-rv" style="color:#d97706">~$2.8M–$3.1M — over $2.4M budget</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Penrith TOP</span>
+        <span class="ct-rv">2029 — can't move in within 1 year</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Penrith TOP risk to CT</span>
+        <span class="ct-rv">Mild 3–5% softening 2029, structural value holds</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Expected 2027 CT PSF (3% growth)</span>
+        <span class="ct-rv">$2,600–$2,650 psf</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-rl">Expected 2027 Penrith subsale PSF</span>
+        <span class="ct-rv">$3,150–$3,220 psf</span>
+      </div>
+    </div>
+
+    <!-- Stack selection -->
+    <div class="ct-section-label">Available stacks — Type (3)a, 904 sqft</div>
+    <div class="ct-two-col">
+      <div class="ct-stack-card">
+        <div class="ct-stack-name">Stack 10 <span class="ct-badge ct-badge-blue">Block 230</span></div>
+        <div class="ct-stack-detail"><i class="ti ti-map-pin"></i>Closer to Queenstown MRT</div>
+        <div class="ct-stack-detail"><i class="ti ti-road"></i>Faces Commonwealth Ave — more road &amp; MRT noise</div>
+        <div class="ct-stack-detail"><i class="ti ti-building-skyscraper"></i>Floors 06–43 available</div>
+        <div class="ct-stack-detail"><i class="ti ti-info-circle"></i>Avoid lower floors (&lt;10) for noise</div>
+        <div class="ct-tag-row">
+          <span class="ct-tag">Block 230</span>
+          <span class="ct-tag">Floors 06–43</span>
+        </div>
+      </div>
+      <div class="ct-stack-card ct-stack-preferred">
+        <div class="ct-stack-name">Stack 21 <span class="ct-badge ct-badge-green">Block 232 · Preferred</span></div>
+        <div class="ct-stack-detail"><i class="ti ti-trees"></i>Faces pool &amp; Alexandra Canal Linear Park</div>
+        <div class="ct-stack-detail"><i class="ti ti-volume-off"></i>Quieter — away from MRT tracks &amp; main road</div>
+        <div class="ct-stack-detail"><i class="ti ti-sun"></i>Better orientation, more natural breeze</div>
+        <div class="ct-stack-detail"><i class="ti ti-star"></i>Sweet spot: floors 18–30</div>
+        <div class="ct-tag-row">
+          <span class="ct-tag">Block 232</span>
+          <span class="ct-tag">Floors 18–30 sweet spot</span>
+          <span class="ct-tag">Best for families</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Watch-outs -->
+    <div class="ct-section-label">Key watch-outs &amp; tips</div>
+    <div class="ct-card">
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">No helper room</span>
+        <span class="ct-wr" style="color:#d97706">Type (3)a has no utility/helper room — clarify with agent, ask about 3BR + yard units</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">Net usable space</span>
+        <span class="ct-wr">~73 sqm net (excl. 8 sqm balcony + 3 sqm AC ledge)</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">3BR scarcity</span>
+        <span class="ct-wr" style="color:#16a34a">Only 100+ units of 845 total — supports long-term price resilience</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">School proximity</span>
+        <span class="ct-wr" style="color:#16a34a">2 primary schools within 1km — P1 registration priority for kids aged 6–7</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">MRT access</span>
+        <span class="ct-wr" style="color:#16a34a">100m to Queenstown MRT — covered linkway within development</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">Negotiation tip</span>
+        <span class="ct-wr">Target listings 60+ days old · Pre-2020 buyers have more room to negotiate</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">Renovation budget</span>
+        <span class="ct-wr">Set aside S$30K–S$50K on top of purchase price</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">First property</span>
+        <span class="ct-wr" style="color:#16a34a">No ABSD — use this advantage to negotiate harder on quantum</span>
+      </div>
+      <div class="ct-watchout-row">
+        <span class="ct-wl ct-rl">Developer pedigree</span>
+        <span class="ct-wr">CDL + Hong Leong — blue chip brand supports resale liquidity</span>
+      </div>
+    </div>
+
+    <!-- Family fit summary -->
+    <div class="ct-section-label">Family fit summary</div>
+    <div class="ct-card">
+      <div class="ct-row"><span class="ct-rl">Family size</span><span class="ct-rv">5 (2 adults, 2 kids aged 3 &amp; 5, 1 helper)</span></div>
+      <div class="ct-row"><span class="ct-rl">Budget</span><span class="ct-rv">S$2.0M–S$2.4M ✓ within range</span></div>
+      <div class="ct-row"><span class="ct-rl">Timeline</span><span class="ct-rv">Within 1 year — CT ready for immediate occupation ✓</span></div>
+      <div class="ct-row"><span class="ct-rl">School proximity</span><span class="ct-rv">New Town Primary + Queenstown Primary within 1km ✓</span></div>
+      <div class="ct-row"><span class="ct-rl">MRT access</span><span class="ct-rv">100m doorstep access ✓</span></div>
+      <div class="ct-row"><span class="ct-rl">Shops &amp; F&B</span><span class="ct-rv">Anchorpoint, IKEA Alexandra, Queensway SC nearby ✓</span></div>
+      <div class="ct-row"><span class="ct-rl">Investment case</span><span class="ct-rv">4.10% ROI, 98.3% profitable transactions, lease-adjusted fair value ✓</span></div>
+    </div>
+
+  </div><!-- end page-ct -->
+
+</div><!-- end wrapper -->
 
 <script>
 var isDark = true;
@@ -185,225 +460,89 @@ function toggleMode() {
   isDark = !isDark;
   document.body.className = isDark ? 'dark' : 'light';
   document.getElementById('modeBtn').innerHTML = isDark
-    ? '<i class="ti ti-moon" id="modeIcon"></i> Dark mode'
-    : '<i class="ti ti-sun" id="modeIcon"></i> Light mode';
+    ? '<i class="ti ti-moon"></i> Dark mode'
+    : '<i class="ti ti-sun"></i> Light mode';
 }
 
-function fmt(v) { return 'S$' + Math.round(v).toLocaleString('en-SG'); }
-
-function pv(id) {
-  var el = document.getElementById(id);
-  if (!el) return 0;
-  return parseFloat(el.value.replace(/,/g, '')) || 0;
+function switchMainTab(id, el) {
+  document.querySelectorAll('.main-nav-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.main-page').forEach(function(p){p.classList.remove('active');});
+  if(el) el.classList.add('active');
+  var pg = document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
 }
 
-function fmtField(el) {
-  var raw = el.value.replace(/,/g, '').replace(/[^0-9.]/g, '');
-  var num = parseFloat(raw);
-  if (!isNaN(num)) el.value = num.toLocaleString('en-SG');
-}
+function fmt(v){return 'S$'+Math.round(v).toLocaleString('en-SG');}
+function pv(id){var el=document.getElementById(id);if(!el)return 0;return parseFloat(el.value.replace(/,/g,''))||0;}
+function fmtField(el){var raw=el.value.replace(/,/g,'').replace(/[^0-9.]/g,'');var num=parseFloat(raw);if(!isNaN(num))el.value=num.toLocaleString('en-SG');}
+function pmt(r,n,pval){if(r===0)return pval/n;return pval*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);}
+function ru1k(v){return Math.ceil(v/1000)*1000;}
+function row(label,value,bold,color,indent,small){var lStyle=bold?' style="font-weight:600"':'';var vStyle=color?(' style="font-weight:600;color:'+color+'"'):(bold?' style="font-weight:600"':'');var cls='row'+(indent?' ri':'');var fsize=small?' style="font-size:12px"':'';return '<div class="'+cls+'"><span class="rl"'+fsize+lStyle+'>'+label+'</span><span class="rv"'+vStyle+'>'+value+'</span></div>';}
+function getC(){return isDark?{G:'#4ade80',R:'#f87171',A:'#fbbf24'}:{G:'#16a34a',R:'#dc2626',A:'#d97706'};}
 
-function pmt(r, n, pval) {
-  if (r === 0) return pval / n;
-  return pval * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
-}
-
-function ru1k(v) { return Math.ceil(v / 1000) * 1000; }
-
-function row(label, value, bold, color, indent, small) {
-  var lStyle = bold ? ' style="font-weight:600"' : '';
-  var vStyle = color ? (' style="font-weight:600;color:' + color + '"') : (bold ? ' style="font-weight:600"' : '');
-  var cls = 'row' + (indent ? ' ri' : '');
-  var fsize = small ? ' style="font-size:12px"' : '';
-  return '<div class="' + cls + '"><span class="rl"' + fsize + lStyle + '>' + label + '</span><span class="rv"' + vStyle + '>' + value + '</span></div>';
-}
-
-function getC() {
-  return isDark
-    ? { G: '#4ade80', R: '#f87171', A: '#fbbf24' }
-    : { G: '#16a34a', R: '#dc2626', A: '#d97706' };
-}
-
-function calcResults() {
-  var c      = getC();
-  var price  = pv('propPrice');
-  var ipa    = pv('ipa');
-  var cpf    = pv('cpf');
-  var cash   = pv('cash');
-  var rate   = parseFloat(document.getElementById('rate').value) / 100;
-  var tenure = pv('tenure') || 30;
-  var condo  = pv('condofee');
-  var rental = pv('rental');
-  var cpfmo  = pv('cpfmo');
-
-  document.getElementById('rateLabel').textContent = (rate * 100).toFixed(2) + '%';
-
-  var max75     = price * 0.75;
-  var shortfall = Math.max(0, max75 - ipa);
-  var hasS      = shortfall > 0;
-  var opt       = price * 0.01;
-  var ex        = price * 0.04;
-  var bsd       = price * 0.05 - 30400;
-  var legal     = 3000;
-  var dp        = price * 0.20;
-  var cashOnly  = opt + ex + bsd + legal;
-  var totalCPF  = cashOnly + dp;
-  var cpfUsed   = Math.min(cpf, dp);
-  var dpCash    = dp - cpfUsed;
-  var r         = rate / 12;
-  var n         = tenure * 12;
-
-  var pledge = 0, show = 0;
-  if (hasS) {
-    pledge = ru1k((pmt(0.04 / 12, 360, shortfall) / 0.55) * 48);
-    show   = ru1k(pledge / 0.30);
-  }
-
-  var cpfLeft     = Math.max(0, cpf - cpfUsed);
-  var cpfToS      = Math.min(cpfLeft, shortfall);
-  var cashToS     = shortfall - cpfToS;
-  var cashNeedA   = cashOnly + dpCash + cashToS;
-  var csA         = Math.max(0, cashNeedA - cash);
-  var cashBase    = cashOnly + dpCash;
-  var totalShow   = cashBase + show;
-  var csShow      = Math.max(0, totalShow - cash);
-  var totalPledge = cashBase + pledge;
-  var csPledge    = Math.max(0, totalPledge - cash);
-
-  // Summary cards
-  document.getElementById('summaryCards').innerHTML =
-    '<div class="metric hi"><div class="ml">Property price</div><div class="mv">' + fmt(price) + '</div></div>' +
-    '<div class="metric"><div class="ml">Max loan (75%)</div><div class="mv">' + fmt(max75) + '</div></div>' +
-    '<div class="metric"><div class="ml">BSD</div><div class="mv">' + fmt(bsd) + '</div><div class="ms">Price x 5% - $30,400</div></div>' +
-    '<div class="metric"><div class="ml">Downpayment (20%)</div><div class="mv">' + fmt(dp) + '</div></div>' +
-    '<div class="metric"><div class="ml">Option (1%) + Exercise fee (4%)</div><div class="mv">' + fmt(opt + ex) + '</div></div>' +
-    '<div class="metric"><div class="ml">Legal fees + valuation (est.)</div><div class="mv">' + fmt(legal) + '</div></div>' +
-    '<div class="metric ' + (hasS ? 'warn' : 'good') + '"><div class="ml">Loan shortfall</div><div class="mv">' + (hasS ? fmt(shortfall) : 'None') + '</div><div class="ms">' + (hasS ? 'IPA < 75% of price' : 'IPA covers full 75%') + '</div></div>';
-
-  // Shared cost rows
-  function costRows(loanAmt) {
-    return row('Loan amount ' + (loanAmt === ipa ? '(IPA)' : '(75% of price)'), fmt(loanAmt)) +
-      row('Downpayment (20%) — cash/CPF', fmt(dp)) +
-      row('Option fee (1%) — cash only', fmt(opt)) +
-      row('Exercise fee (4%) — cash only', fmt(ex)) +
-      row('BSD — cash only', fmt(bsd)) +
-      row('Legal fees + valuation — cash only', fmt(legal)) +
-      '<hr class="divider">' +
-      row('Total cash & CPF required', fmt(totalCPF), true) +
-      row('Less: Cash available', '-' + fmt(cash), false, c.G) +
-      row('Less: CPF OA available', '-' + fmt(cpfUsed), false, c.G);
-  }
-
-  // Loan scenario tabs & panels
-  var tabsHtml = '', panelsHtml = '';
-  if (hasS) {
-    tabsHtml =
-      '<button class="tab active" onclick="switchTab(\'noshow\',this)">No show / pledge</button>' +
-      '<button class="tab" onclick="switchTab(\'show\',this)">Show funds <span class="badge ba">option</span></button>' +
-      '<button class="tab" onclick="switchTab(\'pledge\',this)">Pledge funds <span class="badge bg">recommended</span></button>';
-    panelsHtml +=
-      '<div class="sp active" id="panel-noshow">' + costRows(ipa) +
-      row('Loan shortfall — cash/CPF', fmt(shortfall), false, c.R) +
-      '<hr class="divider">' +
-      row('Total cash required excl. CPF', fmt(cashNeedA), true) +
-      row('Cash shortfall', csA > 0 ? fmt(csA) : 'None — fully covered', true, csA > 0 ? c.R : c.G) +
-      '<div class="info">You take the IPA loan of ' + fmt(ipa) + ' and fund the ' + fmt(shortfall) + ' loan shortfall from your own cash/CPF.</div></div>';
-    panelsHtml +=
-      '<div class="sp" id="panel-show">' + costRows(max75) +
-      row('Show of funds required — cash', fmt(show), false, c.A) +
-      row('= Pledge / 30%', '', false, '', true, true) +
-      '<hr class="divider">' +
-      row('Total cash required excl. CPF (with show)', fmt(totalShow), true) +
-      row('Cash shortfall', csShow > 0 ? fmt(csShow) : 'None — fully covered', true, csShow > 0 ? c.R : c.G) +
-      '<div class="info">Show ' + fmt(show) + ' in liquid assets to demonstrate ability to service the loan. Funds remain yours — bank just needs to see them.</div></div>';
-    panelsHtml +=
-      '<div class="sp" id="panel-pledge">' + costRows(max75) +
-      row('Pledge funds required — cash', fmt(pledge), false, c.G) +
-      row('PMT(4%/12, 360, shortfall) / 0.55 x 48 mths', '', false, '', true, true) +
-      '<hr class="divider">' +
-      row('Total cash required excl. CPF (with pledge)', fmt(totalPledge), true) +
-      row('Cash shortfall', csPledge > 0 ? fmt(csPledge) : 'None — fully covered', true, csPledge > 0 ? c.R : c.G) +
-      '<div class="info">Pledge ' + fmt(pledge) + ' of assets with the bank. Lower threshold than show funds. Assets are held as collateral for the loan.</div></div>';
+function calcResults(){
+  var c=getC();
+  var price=pv('propPrice'),ipa=pv('ipa'),cpf=pv('cpf'),cash=pv('cash');
+  var rate=parseFloat(document.getElementById('rate').value)/100;
+  var tenure=pv('tenure')||30,condo=pv('condofee'),rental=pv('rental'),cpfmo=pv('cpfmo');
+  document.getElementById('rateLabel').textContent=(rate*100).toFixed(2)+'%';
+  var max75=price*0.75,shortfall=Math.max(0,max75-ipa),hasS=shortfall>0;
+  var opt=price*0.01,ex=price*0.04,bsd=price*0.05-30400,legal=3000;
+  var dp=price*0.20,cashOnly=opt+ex+bsd+legal,totalCPF=cashOnly+dp;
+  var cpfUsed=Math.min(cpf,dp),dpCash=dp-cpfUsed;
+  var r=rate/12,n=tenure*12;
+  var pledge=0,show=0;
+  if(hasS){pledge=ru1k((pmt(0.04/12,360,shortfall)/0.55)*48);show=ru1k(pledge/0.30);}
+  var cpfLeft=Math.max(0,cpf-cpfUsed),cpfToS=Math.min(cpfLeft,shortfall),cashToS=shortfall-cpfToS;
+  var cashNeedA=cashOnly+dpCash+cashToS,csA=Math.max(0,cashNeedA-cash);
+  var cashBase=cashOnly+dpCash,totalShow=cashBase+show,csShow=Math.max(0,totalShow-cash);
+  var totalPledge=cashBase+pledge,csPledge=Math.max(0,totalPledge-cash);
+  document.getElementById('summaryCards').innerHTML=
+    '<div class="metric hi"><div class="ml">Property price</div><div class="mv">'+fmt(price)+'</div></div>'+
+    '<div class="metric"><div class="ml">Max loan (75%)</div><div class="mv">'+fmt(max75)+'</div></div>'+
+    '<div class="metric"><div class="ml">BSD</div><div class="mv">'+fmt(bsd)+'</div><div class="ms">Price x 5% - $30,400</div></div>'+
+    '<div class="metric"><div class="ml">Downpayment (20%)</div><div class="mv">'+fmt(dp)+'</div></div>'+
+    '<div class="metric"><div class="ml">Option (1%) + Exercise fee (4%)</div><div class="mv">'+fmt(opt+ex)+'</div></div>'+
+    '<div class="metric"><div class="ml">Legal fees + valuation (est.)</div><div class="mv">'+fmt(legal)+'</div></div>'+
+    '<div class="metric '+(hasS?'warn':'good')+'"><div class="ml">Loan shortfall</div><div class="mv">'+(hasS?fmt(shortfall):'None')+'</div><div class="ms">'+(hasS?'IPA < 75% of price':'IPA covers full 75%')+'</div></div>';
+  function costRows(loanAmt){return row('Loan amount '+(loanAmt===ipa?'(IPA)':'(75% of price)'),fmt(loanAmt))+row('Downpayment (20%) — cash/CPF',fmt(dp))+row('Option fee (1%) — cash only',fmt(opt))+row('Exercise fee (4%) — cash only',fmt(ex))+row('BSD — cash only',fmt(bsd))+row('Legal fees + valuation — cash only',fmt(legal))+'<hr class="divider">'+row('Total cash & CPF required',fmt(totalCPF),true)+row('Less: Cash available','-'+fmt(cash),false,c.G)+row('Less: CPF OA available','-'+fmt(cpfUsed),false,c.G);}
+  var tabsHtml='',panelsHtml='';
+  if(hasS){
+    tabsHtml='<button class="tab active" onclick="switchTab(\'noshow\',this)">No show / pledge</button><button class="tab" onclick="switchTab(\'show\',this)">Show funds <span class="badge ba">option</span></button><button class="tab" onclick="switchTab(\'pledge\',this)">Pledge funds <span class="badge bg">recommended</span></button>';
+    panelsHtml+='<div class="sp active" id="panel-noshow">'+costRows(ipa)+row('Loan shortfall — cash/CPF',fmt(shortfall),false,c.R)+'<hr class="divider">'+row('Total cash required excl. CPF',fmt(cashNeedA),true)+row('Cash shortfall',csA>0?fmt(csA):'None — fully covered',true,csA>0?c.R:c.G)+'<div class="info">You take the IPA loan of '+fmt(ipa)+' and fund the '+fmt(shortfall)+' loan shortfall from your own cash/CPF.</div></div>';
+    panelsHtml+='<div class="sp" id="panel-show">'+costRows(max75)+row('Show of funds required — cash',fmt(show),false,c.A)+row('= Pledge / 30%','',false,'',true,true)+'<hr class="divider">'+row('Total cash required excl. CPF (with show)',fmt(totalShow),true)+row('Cash shortfall',csShow>0?fmt(csShow):'None — fully covered',true,csShow>0?c.R:c.G)+'<div class="info">Show '+fmt(show)+' in liquid assets to demonstrate ability to service the loan. Funds remain yours — bank just needs to see them.</div></div>';
+    panelsHtml+='<div class="sp" id="panel-pledge">'+costRows(max75)+row('Pledge funds required — cash',fmt(pledge),false,c.G)+row('PMT(4%/12, 360, shortfall) / 0.55 x 48 mths','',false,'',true,true)+'<hr class="divider">'+row('Total cash required excl. CPF (with pledge)',fmt(totalPledge),true)+row('Cash shortfall',csPledge>0?fmt(csPledge):'None — fully covered',true,csPledge>0?c.R:c.G)+'<div class="info">Pledge '+fmt(pledge)+' of assets with the bank. Lower threshold than show funds. Assets are held as collateral for the loan.</div></div>';
   } else {
-    tabsHtml = '<button class="tab active" onclick="switchTab(\'full\',this)">Full 75% loan <span class="badge bg">no shortfall</span></button>';
-    var cs0 = Math.max(0, cashBase - cash);
-    panelsHtml =
-      '<div class="sp active" id="panel-full">' + costRows(max75) +
-      '<hr class="divider">' +
-      row('Total cash required excl. CPF', fmt(cashBase), true) +
-      row('Cash shortfall', cs0 > 0 ? fmt(cs0) : 'None — fully covered', true, cs0 > 0 ? c.R : c.G) +
-      '<div class="info">Your IPA covers the full 75% loan — no show or pledge funds needed.</div></div>';
+    tabsHtml='<button class="tab active" onclick="switchTab(\'full\',this)">Full 75% loan <span class="badge bg">no shortfall</span></button>';
+    var cs0=Math.max(0,cashBase-cash);
+    panelsHtml='<div class="sp active" id="panel-full">'+costRows(max75)+'<hr class="divider">'+row('Total cash required excl. CPF',fmt(cashBase),true)+row('Cash shortfall',cs0>0?fmt(cs0):'None — fully covered',true,cs0>0?c.R:c.G)+'<div class="info">Your IPA covers the full 75% loan — no show or pledge funds needed.</div></div>';
   }
-  document.getElementById('scenarioTabs').innerHTML = tabsHtml;
-  document.getElementById('scenarioPanels').innerHTML = panelsHtml;
-
-  // Monthly cash flow
-  var mo       = pmt(r, n, max75);
-  var interest = max75 * rate / 12;
-  var prin     = mo - interest;
-  var netMo    = mo + condo - rental - cpfmo;
-  document.getElementById('cashflow').innerHTML =
-    row('Monthly mortgage repayment', fmt(mo)) +
-    row('— Principal', fmt(prin), false, '', true) +
-    row('— Interest', fmt(interest), false, '', true) +
-    row('+ Condo maintenance fee — expense', fmt(condo)) +
-    row('- Rental income — HDB', '-' + fmt(rental), false, c.G) +
-    row('- Monthly CPF OA contribution — income', '-' + fmt(cpfmo), false, c.G) +
-    '<hr class="divider">' +
-    row('Net monthly cash top-up', fmt(Math.abs(netMo)) + (netMo > 0 ? ' outflow' : ' surplus'), true, netMo > 0 ? c.R : c.G) +
-    '<div class="ms" style="margin-top:4px;text-align:right">Based on ' + (rate * 100).toFixed(2) + '% p.a., ' + tenure + '-yr loan at 75% LTV</div>';
-
-  // Stress test results only (inputs stay in HTML)
-  var stRBC   = parseFloat(document.getElementById('st-rbc').value) || 0;
-  var stRWC   = parseFloat(document.getElementById('st-rwc').value) || 0;
-  var stCBC   = parseFloat(document.getElementById('st-cbc').value) || 0;
-  var stCWC   = parseFloat(document.getElementById('st-cwc').value) || 0;
-  var stRenBC = parseFloat(document.getElementById('st-renbc').value) || 0;
-  var stRenWC = parseFloat(document.getElementById('st-renwc').value) || 0;
-  var stCpfBC = parseFloat(document.getElementById('st-cpfbc').value) || 0;
-  var stCpfWC = parseFloat(document.getElementById('st-cpfwc').value) || 0;
-
-  var bcMo  = pmt(stRBC / 100 / 12, n, max75);
-  var wcMo  = pmt(stRWC / 100 / 12, n, max75);
-  var bcNet = bcMo + stCBC - stRenBC - stCpfBC;
-  var wcNet = wcMo + stCWC - stRenWC - stCpfWC;
-
-  document.getElementById('stressResults').innerHTML =
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-    '<div class="metric ' + (bcNet > 0 ? 'warn' : 'good') + '">' +
-    '<div class="ml">Best case — ' + stRBC.toFixed(2) + '% i/r</div>' +
-    '<div class="mv">' + fmt(Math.abs(bcNet)) + '/mth</div>' +
-    '<div class="ms">' + (bcNet > 0 ? 'net outflow' : 'net surplus') + ' · rental + CPF offset applied</div>' +
-    '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
-    '<div class="ml" style="font-size:12px">1.5-yr cash reserve needed</div>' +
-    '<div class="mv" style="font-size:16px;font-weight:600">' + (bcNet > 0 ? fmt(bcNet * 18) : 'None — surplus') + '</div></div></div>' +
-    '<div class="metric ' + (wcNet > 0 ? 'danger' : 'good') + '">' +
-    '<div class="ml">Worst case — ' + stRWC.toFixed(2) + '% i/r</div>' +
-    '<div class="mv">' + fmt(Math.abs(wcNet)) + '/mth</div>' +
-    '<div class="ms">' + (wcNet > 0 ? 'net outflow' : 'net surplus') + ' · no rental or CPF offset</div>' +
-    '<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)">' +
-    '<div class="ml" style="font-size:12px">1.5-yr cash reserve needed</div>' +
-    '<div class="mv" style="font-size:16px;font-weight:600">' + (wcNet > 0 ? fmt(wcNet * 18) : 'None — surplus') + '</div></div></div>' +
-    '</div>' +
-    '<div class="info" style="margin-top:10px">Cash reserve = net monthly outflow x 18 months. Adjust inputs above to model different scenarios.</div>';
+  document.getElementById('scenarioTabs').innerHTML=tabsHtml;
+  document.getElementById('scenarioPanels').innerHTML=panelsHtml;
+  var mo=pmt(r,n,max75),interest=max75*rate/12,prin=mo-interest,netMo=mo+condo-rental-cpfmo;
+  document.getElementById('cashflow').innerHTML=row('Monthly mortgage repayment',fmt(mo))+row('— Principal',fmt(prin),false,'',true)+row('— Interest',fmt(interest),false,'',true)+row('+ Condo maintenance fee — expense',fmt(condo))+row('- Rental income — HDB','-'+fmt(rental),false,c.G)+row('- Monthly CPF OA contribution — income','-'+fmt(cpfmo),false,c.G)+'<hr class="divider">'+row('Net monthly cash top-up',fmt(Math.abs(netMo))+(netMo>0?' outflow':' surplus'),true,netMo>0?c.R:c.G)+'<div class="ms" style="margin-top:4px;text-align:right">Based on '+(rate*100).toFixed(2)+'% p.a., '+tenure+'-yr loan at 75% LTV</div>';
+  var stRBC=parseFloat(document.getElementById('st-rbc').value)||0,stRWC=parseFloat(document.getElementById('st-rwc').value)||0;
+  var stCBC=parseFloat(document.getElementById('st-cbc').value)||0,stCWC=parseFloat(document.getElementById('st-cwc').value)||0;
+  var stRenBC=parseFloat(document.getElementById('st-renbc').value)||0,stRenWC=parseFloat(document.getElementById('st-renwc').value)||0;
+  var stCpfBC=parseFloat(document.getElementById('st-cpfbc').value)||0,stCpfWC=parseFloat(document.getElementById('st-cpfwc').value)||0;
+  var bcMo=pmt(stRBC/100/12,n,max75),wcMo=pmt(stRWC/100/12,n,max75);
+  var bcNet=bcMo+stCBC-stRenBC-stCpfBC,wcNet=wcMo+stCWC-stRenWC-stCpfWC;
+  document.getElementById('stressResults').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="metric '+(bcNet>0?'warn':'good')+'"><div class="ml">Best case — '+stRBC.toFixed(2)+'% i/r</div><div class="mv">'+fmt(Math.abs(bcNet))+'/mth</div><div class="ms">'+(bcNet>0?'net outflow':'net surplus')+' · rental + CPF offset applied</div><div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)"><div class="ml" style="font-size:12px">1.5-yr cash reserve needed</div><div class="mv" style="font-size:16px;font-weight:600">'+(bcNet>0?fmt(bcNet*18):'None — surplus')+'</div></div></div><div class="metric '+(wcNet>0?'danger':'good')+'"><div class="ml">Worst case — '+stRWC.toFixed(2)+'% i/r</div><div class="mv">'+fmt(Math.abs(wcNet))+'/mth</div><div class="ms">'+(wcNet>0?'net outflow':'net surplus')+' · no rental or CPF offset</div><div style="margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(128,128,128,0.2)"><div class="ml" style="font-size:12px">1.5-yr cash reserve needed</div><div class="mv" style="font-size:16px;font-weight:600">'+(wcNet>0?fmt(wcNet*18):'None — surplus')+'</div></div></div></div><div class="info" style="margin-top:10px">Cash reserve = net monthly outflow x 18 months. Adjust inputs above to model different scenarios.</div>';
 }
 
-function switchTab(id, el) {
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.querySelectorAll('.sp').forEach(function(p) { p.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  var p = document.getElementById('panel-' + id);
-  if (p) p.classList.add('active');
+function switchTab(id,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.sp').forEach(function(p){p.classList.remove('active');});
+  if(el)el.classList.add('active');
+  var p=document.getElementById('panel-'+id);
+  if(p)p.classList.add('active');
 }
 
-['propPrice','ipa','cpf','cash','condofee','rental','cpfmo'].forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('blur', function() { fmtField(this); calcResults(); });
-    el.addEventListener('input', calcResults);
-  }
+['propPrice','ipa','cpf','cash','condofee','rental','cpfmo'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el){el.addEventListener('blur',function(){fmtField(this);calcResults();});el.addEventListener('input',calcResults);}
 });
-document.getElementById('rate').addEventListener('input', calcResults);
+document.getElementById('rate').addEventListener('input',calcResults);
 calcResults();
 </script>
 </body>
