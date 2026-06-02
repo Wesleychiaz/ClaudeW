@@ -196,6 +196,7 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
   <div class="nav-bar">
     <button class="main-nav-tab active" onclick="switchMainTab('calc',this)"><i class="ti ti-calculator" style="font-size:15px"></i> Purchase calculator</button>
     <button class="main-nav-tab" onclick="switchMainTab('ct',this)"><i class="ti ti-building" style="font-size:15px"></i> Commonwealth Towers — 904 sqft analysis</button>
+    <button class="main-nav-tab" onclick="switchMainTab('sr',this)"><i class="ti ti-building-skyscraper" style="font-size:15px"></i> Stirling Residences — 883 &amp; 893 sqft analysis</button>
   </div>
 
   <!-- PAGE 1: Calculator -->
@@ -450,6 +451,137 @@ input[type=range]{width:100%;background:transparent;border:none;accent-color:#3b
     </div>
 
   </div><!-- end page-ct -->
+
+  <!-- PAGE 3: Stirling Residences Analysis -->
+  <div class="main-page" id="page-sr">
+
+    <!-- Key metrics -->
+    <div class="ct-card">
+      <div class="ct-metrics">
+        <div class="ct-metric hi"><div class="ct-ml">Development</div><div class="ct-mv">Stirling Residences</div><div class="ct-ms">Block 25 · Stacks 30 &amp; 31</div></div>
+        <div class="ct-metric hi"><div class="ct-ml">Unit types</div><div class="ct-mv">883 &amp; 893 sqft</div><div class="ct-ms">Type C1 (82sqm) &amp; C2 (83sqm)</div></div>
+        <div class="ct-metric warn"><div class="ct-ml">Current PSF range</div><div class="ct-mv">$2,628–$2,665</div><div class="ct-ms">Apr 2026 actual transactions</div></div>
+        <div class="ct-metric warn"><div class="ct-ml">Current quantum</div><div class="ct-mv">$2.32M–$2.38M</div><div class="ct-ms">Within $2.5M flexible budget ✓</div></div>
+        <div class="ct-metric good"><div class="ct-ml">Annualised ROI</div><div class="ct-mv">6.12%</div><div class="ct-ms">100% profitable transactions</div></div>
+        <div class="ct-metric good"><div class="ct-ml">3BR compact scarcity</div><div class="ct-mv">73 units</div><div class="ct-ms">5.8% of 1,259 — very scarce</div></div>
+      </div>
+    </div>
+
+    <!-- Stack orientation -->
+    <div class="ct-section-label">Stack orientation — Block 25, Stacks 30 &amp; 31</div>
+    <div class="ct-two-col">
+      <div class="ct-stack-card">
+        <div class="ct-stack-name">Stack 30 — Type C1 (883 sqft)</div>
+        <div class="ct-stack-detail"><i class="ti ti-compass"></i>North-East facing</div>
+        <div class="ct-stack-detail"><i class="ti ti-sun-off"></i>Minimal afternoon sun — good for SG climate</div>
+        <div class="ct-stack-detail"><i class="ti ti-trees"></i>Faces internal greenery / pool area</div>
+        <div class="ct-stack-detail"><i class="ti ti-volume-off"></i>Away from Stirling Road traffic</div>
+        <div class="ct-tag-row"><span class="ct-tag">883 sqft</span><span class="ct-tag">NE facing</span><span class="ct-tag">Low afternoon heat</span></div>
+      </div>
+      <div class="ct-stack-card ct-stack-preferred">
+        <div class="ct-stack-name">Stack 31 — Type C2 (893 sqft) <span class="ct-badge ct-badge-green">Preferred</span></div>
+        <div class="ct-stack-detail"><i class="ti ti-compass"></i>South-West facing — Shepherd's Hill landed estate</div>
+        <div class="ct-stack-detail"><i class="ti ti-eye"></i>Unobstructed low-rise views, possible sea view on high floors</div>
+        <div class="ct-stack-detail"><i class="ti ti-sun"></i>More afternoon sun — budget for blackout blinds</div>
+        <div class="ct-stack-detail"><i class="ti ti-star"></i>Sweet spot: floors 26–30</div>
+        <div class="ct-tag-row"><span class="ct-tag">893 sqft</span><span class="ct-tag">SW facing</span><span class="ct-tag">Best views</span><span class="ct-tag">+10 sqft vs C1</span></div>
+      </div>
+    </div>
+
+    <!-- Floor by floor -->
+    <div class="ct-section-label">Floor-by-floor price guide — Q4 2026 estimate</div>
+    <div class="ct-card">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr>
+            <th style="text-align:left;font-weight:500;font-size:12px;color:var(--ct-rl,#94a3b8);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)">Floor band</th>
+            <th style="text-align:left;font-weight:500;font-size:12px;color:var(--ct-rl,#94a3b8);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)">883 sqft PSF</th>
+            <th style="text-align:left;font-weight:500;font-size:12px;color:var(--ct-rl,#94a3b8);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)">883 sqft quantum</th>
+            <th style="text-align:left;font-weight:500;font-size:12px;color:var(--ct-rl,#94a3b8);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)">893 sqft PSF</th>
+            <th style="text-align:left;font-weight:500;font-size:12px;color:var(--ct-rl,#94a3b8);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)">893 sqft quantum</th>
+            <th style="text-align:left;font-weight:500;font-size:12px;color:var(--ct-rl,#94a3b8);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)">Budget fit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">Floors 21–25</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">$2,580–$2,620</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">$2.28M–$2.31M</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">$2,610–$2,650</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">$2.33M–$2.37M</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">✓ Within $2.5M</td></tr>
+          <tr><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">Floors 26–30</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">$2,620–$2,660</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">$2.31M–$2.35M</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">$2,650–$2,690</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">$2.37M–$2.40M</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">✓ Within $2.5M</td></tr>
+          <tr><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">Floors 31–35</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">$2,660–$2,720</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#0F6E56;font-weight:500">$2.35M–$2.40M</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)">$2,690–$2,750</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#854F0B;font-weight:500">$2.40M–$2.46M</td><td style="padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:#854F0B;font-weight:500">⚠ Borderline</td></tr>
+          <tr><td style="padding:7px 8px;color:var(--color-text-primary)">Floors 36–38</td><td style="padding:7px 8px;color:var(--color-text-primary)">$2,720–$2,800</td><td style="padding:7px 8px;color:#854F0B;font-weight:500">$2.40M–$2.47M</td><td style="padding:7px 8px;color:var(--color-text-primary)">$2,750–$2,830</td><td style="padding:7px 8px;color:#A32D2D;font-weight:500">$2.46M–$2.53M</td><td style="padding:7px 8px;color:#A32D2D;font-weight:500">✗ Over $2.5M</td></tr>
+        </tbody>
+      </table>
+      <div class="ct-info" style="margin-top:10px">Based on Apr 2026 actual transactions: floor 19 at $2,665 psf ($2.38M) and floor 23 at $2,628 psf ($2.32M). Floor premium estimated ~$8–12 psf per floor. Mar 2026 outlier at $1,971 psf (floor 38) excluded — likely distressed sale.</div>
+    </div>
+
+    <!-- Price scenarios -->
+    <div class="ct-section-label">Price scenarios — Q4 2026 (893 sqft, Stack 31, floors 26–30)</div>
+    <div class="ct-card">
+      <div class="ct-row"><span class="ct-rl">Conservative — 0% growth</span><span class="ct-rv">$2,665 psf · <strong>$2.38M</strong> <span class="ct-badge ct-badge-green">Within budget</span></span></div>
+      <div class="ct-row"><span class="ct-rl">Moderate — 3% growth <span class="ct-badge ct-badge-blue">Most likely</span></span><span class="ct-rv">$2,745 psf · <strong>$2.45M</strong> <span class="ct-badge ct-badge-green">Within $2.5M</span></span></div>
+      <div class="ct-row"><span class="ct-rl">Optimistic — 5% growth</span><span class="ct-rv" style="color:#854F0B">$2,798 psf · $2.50M <span class="ct-badge ct-badge-amber">At limit</span></span></div>
+    </div>
+
+    <!-- Vs Penrith -->
+    <div class="ct-section-label">Vs Penrith — lease-adjusted comparison</div>
+    <div class="ct-card">
+      <div class="ct-row"><span class="ct-rl">Stirling lease start</span><span class="ct-rv">Aug 2017 — 8 yrs newer than CT, 8 yrs older than Penrith</span></div>
+      <div class="ct-row"><span class="ct-rl">Stirling vs Penrith lease gap</span><span class="ct-rv">8 years · $50 × 8 = $400 psf discount vs Penrith</span></div>
+      <div class="ct-row"><span class="ct-rl">Stirling current PSF</span><span class="ct-rv">$2,628–$2,665 psf</span></div>
+      <div class="ct-row"><span class="ct-rl">Penrith theoretical fair value</span><span class="ct-rv">$3,028–$3,065 psf (Stirling + $400)</span></div>
+      <div class="ct-row"><span class="ct-rl">Penrith actual subsale PSF</span><span class="ct-rv">~$2,900–$3,100 — roughly fairly priced vs Stirling</span></div>
+      <div class="ct-row"><span class="ct-rl">Penrith TOP risk to Stirling</span><span class="ct-rv" style="color:#854F0B">Higher risk than CT — similar price bracket, Penrith is 8 yrs newer</span></div>
+    </div>
+
+    <!-- Head to head -->
+    <div class="ct-section-label">Head-to-head — Stirling C2 (893 sqft) vs Commonwealth Towers (904 sqft)</div>
+    <div class="ct-two-col">
+      <div class="ct-stack-card">
+        <div class="ct-stack-name">Commonwealth Towers · Stack 21</div>
+        <div class="ct-stack-detail"><i class="ti ti-ruler"></i>904 sqft · Lease 2013</div>
+        <div class="ct-stack-detail"><i class="ti ti-currency-dollar"></i>PSF $2,535 · Quantum $2.28M–$2.35M</div>
+        <div class="ct-stack-detail"><i class="ti ti-train"></i>100m to MRT — doorstep</div>
+        <div class="ct-stack-detail" style="color:#0F6E56"><i class="ti ti-school"></i>2 primary schools within 1km ✓</div>
+        <div class="ct-stack-detail" style="color:#854F0B"><i class="ti ti-home"></i>No helper room in Type 3a ✗</div>
+        <div class="ct-stack-detail"><i class="ti ti-trending-up"></i>4.10% ROI · 98.3% profitable txns</div>
+        <div class="ct-stack-detail" style="color:#0F6E56"><i class="ti ti-shield"></i>Lower Penrith TOP risk</div>
+      </div>
+      <div class="ct-stack-card ct-stack-preferred">
+        <div class="ct-stack-name">Stirling Residences · Stack 31 <span class="ct-badge ct-badge-blue">Better investment</span></div>
+        <div class="ct-stack-detail"><i class="ti ti-ruler"></i>893 sqft · Lease 2017 (4 yrs newer)</div>
+        <div class="ct-stack-detail"><i class="ti ti-currency-dollar"></i>PSF $2,665 · Quantum $2.37M–$2.45M</div>
+        <div class="ct-stack-detail"><i class="ti ti-train"></i>~350m to MRT — 3–4 min walk</div>
+        <div class="ct-stack-detail" style="color:#854F0B"><i class="ti ti-school"></i>No primary school within 1km ✗</div>
+        <div class="ct-stack-detail" style="color:#854F0B"><i class="ti ti-home"></i>No helper room in compact ✗</div>
+        <div class="ct-stack-detail"><i class="ti ti-trending-up"></i>6.12% ROI · 100% profitable txns</div>
+        <div class="ct-stack-detail" style="color:#854F0B"><i class="ti ti-shield"></i>Higher Penrith TOP risk</div>
+      </div>
+    </div>
+
+    <!-- Watch-outs -->
+    <div class="ct-section-label">Key watch-outs &amp; tips</div>
+    <div class="ct-card">
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">No helper room</span><span class="ct-wr" style="color:#854F0B">Type C1 &amp; C2 compact — no utility room. Same limitation as CT Type 3a</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">No school within 1km</span><span class="ct-wr" style="color:#854F0B">Nearest primary school ~570m — does NOT qualify for P1 1km priority phase</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">Net usable space</span><span class="ct-wr">883/893 sqft includes AC ledge &amp; balcony — net usable ~750–760 sqft</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">PSF premium vs CT</span><span class="ct-wr">$130 psf higher than CT — but 4 yr newer lease justifies ~$200 psf per lease rule · still good value</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">Penrith TOP 2029</span><span class="ct-wr" style="color:#854F0B">Stirling more exposed than CT — similar price bracket means buyers will compare directly</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">Larger development</span><span class="ct-wr">1,259 units — facilities busier on weekends vs CT's 845 units</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">Sweet spot</span><span class="ct-wr" style="color:#0F6E56">Stack 31, floors 26–30 — SW views, within $2.5M budget, strong resale appeal</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">Renovation budget</span><span class="ct-wr">Set aside S$30K–S$50K on top of purchase price</span></div>
+      <div class="ct-watchout-row"><span class="ct-wl ct-rl">Kid facilities</span><span class="ct-wr" style="color:#0F6E56">On-site childcare centre, kid's pool, kid's water play, kid's club — excellent for ages 3 &amp; 5</span></div>
+    </div>
+
+    <!-- Bottom line -->
+    <div class="ct-section-label">Bottom line verdict</div>
+    <div class="ct-card" style="border:2px solid #378ADD">
+      <div class="ct-row"><span class="ct-rl">Investment priority</span><span class="ct-rv" style="color:#0F6E56">Stirling wins — 6.12% ROI, 100% profitable, highest scarcity at 5.8%</span></div>
+      <div class="ct-row"><span class="ct-rl">School proximity priority</span><span class="ct-rv" style="color:#0F6E56">CT wins — 2 primary schools within 1km for P1 advantage</span></div>
+      <div class="ct-row"><span class="ct-rl">Budget $2.4M strict</span><span class="ct-rv" style="color:#0F6E56">CT safer — Stirling pushes toward $2.4M+ on mid/high floors</span></div>
+      <div class="ct-row"><span class="ct-rl">Budget flexible to $2.5M</span><span class="ct-rv">Stirling Stack 31, floors 26–30 is viable and compelling</span></div>
+      <div class="ct-row"><span class="ct-rl">Family liveability</span><span class="ct-rv">Stirling edges ahead on kid facilities &amp; on-site childcare · CT edges ahead on school proximity</span></div>
+      <div class="ct-row"><span class="ct-rl">Overall recommendation</span><span class="ct-rv">CT for school-first families · Stirling for investment-first buyers with $2.5M flexibility</span></div>
+    </div>
+
+  </div><!-- end page-sr -->
 
 </div><!-- end wrapper -->
 
