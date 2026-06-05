@@ -28,6 +28,33 @@
   .nav-name span:first-child { font-size: 15px; font-weight: 600; }
   .nav-name span:last-child { font-size: 12px; color: #888; margin-top: 1px; }
 
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+    margin-bottom: 4px;
+  }
+
+  .logo-w {
+    font-size: 22px;
+    font-weight: 800;
+    color: #f0f0f0;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  .logo-dot {
+    width: 7px;
+    height: 7px;
+    background: #f97316;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 1px;
+    margin-bottom: 3px;
+    flex-shrink: 0;
+  }
+
   .hero {
     min-height: 100vh;
     display: flex;
@@ -60,7 +87,23 @@
   .dot-yellow { background: #febc2e; }
   .dot-green { background: #28c840; }
 
-  .window-content { padding: 72px 64px 80px; }
+  .window-content { padding: 72px 64px 80px; position: relative; overflow: hidden; }
+
+  .hero-bg-photo {
+    position: absolute;
+    top: 0; right: 0;
+    width: 55%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: grayscale(100%) brightness(0.25);
+    mask-image: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-text-content { position: relative; z-index: 1; }
 
   .hero-headline {
     font-size: clamp(40px, 6.5vw, 72px);
@@ -71,26 +114,50 @@
   }
 
   .hero-headline em { font-style: italic; font-weight: 300; color: #ccc; }
-
   .hero-sub { font-size: 15px; color: #999; line-height: 1.7; max-width: 460px; margin-bottom: 8px; }
   .hero-sub strong { color: #ddd; font-weight: 500; }
   .hero-sub-2 { font-size: 14px; color: #666; margin-bottom: 48px; }
 
-  .projects-inner { border-top: 1px solid #1e1e1e; padding-top: 40px; }
+  .projects-inner { border-top: 1px solid #1e1e1e; padding-top: 44px; }
+
+  .category-block { margin-bottom: 44px; }
+  .category-block:last-child { margin-bottom: 0; }
+
+  .category-divider {
+    border: none;
+    border-top: 1px solid #1e1e1e;
+    margin-bottom: 44px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
 
   .section-label {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #555;
-    margin-bottom: 20px;
+    color: #f97316;
+    font-weight: 600;
+  }
+
+  .section-count {
+    font-size: 10px;
+    color: #444;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 999px;
+    padding: 2px 8px;
+    letter-spacing: 0.05em;
   }
 
   .project-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 14px;
-    margin-bottom: 32px;
   }
 
   .card {
@@ -98,14 +165,19 @@
     border: 1px solid #222;
     border-radius: 10px;
     padding: 22px;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
     text-decoration: none;
     display: block;
     color: inherit;
     cursor: pointer;
   }
 
-  .card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
+  .card:hover {
+    border-color: #f97316;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.1);
+  }
+
   .card-icon { font-size: 20px; margin-bottom: 12px; }
   .card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #e8e8e8; }
   .card-desc { font-size: 13px; color: #666; line-height: 1.6; }
@@ -122,9 +194,9 @@
   }
 
   .live-tag {
-    color: #4ade80;
-    background: rgba(74, 222, 128, 0.08);
-    border-color: rgba(74, 222, 128, 0.25);
+    color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+    border-color: rgba(249, 115, 22, 0.3);
     font-weight: 600;
   }
 
@@ -145,8 +217,10 @@
 
 <nav>
   <div class="nav-name">
-    <span>Wesley</span>
-    <span>Programme Manager</span>
+    <div class="logo">
+      <span class="logo-w">W</span><span class="logo-dot"></span>
+    </div>
+    <span style="font-size:12px;color:#888;">Programme Manager</span>
   </div>
 </nav>
 
@@ -159,7 +233,8 @@
         <div class="dot dot-green"></div>
       </div>
       <div class="window-content">
-        <h1 class="hero-headline">
+        <img src="https://wesleychiaz.github.io/ClaudeW/wesley.jpg" class="hero-bg-photo" alt="">
+        <div class="hero-text-content">
           I build AI tools,<br>dashboards &amp; <em>experiments.</em>
         </h1>
         <p class="hero-sub">
@@ -168,104 +243,131 @@
         </p>
         <p class="hero-sub-2">Built with Claude. Powered by curiosity.</p>
 
+        </div>
         <div class="projects-inner">
 
           <!-- 1. TOOLS & FINANCE -->
-          <p class="section-label">🛠 Tools & Finance</p>
-          <div class="project-cards">
-            <a href="https://wesleychiaz.github.io/ClaudeW/dashboard/" target="_blank" class="card">
-              <div class="card-icon">🌅</div>
-              <div class="card-title">Morning Investor Dashboard</div>
-              <div class="card-desc">A morning briefing tool for staying on top of markets and investments.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/mortgagecalculator/" target="_blank" class="card">
-              <div class="card-icon">🏠</div>
-              <div class="card-title">Wesley's Mortgage Planner</div>
-              <div class="card-desc">Built to make sense of the numbers behind homeownership — calculate repayments and plan ahead.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
+          <div class="category-block">
+            <div class="section-header">
+              <span class="section-label">🛠 Tools & Finance</span>
+              <span class="section-count">2 projects</span>
+            </div>
+            <div class="project-cards">
+              <a href="https://wesleychiaz.github.io/ClaudeW/dashboard/" target="_blank" class="card">
+                <div class="card-icon">🌅</div>
+                <div class="card-title">Morning Investor Dashboard</div>
+                <div class="card-desc">A morning briefing tool for staying on top of markets and investments.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/mortgagecalculator/" target="_blank" class="card">
+                <div class="card-icon">🏠</div>
+                <div class="card-title">Wesley's Mortgage Planner</div>
+                <div class="card-desc">Built to make sense of the numbers behind homeownership — calculate repayments and plan ahead.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+            </div>
           </div>
+
+          <hr class="category-divider">
 
           <!-- 2. HEALTH & WELLNESS -->
-          <p class="section-label">🏃 Health & Wellness</p>
-          <div class="project-cards">
-            <a href="https://wesleychiaz.github.io/ClaudeW/whealth/" target="_blank" class="card">
-              <div class="card-icon">💪</div>
-              <div class="card-title">Whealth</div>
-              <div class="card-desc">From surgery bed to sustainable habits — Wesley's personal health tracker, built in recovery.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
+          <div class="category-block">
+            <div class="section-header">
+              <span class="section-label">🏃 Health & Wellness</span>
+              <span class="section-count">1 project</span>
+            </div>
+            <div class="project-cards">
+              <a href="https://wesleychiaz.github.io/ClaudeW/whealth/" target="_blank" class="card">
+                <div class="card-icon">💪</div>
+                <div class="card-title">Whealth</div>
+                <div class="card-desc">From surgery bed to sustainable habits — Wesley's personal health tracker, built in recovery.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+            </div>
           </div>
+
+          <hr class="category-divider">
 
           <!-- 3. EDUCATION & LEARNING -->
-          <p class="section-label">📚 Education & Learning</p>
-          <div class="project-cards">
-            <a href="https://wesleychiaz.github.io/ClaudeW/BridgeED/" target="_blank" class="card">
-              <div class="card-icon">🎓</div>
-              <div class="card-title">BridgeED</div>
-              <div class="card-desc">An automated parental reinforcement platform that syncs with SLS, turning weekly lessons into 1-minute family rituals.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/Chocho/" target="_blank" class="card">
-              <div class="card-icon">🌸</div>
-              <div class="card-title">Chocho's Japanese Learning Companion</div>
-              <div class="card-desc">A personal language tool built for Chocho — translating English & Burmese to Japanese, one word at a time.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/slsreit/" target="_blank" class="card">
-              <div class="card-icon">🏢</div>
-              <div class="card-title">REITs for SSL</div>
-              <div class="card-desc">Everything Sim Soon Lian needs to know about REITs, in one place.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/chia/" target="_blank" class="card">
-              <div class="card-icon">🐾</div>
-              <div class="card-title">Learning with Paw Patrol</div>
-              <div class="card-desc">Built for the Chia kids — a fun Mandarin & English learning adventure featuring their favourite pups.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/coen/" target="_blank" class="card">
-              <div class="card-icon">🗣️</div>
-              <div class="card-title">Coen's Lesson Helper</div>
-              <div class="card-desc">Built to support Coen's speech and language journey — a simple tool to keep sessions structured and fun.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
+          <div class="category-block">
+            <div class="section-header">
+              <span class="section-label">📚 Education & Learning</span>
+              <span class="section-count">5 projects</span>
+            </div>
+            <div class="project-cards">
+              <a href="https://wesleychiaz.github.io/ClaudeW/BridgeED/" target="_blank" class="card">
+                <div class="card-icon">🎓</div>
+                <div class="card-title">BridgeED</div>
+                <div class="card-desc">An automated parental reinforcement platform that syncs with SLS, turning weekly lessons into 1-minute family rituals.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/Chocho/" target="_blank" class="card">
+                <div class="card-icon">🌸</div>
+                <div class="card-title">Chocho's Japanese Learning Companion</div>
+                <div class="card-desc">A personal language tool built for Chocho — translating English & Burmese to Japanese, one word at a time.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/slsreit/" target="_blank" class="card">
+                <div class="card-icon">🏢</div>
+                <div class="card-title">REITs for SSL</div>
+                <div class="card-desc">Everything Sim Soon Lian needs to know about REITs, in one place.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/chia/" target="_blank" class="card">
+                <div class="card-icon">🐾</div>
+                <div class="card-title">Learning with Paw Patrol</div>
+                <div class="card-desc">Built for the Chia kids — a fun Mandarin & English learning adventure featuring their favourite pups.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/coen/" target="_blank" class="card">
+                <div class="card-icon">🗣️</div>
+                <div class="card-title">Coen's Lesson Helper</div>
+                <div class="card-desc">Built to support Coen's speech and language journey — a simple tool to keep sessions structured and fun.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+            </div>
           </div>
 
+          <hr class="category-divider">
+
           <!-- 4. GAMES -->
-          <p class="section-label">🎮 Games</p>
-          <div class="project-cards" style="margin-bottom: 0;">
-            <a href="https://wesleychiaz.github.io/ClaudeW/snake/" target="_blank" class="card">
-              <div class="card-icon">🐍</div>
-              <div class="card-title">Snake</div>
-              <div class="card-desc">A classic Snake game, rebuilt for fun — how long can you last?</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/flappybird/" target="_blank" class="card">
-              <div class="card-icon">🐦</div>
-              <div class="card-title">Flappy Bird</div>
-              <div class="card-desc">The infamous one-tap game, rebuilt — tap to fly, try not to rage quit.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/tetris/" target="_blank" class="card">
-              <div class="card-icon">🟦</div>
-              <div class="card-title">Tetris</div>
-              <div class="card-desc">The block-stacking classic, rebuilt. Clear lines, keep calm, don't let it stack up.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/blackjack/" target="_blank" class="card">
-              <div class="card-icon">🃏</div>
-              <div class="card-title">Blackjack</div>
-              <div class="card-desc">Hit or stand? A classic card game rebuilt — beat the dealer without going bust.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
-            <a href="https://wesleychiaz.github.io/ClaudeW/chinesechess/" target="_blank" class="card">
-              <div class="card-icon">♟️</div>
-              <div class="card-title">象棋 — Chinese Chess</div>
-              <div class="card-desc">A timeless battle of wits. Move your general, protect your palace, conquer the board.</div>
-              <span class="card-tag live-tag">● Live</span>
-            </a>
+          <div class="category-block">
+            <div class="section-header">
+              <span class="section-label">🎮 Games</span>
+              <span class="section-count">5 projects</span>
+            </div>
+            <div class="project-cards">
+              <a href="https://wesleychiaz.github.io/ClaudeW/snake/" target="_blank" class="card">
+                <div class="card-icon">🐍</div>
+                <div class="card-title">Snake</div>
+                <div class="card-desc">A classic Snake game, rebuilt for fun — how long can you last?</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/flappybird/" target="_blank" class="card">
+                <div class="card-icon">🐦</div>
+                <div class="card-title">Flappy Bird</div>
+                <div class="card-desc">The infamous one-tap game, rebuilt — tap to fly, try not to rage quit.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/tetris/" target="_blank" class="card">
+                <div class="card-icon">🟦</div>
+                <div class="card-title">Tetris</div>
+                <div class="card-desc">The block-stacking classic, rebuilt. Clear lines, keep calm, don't let it stack up.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/blackjack/" target="_blank" class="card">
+                <div class="card-icon">🃏</div>
+                <div class="card-title">Blackjack</div>
+                <div class="card-desc">Hit or stand? A classic card game rebuilt — beat the dealer without going bust.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+              <a href="https://wesleychiaz.github.io/ClaudeW/chinesechess/" target="_blank" class="card">
+                <div class="card-icon">♟️</div>
+                <div class="card-title">象棋 — Chinese Chess</div>
+                <div class="card-desc">A timeless battle of wits. Move your general, protect your palace, conquer the board.</div>
+                <span class="card-tag live-tag">● Live</span>
+              </a>
+            </div>
           </div>
 
         </div>
