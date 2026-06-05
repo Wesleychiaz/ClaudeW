@@ -87,23 +87,7 @@
   .dot-yellow { background: #febc2e; }
   .dot-green { background: #28c840; }
 
-  .window-content { padding: 72px 64px 80px; position: relative; overflow: hidden; }
-
-  .hero-bg-photo {
-    position: absolute;
-    top: 0; right: 0;
-    width: 55%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center top;
-    filter: grayscale(100%) brightness(0.25);
-    mask-image: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .hero-text-content { position: relative; z-index: 1; }
+  .window-content { padding: 72px 64px 80px; }
 
   .hero-headline {
     font-size: clamp(40px, 6.5vw, 72px);
@@ -233,8 +217,7 @@
         <div class="dot dot-green"></div>
       </div>
       <div class="window-content">
-        <img src="https://wesleychiaz.github.io/ClaudeW/wesley.jpg" class="hero-bg-photo" alt="">
-        <div class="hero-text-content">
+        <h1 class="hero-headline">
           I build AI tools,<br>dashboards &amp; <em>experiments.</em>
         </h1>
         <p class="hero-sub">
@@ -243,7 +226,6 @@
         </p>
         <p class="hero-sub-2">Built with Claude. Powered by curiosity.</p>
 
-        </div>
         <div class="projects-inner">
 
           <!-- 1. TOOLS & FINANCE -->
