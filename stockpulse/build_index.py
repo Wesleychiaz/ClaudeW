@@ -173,8 +173,9 @@ def get_reports():
     for f in files:
         m = pattern.match(f)
         if m:
-            reports.append({"date": m.group(1), "ticker": m.group(2), "filename": f})
-    reports.sort(key=lambda x: x["date"], reverse=True)
+            mtime = os.path.getmtime(os.path.join(REPORTS_DIR, f))
+            reports.append({"date": m.group(1), "ticker": m.group(2), "filename": f, "mtime": mtime})
+    reports.sort(key=lambda x: (x["date"], x["mtime"]), reverse=True)
     return reports
 
 def build_index():
