@@ -21,10 +21,10 @@ FOMC_2026 = [
 CPI_2026 = [
     datetime.date(2026, 1, 14), datetime.date(2026, 2, 11),
     datetime.date(2026, 3, 11), datetime.date(2026, 4, 10),
-    datetime.date(2026, 5, 13), datetime.date(2026, 6, 10),
-    datetime.date(2026, 7, 9),  datetime.date(2026, 8, 12),
-    datetime.date(2026, 9, 11), datetime.date(2026, 10, 13),
-    datetime.date(2026, 11, 12), datetime.date(2026, 12, 10),
+    datetime.date(2026, 5, 12), datetime.date(2026, 6, 10),
+    datetime.date(2026, 7, 14), datetime.date(2026, 8, 12),
+    datetime.date(2026, 9, 11), datetime.date(2026, 10, 14),
+    datetime.date(2026, 11, 10), datetime.date(2026, 12, 10),
 ]
 NFP_2026 = [
     datetime.date(2026, 1, 9),  datetime.date(2026, 2, 6),
