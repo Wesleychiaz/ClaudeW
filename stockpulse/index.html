@@ -50,6 +50,16 @@
   .wl-done .wl-cat{border-color:rgba(249,115,22,0.3);color:#f97316}
   .wl-next .wl-ticker{color:#fff}
   .footer{font-size:12px;color:#555;text-align:center;padding-top:32px;border-top:1px solid #2a2a2a}
+  /* Macro dashboard */
+  .macro-dash{margin-bottom:40px}
+  .macro-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+  .mc{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:8px;padding:16px 18px}
+  .mc-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .mc-value{font-size:22px;font-weight:700;color:#fff;margin-bottom:2px}
+  .mc-sub{font-size:11px;color:#666;margin-bottom:6px}
+  .mc-next{font-size:11px;color:#555;border-top:1px solid #272727;padding-top:6px;margin-top:4px}
+  .mc-next span{color:#f97316}
+  .mc-why{font-size:11px;color:#555;line-height:1.5;margin-top:4px;font-style:italic}
   /* Framework section */
   .about{margin-bottom:48px}
   .about-intro{font-size:14px;color:#aaa;line-height:1.7;margin-bottom:24px}
@@ -66,7 +76,8 @@
   .method-steps{display:flex;gap:12px;flex-wrap:wrap}
   .method-step{background:#272727;border-radius:6px;padding:8px 14px;font-size:12px;color:#ccc;display:flex;align-items:center;gap:8px}
   .method-step-num{color:#f97316;font-weight:700;font-size:13px}
-  @media(max-width:600px){.latest-ticker{font-size:36px}.stats-bar{gap:12px}.framework-grid{grid-template-columns:1fr}.wl-subcat{display:none}}
+  @media(max-width:700px){.macro-cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.latest-ticker{font-size:36px}.stats-bar{gap:12px}.framework-grid{grid-template-columns:1fr}.wl-subcat{display:none}.macro-cards{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -98,6 +109,40 @@
     <div class="stat">
       <span class="stat-label">Next Up</span>
       <span class="stat-value">NVDA</span>
+    </div>
+  </div>
+
+  <!-- MACRO DASHBOARD -->
+  <div class="macro-dash">
+    <p class="section-title">Macro Dashboard</p>
+    <div class="macro-cards">
+      <div class="mc">
+        <div class="mc-label">Fear &amp; Greed Index</div>
+        <div class="mc-value" style="color:#ef4444">9</div>
+        <div class="mc-sub">Extreme Fear · CNN · 0–100</div>
+        <div class="mc-why">Sentiment context — signals whether moves are noise or conviction</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">Fed Funds Rate</div>
+        <div class="mc-value">3.75%</div>
+        <div class="mc-sub">Upper target bound</div>
+        <div class="mc-next">Next FOMC: <span>17 Jun</span></div>
+        <div class="mc-why">Direct impact on high-multiple tech valuations</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">CPI (YoY)</div>
+        <div class="mc-value">4.2%</div>
+        <div class="mc-sub">All Urban Consumers</div>
+        <div class="mc-next">Next release: <span>9 Jul</span></div>
+        <div class="mc-why">Inflation → rate expectations → growth stock discount rates</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">NFP (Last)</div>
+        <div class="mc-value">+172K</div>
+        <div class="mc-sub">Monthly job additions</div>
+        <div class="mc-next">Next release: <span>2 Jul</span></div>
+        <div class="mc-why">Labour market strength → Fed posture → tech valuations</div>
+      </div>
     </div>
   </div>
 

@@ -5,10 +5,152 @@ import os
 import json
 import re
 import datetime
+import requests
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORTS_DIR = os.path.join(SCRIPT_DIR, "reports")
 WATCHLIST_PATH = os.path.join(SCRIPT_DIR, "watchlist.json")
+
+# 2026 announcement calendars (update in Jan 2027)
+FOMC_2026 = [
+    datetime.date(2026, 1, 28), datetime.date(2026, 3, 18),
+    datetime.date(2026, 4, 29), datetime.date(2026, 6, 17),
+    datetime.date(2026, 7, 29), datetime.date(2026, 9, 16),
+    datetime.date(2026, 10, 28), datetime.date(2026, 12, 9),
+]
+CPI_2026 = [
+    datetime.date(2026, 1, 14), datetime.date(2026, 2, 11),
+    datetime.date(2026, 3, 11), datetime.date(2026, 4, 10),
+    datetime.date(2026, 5, 13), datetime.date(2026, 6, 10),
+    datetime.date(2026, 7, 9),  datetime.date(2026, 8, 12),
+    datetime.date(2026, 9, 11), datetime.date(2026, 10, 13),
+    datetime.date(2026, 11, 12), datetime.date(2026, 12, 10),
+]
+NFP_2026 = [
+    datetime.date(2026, 1, 9),  datetime.date(2026, 2, 6),
+    datetime.date(2026, 3, 6),  datetime.date(2026, 4, 3),
+    datetime.date(2026, 5, 8),  datetime.date(2026, 6, 5),
+    datetime.date(2026, 7, 2),  datetime.date(2026, 8, 7),
+    datetime.date(2026, 9, 4),  datetime.date(2026, 10, 2),
+    datetime.date(2026, 11, 6), datetime.date(2026, 12, 4),
+]
+
+# Fallback values when FRED is unreachable — update when data changes
+FALLBACK = {
+    "fed_rate": "3.75%",          # DFEDTARU as of 2026-06-09
+    "cpi_yoy": "4.2%",            # May 2026 YoY, released 2026-06-10
+    "nfp_change": "+172K",        # May 2026 (159,001K - 158,829K), released 2026-06-05
+}
+
+
+def next_date(dates):
+    today = datetime.date.today()
+    future = [d for d in dates if d > today]
+    return future[0].strftime("%-d %b") if future else "—"
+
+
+def next_nfp():
+    return next_date(NFP_2026)
+
+
+def get_fred_csv(series_id):
+    """Fetch FRED public CSV. Works around LibreSSL issues on macOS."""
+    import ssl, urllib.request
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=12) as resp:
+            text = resp.read().decode("utf-8")
+        lines = [l for l in text.strip().split("\n") if l and not l.startswith("DATE")]
+        return lines
+    except Exception:
+        return []
+
+
+def get_fred_value(series_id):
+    lines = get_fred_csv(series_id)
+    if lines:
+        last = lines[-1].split(",")
+        return last[1].strip() if len(last) > 1 else None
+    return None
+
+
+def get_fear_greed():
+    try:
+        r = requests.get(
+            "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.cnn.com/"},
+            timeout=10
+        )
+        if r.status_code == 200 and r.text.strip():
+            data = r.json()
+            score = round(data["fear_and_greed"]["score"])
+            rating = data["fear_and_greed"]["rating"].replace("_", " ").title()
+            return score, rating
+    except Exception:
+        pass
+    try:
+        r = requests.get("https://api.alternative.me/fng/?limit=1", timeout=10)
+        data = r.json()
+        score = int(data["data"][0]["value"])
+        rating = data["data"][0]["value_classification"]
+        return score, rating
+    except Exception:
+        pass
+    return "—", "—"
+
+
+def fg_color(score):
+    if score == "—":
+        return "#888"
+    s = int(score)
+    if s <= 25: return "#ef4444"
+    if s <= 45: return "#f87171"
+    if s <= 55: return "#fbbf24"
+    if s <= 75: return "#86efac"
+    return "#4ade80"
+
+
+def get_macro_data():
+    fg_score, fg_rating = get_fear_greed()
+
+    fed_raw = get_fred_value("DFEDTARU")  # Upper bound of Fed Funds target rate
+    fed_rate = f"{float(fed_raw):.2f}%" if fed_raw else FALLBACK["fed_rate"]
+
+    cpi_raw = get_fred_value("CPIAUCSL")
+    cpi_prev = get_fred_value("CPIAUCSL")
+    # Calculate YoY — fetch last 13 months via CSV
+    cpi_yoy = FALLBACK["cpi_yoy"]
+    try:
+        lines = get_fred_csv("CPIAUCSL")
+        if len(lines) >= 13:
+            latest = float(lines[-1].split(",")[1])
+            year_ago = float(lines[-13].split(",")[1])
+            cpi_yoy = f"{((latest / year_ago) - 1) * 100:.1f}%"
+    except Exception:
+        pass
+
+    nfp_change = FALLBACK["nfp_change"]
+    try:
+        lines = get_fred_csv("PAYEMS")
+        if len(lines) >= 2:
+            latest = float(lines[-1].split(",")[1])
+            prev = float(lines[-2].split(",")[1])
+            diff = round((latest - prev) * 1000)  # PAYEMS in thousands
+            sign = "+" if diff >= 0 else ""
+            nfp_change = f"{sign}{diff:,}K"
+    except Exception:
+        pass
+
+    return {
+        "fg_score": fg_score, "fg_rating": fg_rating,
+        "fed_rate": fed_rate, "fed_next": next_date(FOMC_2026),
+        "cpi_yoy": cpi_yoy, "cpi_next": next_date(CPI_2026),
+        "nfp_change": nfp_change, "nfp_next": next_nfp(),
+    }
 
 def get_watchlist_progress():
     try:
@@ -39,6 +181,7 @@ def build_index():
     idx, total, next_stock = get_watchlist_progress()
     completed = idx
     today = datetime.date.today().isoformat()
+    macro = get_macro_data()
 
     # Report cards HTML
     if reports:
@@ -126,6 +269,16 @@ def build_index():
   .wl-done .wl-cat{{border-color:rgba(249,115,22,0.3);color:#f97316}}
   .wl-next .wl-ticker{{color:#fff}}
   .footer{{font-size:12px;color:#555;text-align:center;padding-top:32px;border-top:1px solid #2a2a2a}}
+  /* Macro dashboard */
+  .macro-dash{{margin-bottom:40px}}
+  .macro-cards{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}}
+  .mc{{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:8px;padding:16px 18px}}
+  .mc-label{{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}}
+  .mc-value{{font-size:22px;font-weight:700;color:#fff;margin-bottom:2px}}
+  .mc-sub{{font-size:11px;color:#666;margin-bottom:6px}}
+  .mc-next{{font-size:11px;color:#555;border-top:1px solid #272727;padding-top:6px;margin-top:4px}}
+  .mc-next span{{color:#f97316}}
+  .mc-why{{font-size:11px;color:#555;line-height:1.5;margin-top:4px;font-style:italic}}
   /* Framework section */
   .about{{margin-bottom:48px}}
   .about-intro{{font-size:14px;color:#aaa;line-height:1.7;margin-bottom:24px}}
@@ -142,7 +295,8 @@ def build_index():
   .method-steps{{display:flex;gap:12px;flex-wrap:wrap}}
   .method-step{{background:#272727;border-radius:6px;padding:8px 14px;font-size:12px;color:#ccc;display:flex;align-items:center;gap:8px}}
   .method-step-num{{color:#f97316;font-weight:700;font-size:13px}}
-  @media(max-width:600px){{.latest-ticker{{font-size:36px}}.stats-bar{{gap:12px}}.framework-grid{{grid-template-columns:1fr}}.wl-subcat{{display:none}}}}
+  @media(max-width:700px){{.macro-cards{{grid-template-columns:repeat(2,1fr)}}}}
+  @media(max-width:600px){{.latest-ticker{{font-size:36px}}.stats-bar{{gap:12px}}.framework-grid{{grid-template-columns:1fr}}.wl-subcat{{display:none}}.macro-cards{{grid-template-columns:1fr}}}}
 </style>
 </head>
 <body>
@@ -174,6 +328,40 @@ def build_index():
     <div class="stat">
       <span class="stat-label">Next Up</span>
       <span class="stat-value">{next_stock.get('ticker','—')}</span>
+    </div>
+  </div>
+
+  <!-- MACRO DASHBOARD -->
+  <div class="macro-dash">
+    <p class="section-title">Macro Dashboard</p>
+    <div class="macro-cards">
+      <div class="mc">
+        <div class="mc-label">Fear &amp; Greed Index</div>
+        <div class="mc-value" style="color:{fg_color(macro['fg_score'])}">{macro['fg_score']}</div>
+        <div class="mc-sub">{macro['fg_rating']} · CNN · 0–100</div>
+        <div class="mc-why">Sentiment context — signals whether moves are noise or conviction</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">Fed Funds Rate</div>
+        <div class="mc-value">{macro['fed_rate']}</div>
+        <div class="mc-sub">Upper target bound</div>
+        <div class="mc-next">Next FOMC: <span>{macro['fed_next']}</span></div>
+        <div class="mc-why">Direct impact on high-multiple tech valuations</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">CPI (YoY)</div>
+        <div class="mc-value">{macro['cpi_yoy']}</div>
+        <div class="mc-sub">All Urban Consumers</div>
+        <div class="mc-next">Next release: <span>{macro['cpi_next']}</span></div>
+        <div class="mc-why">Inflation → rate expectations → growth stock discount rates</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">NFP (Last)</div>
+        <div class="mc-value">{macro['nfp_change']}</div>
+        <div class="mc-sub">Monthly job additions</div>
+        <div class="mc-next">Next release: <span>{macro['nfp_next']}</span></div>
+        <div class="mc-why">Labour market strength → Fed posture → tech valuations</div>
+      </div>
     </div>
   </div>
 

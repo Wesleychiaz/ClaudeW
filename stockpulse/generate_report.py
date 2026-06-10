@@ -179,7 +179,7 @@ def build_report(data):
 <div class="topbar">
   <div class="topbar-left">
     <span class="w-mark">W<span>.</span></span>
-    <a href="../" class="back">StockPulse</a>
+    <span style="font-size:13px;color:#555">StockPulse</span>
     <span class="report-num">Report {stock_num} of {total_stocks}</span>
   </div>
   <span style="font-size:12px;color:#555">{date_str}</span>
@@ -204,15 +204,10 @@ def build_report(data):
     </div>
   </div>
 
-  <!-- MACRO CONTEXT -->
+  <!-- MARKET SNAPSHOT -->
   <div class="section">
-    <p class="section-title">Macro Context</p>
+    <p class="section-title">Market Snapshot</p>
     <div class="macro-bar">
-      <div class="macro-item">
-        <span class="macro-label">Fear & Greed Index</span>
-        <span class="macro-value" style="color:{fg_color(fg.get('score'))}">{fg.get('score','N/A')}</span>
-        <span class="macro-sub">{fg.get('rating','N/A')}</span>
-      </div>
       <div class="macro-item">
         <span class="macro-label">Market Cap</span>
         <span class="macro-value">{fmt_b(s.get('market_cap_b'))}</span>
