@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — Daily AI Stock Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em;margin-right:12px}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .container{max-width:860px;margin:0 auto;padding:48px 24px 80px}
+  .hero{margin-bottom:40px}
+  .hero h1{font-size:36px;font-weight:900;letter-spacing:-0.03em;margin-bottom:8px}
+  .hero p{font-size:15px;color:#888}
+  .stats-bar{display:flex;gap:16px;margin:24px 0;flex-wrap:wrap}
+  .stat{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;display:flex;flex-direction:column;gap:3px}
+  .stat-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .stat-value{font-size:22px;font-weight:700}
+  .latest-card{display:block;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:28px 32px;margin-bottom:32px;transition:border-color 0.2s}
+  .latest-card:hover{border-color:#f97316}
+  .latest-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+  .latest-ticker{font-size:48px;font-weight:900;letter-spacing:-0.03em;margin-bottom:4px}
+  .latest-sub{font-size:14px;color:#f97316}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .archive{margin-bottom:40px}
+  .archive-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #2a2a2a;transition:color 0.15s}
+  .archive-row:hover{color:#f97316}
+  .ar-date{font-size:12px;color:#555;width:100px;flex-shrink:0}
+  .ar-ticker{font-size:15px;font-weight:600;flex:1}
+  .ar-arrow{font-size:14px;color:#555}
+  .watchlist{margin-bottom:40px}
+  .wl-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:6px;margin-bottom:4px}
+  .wl-done{background:rgba(249,115,22,0.06);}
+  .wl-next{background:#1a1a1a;border:1px solid #2a2a2a}
+  .wl-pending{background:transparent}
+  .wl-num{font-size:12px;color:#555;width:20px;text-align:center;flex-shrink:0}
+  .wl-done .wl-num{color:#f97316}
+  .wl-next .wl-num{color:#f97316;font-weight:700}
+  .wl-ticker{font-size:14px;font-weight:700;width:56px;flex-shrink:0}
+  .wl-name{font-size:13px;color:#888;flex:1}
+  .wl-cat{font-size:11px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:2px 8px;flex-shrink:0}
+  .wl-done .wl-ticker{color:#f97316}
+  .wl-next .wl-ticker{color:#fff}
+  .footer{font-size:12px;color:#555;text-align:center;padding-top:32px;border-top:1px solid #2a2a2a}
+  @media(max-width:600px){.latest-ticker{font-size:36px}.stats-bar{gap:12px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="../" class="back">← Wesley's Projects</a>
+  </div>
+  <span style="font-size:12px;color:#555">Updated 2026-06-10</span>
+</div>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>StockPulse</h1>
+    <p>One AI stock analysis, every weekday. Focused on the AI ecosystem — enablers and adopters.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-label">Reports Published</span>
+      <span class="stat-value">1</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Watchlist Coverage</span>
+      <span class="stat-value">0 / 25</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Next Up</span>
+      <span class="stat-value">NVDA</span>
+    </div>
+  </div>
+
+  
+        <a href="reports/2026-06-10-NVDA.html" class="latest-card">
+          <div class="latest-label">Latest Report — 2026-06-10</div>
+          <div class="latest-ticker">NVDA</div>
+          <div class="latest-sub">Click to read full analysis →</div>
+        </a>
+
+  <div class="archive">
+    <p class="section-title">Archive</p>
+    <div style="color:#444;font-size:13px;padding:16px 0">Archive will build up as daily reports are generated.</div>
+  </div>
+
+  <div class="watchlist">
+    <p class="section-title">Watchlist — 25 AI Stocks</p>
+    <div class="wl-item wl-done"><span class="wl-num">✓</span><span class="wl-ticker">NVDA</span><span class="wl-name">NVIDIA Corporation</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">2</span><span class="wl-ticker">AMD</span><span class="wl-name">Advanced Micro Devices</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">3</span><span class="wl-ticker">AVGO</span><span class="wl-name">Broadcom Inc.</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">4</span><span class="wl-ticker">META</span><span class="wl-name">Meta Platforms</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">5</span><span class="wl-ticker">ASML</span><span class="wl-name">ASML Holding</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">6</span><span class="wl-ticker">AMAT</span><span class="wl-name">Applied Materials</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">7</span><span class="wl-ticker">LRCX</span><span class="wl-name">Lam Research</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">8</span><span class="wl-ticker">KLAC</span><span class="wl-name">KLA Corporation</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">9</span><span class="wl-ticker">MU</span><span class="wl-name">Micron Technology</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">10</span><span class="wl-ticker">ARM</span><span class="wl-name">Arm Holdings</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">11</span><span class="wl-ticker">TSM</span><span class="wl-name">Taiwan Semiconductor (ADR)</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">12</span><span class="wl-ticker">MRVL</span><span class="wl-name">Marvell Technology</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">13</span><span class="wl-ticker">ANET</span><span class="wl-name">Arista Networks</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">14</span><span class="wl-ticker">ORCL</span><span class="wl-name">Oracle Corporation</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">15</span><span class="wl-ticker">CRM</span><span class="wl-name">Salesforce</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">16</span><span class="wl-ticker">SNOW</span><span class="wl-name">Snowflake</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">17</span><span class="wl-ticker">ADBE</span><span class="wl-name">Adobe Inc.</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">18</span><span class="wl-ticker">PANW</span><span class="wl-name">Palo Alto Networks</span><span class="wl-cat">Adopter</span></div><div class="wl-item wl-pending"><span class="wl-num">19</span><span class="wl-ticker">FTNT</span><span class="wl-name">Fortinet</span><span class="wl-cat">Adopter</span></div><div class="wl-item wl-pending"><span class="wl-num">20</span><span class="wl-ticker">IBM</span><span class="wl-name">IBM</span><span class="wl-cat">Adopter</span></div><div class="wl-item wl-pending"><span class="wl-num">21</span><span class="wl-ticker">DELL</span><span class="wl-name">Dell Technologies</span><span class="wl-cat">Adopter</span></div><div class="wl-item wl-pending"><span class="wl-num">22</span><span class="wl-ticker">HPE</span><span class="wl-name">Hewlett Packard Enterprise</span><span class="wl-cat">Adopter</span></div><div class="wl-item wl-pending"><span class="wl-num">23</span><span class="wl-ticker">ISRG</span><span class="wl-name">Intuitive Surgical</span><span class="wl-cat">Adopter</span></div><div class="wl-item wl-pending"><span class="wl-num">24</span><span class="wl-ticker">QCOM</span><span class="wl-name">Qualcomm</span><span class="wl-cat">Enabler</span></div><div class="wl-item wl-pending"><span class="wl-num">25</span><span class="wl-ticker">APP</span><span class="wl-name">AppLovin Corporation</span><span class="wl-cat">Adopter</span></div>
+  </div>
+
+  <div class="footer">
+    Built by Wesley with Claude · Not financial advice
+  </div>
+
+</div>
+</body>
+</html>

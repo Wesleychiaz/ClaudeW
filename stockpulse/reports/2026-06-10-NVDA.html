@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — NVDA | 2026-06-10</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .news-list li{font-size:13px;color:#888;border-bottom:1px solid #2a2a2a;padding-bottom:8px;line-height:1.5}
+  .news-list li:last-child{border-bottom:none}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#888;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#888;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="../stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report — of —</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-10</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">NVDA</span>
+      <span class="company-name">NVIDIA Corporation</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$208.19</span>
+      <span class="day-change" style="color:#f87171">-0.22% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">N/A</span>
+      <span class="tag">N/A</span>
+      <span class="tag">Technology</span>
+      &nbsp;Semiconductors
+    </div>
+  </div>
+
+  <!-- MACRO CONTEXT -->
+  <div class="section">
+    <p class="section-title">Macro Context</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Fear & Greed Index</span>
+        <span class="macro-value" style="color:#ef4444">9</span>
+        <span class="macro-sub">Extreme Fear</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$5042.57B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">2.202</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#4ade8022;color:#4ade80;border:1px solid #4ade8044">STRONG BUY</span>
+        <span class="macro-sub">59 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#f87171;font-weight:600">-0.22%</td></tr><tr><td>5 Days</td><td style="color:#f87171;font-weight:600">-2.73%</td></tr><tr><td>1 Month</td><td style="color:#f87171;font-weight:600">-4.81%</td></tr><tr><td>3 Months</td><td style="color:#4ade80;font-weight:600">+13.06%</td></tr><tr><td>6 Months</td><td style="color:#4ade80;font-weight:600">+13.67%</td></tr><tr><td>YTD</td><td style="color:#4ade80;font-weight:600">+10.61%</td></tr><tr><td>1 Year</td><td style="color:#4ade80;font-weight:600">+45.13%</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:70%"></div></div>
+          <div class="range-labels"><span>$140.85</span><span style="color:#f97316">$208.19</span><span>$236.54</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$298.42</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $180.00 — $500.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">165.59M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$253.49B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +85.20%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$46.34B</p>
+        <p class="card-sub">Cash: $53.17B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+214.50%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">74.10%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">65.60%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">63.00%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">31.8x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">16.4x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">19.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">25.8x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$12.81B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$53.17B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <h3>Overview</h3>
+      <p>NVIDIA is the dominant AI infrastructure enabler — its GPUs and accelerators power virtually all AI model training and inference globally. From hyperscalers like Microsoft, Google, and Amazon to sovereign AI programmes, NVIDIA sits at the centre of the AI compute stack. This is an Enabler in the truest sense: without NVIDIA hardware, most of today's AI doesn't run.</p>
+
+      <h3>Bull Case</h3>
+      <ul>
+        <li><strong>Extraordinary financials at scale.</strong> Revenue hit $253.5B TTM (+85.2% YoY) with a 63% net margin and $46.3B in free cash flow — rare at this size. Earnings grew +214.5% YoY.</li>
+        <li><strong>Cheap on a forward basis.</strong> Despite a $5T market cap, forward P/E is just 16.4x — modest for a company growing earnings at triple-digit rates. Analysts have a mean price target of $298.42 (~43% upside from current $208).</li>
+        <li><strong>Strong buy consensus from 59 analysts.</strong> The breadth of coverage and conviction is unusually high. High PT of $500 reflects long-term bull scenarios around sovereign AI and data centre buildout.</li>
+        <li><strong>Structurally positioned for the next wave.</strong> Data centre capex from hyperscalers continues to accelerate. NVIDIA's CUDA software moat makes switching costs extremely high — customers don't just buy hardware, they build entire workflows on NVIDIA's ecosystem.</li>
+      </ul>
+
+      <h3>Bear Case</h3>
+      <ul>
+        <li><strong>Concentration risk.</strong> A significant portion of revenue flows from a handful of hyperscalers. Any slowdown in cloud capex or a shift to custom silicon (Google TPUs, Amazon Trainium) dents the thesis.</li>
+        <li><strong>US-China export restrictions.</strong> Regulatory tightening on AI chip exports to China has already impacted revenue. Further escalation remains a live risk given the geopolitical environment.</li>
+        <li><strong>High beta and recent weakness.</strong> Beta of 2.2 means NVDA moves hard in both directions. Down -4.81% over the past month and currently trading 12% below its 52-week high — vulnerable to sentiment shifts in a Fear & Greed environment of 9 (Extreme Fear).</li>
+      </ul>
+
+      <div class="verdict-box">
+        <div class="verdict-label">Verdict</div>
+        <div class="verdict-text">BUY — Accumulate on dips toward $190–200</div>
+        <div class="verdict-sub">Time horizon: 12–18 months · The fundamental story is intact. At 16.4x forward P/E with 85%+ revenue growth and a $298 mean analyst target, the current price offers a reasonable entry for a long-term AI infrastructure position. Not a trade — a hold.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li>2026-06-09&nbsp;&nbsp;There's more 'adoption of options' among retail traders: Schwab</li><li>2026-06-10&nbsp;&nbsp;Blowout Jobs Numbers Just Made Kevin Warsh's Job Much Harder -- and Put a Showdown With Trump in Motion</li><li>2026-06-10&nbsp;&nbsp;Better IPO Buy: SpaceX vs Anthropic</li><li>2026-06-10&nbsp;&nbsp;What a 3.9% Social Security COLA in 2027 Would Add to Your Monthly Check</li><li>2026-06-10&nbsp;&nbsp;With Mortgage Rates Stuck High, Can UWM Holdings Keep Taking Market Share?</li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-10 08:04 UTC.
+  </div>
+
+</div>
+</body>
+</html>

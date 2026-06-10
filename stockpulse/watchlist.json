@@ -1,0 +1,31 @@
+{
+  "current_index": 0,
+  "last_run": null,
+  "stocks": [
+    { "ticker": "NVDA", "name": "NVIDIA Corporation", "sector": "AI Chips", "category": "Enabler" },
+    { "ticker": "AMD",  "name": "Advanced Micro Devices", "sector": "AI Chips", "category": "Enabler" },
+    { "ticker": "AVGO", "name": "Broadcom Inc.", "sector": "AI Chips / Networking", "category": "Enabler" },
+    { "ticker": "META", "name": "Meta Platforms", "sector": "AI Software & Services", "category": "Enabler" },
+    { "ticker": "ASML", "name": "ASML Holding", "sector": "Semiconductor Equipment", "category": "Enabler" },
+    { "ticker": "AMAT", "name": "Applied Materials", "sector": "Semiconductor Equipment", "category": "Enabler" },
+    { "ticker": "LRCX", "name": "Lam Research", "sector": "Semiconductor Equipment", "category": "Enabler" },
+    { "ticker": "KLAC", "name": "KLA Corporation", "sector": "Semiconductor Equipment", "category": "Enabler" },
+    { "ticker": "MU",   "name": "Micron Technology", "sector": "Memory", "category": "Enabler" },
+    { "ticker": "ARM",  "name": "Arm Holdings", "sector": "Chip Architecture", "category": "Enabler" },
+    { "ticker": "TSM",  "name": "Taiwan Semiconductor (ADR)", "sector": "Foundry", "category": "Enabler" },
+    { "ticker": "MRVL", "name": "Marvell Technology", "sector": "AI Networking Chips", "category": "Enabler" },
+    { "ticker": "ANET", "name": "Arista Networks", "sector": "AI Network Systems", "category": "Enabler" },
+    { "ticker": "ORCL", "name": "Oracle Corporation", "sector": "Cloud & AI Services", "category": "Enabler" },
+    { "ticker": "CRM",  "name": "Salesforce", "sector": "AI Software", "category": "Enabler" },
+    { "ticker": "SNOW", "name": "Snowflake", "sector": "Data Platform", "category": "Enabler" },
+    { "ticker": "ADBE", "name": "Adobe Inc.", "sector": "AI Creative Software", "category": "Enabler" },
+    { "ticker": "PANW", "name": "Palo Alto Networks", "sector": "Cybersecurity", "category": "Adopter" },
+    { "ticker": "FTNT", "name": "Fortinet", "sector": "Cybersecurity", "category": "Adopter" },
+    { "ticker": "IBM",  "name": "IBM", "sector": "Enterprise AI", "category": "Adopter" },
+    { "ticker": "DELL", "name": "Dell Technologies", "sector": "AI Servers", "category": "Adopter" },
+    { "ticker": "HPE",  "name": "Hewlett Packard Enterprise", "sector": "AI Infrastructure", "category": "Adopter" },
+    { "ticker": "ISRG", "name": "Intuitive Surgical", "sector": "Medical Devices AI", "category": "Adopter" },
+    { "ticker": "QCOM", "name": "Qualcomm", "sector": "AI Edge Chips", "category": "Enabler" },
+    { "ticker": "APP",  "name": "AppLovin Corporation", "sector": "AI Ad Tech", "category": "Adopter" }
+  ]
+}
