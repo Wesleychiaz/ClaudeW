@@ -170,7 +170,7 @@ def build_report(data):
 <div class="topbar">
   <div class="topbar-left">
     <span class="w-mark">W<span>.</span></span>
-    <a href="../stockpulse/" class="back">StockPulse</a>
+    <a href="../" class="back">StockPulse</a>
     <span class="report-num">Report {stock_num} of {total_stocks}</span>
   </div>
   <span style="font-size:12px;color:#555">{date_str}</span>
@@ -189,7 +189,7 @@ def build_report(data):
     </div>
     <div class="meta-row">
       <span class="tag">{meta.get('watchlist_category','')}</span>
-      <span class="tag">{meta.get('watchlist_sector','')}</span>
+      <span class="tag">{meta.get('watchlist_subcategory') or meta.get('watchlist_sector','')}</span>
       <span class="tag">{s.get('sector','')}</span>
       &nbsp;{s.get('industry','')}
     </div>

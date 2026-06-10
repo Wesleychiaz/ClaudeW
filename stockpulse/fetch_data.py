@@ -154,9 +154,20 @@ def advance_watchlist():
 def main():
     if len(sys.argv) > 1:
         ticker = sys.argv[1].upper()
-        stock_meta = {"ticker": ticker, "name": ticker, "sector": "N/A", "category": "N/A"}
         report_num = "—"
         total = "—"
+        # Look up in watchlist so category/sector/subcategory are populated
+        stock_meta = {"ticker": ticker, "name": ticker, "sector": "N/A", "category": "N/A", "subcategory": ""}
+        try:
+            with open(WATCHLIST_PATH) as f:
+                wl = json.load(f)
+            for s in wl["stocks"]:
+                if s["ticker"] == ticker:
+                    stock_meta = s
+                    total = len(wl["stocks"])
+                    break
+        except Exception:
+            pass
     else:
         stock_meta, report_num, total = advance_watchlist()
         ticker = stock_meta["ticker"]
@@ -169,6 +180,7 @@ def main():
             "name": stock_meta.get("name", ticker),
             "watchlist_category": stock_meta.get("category", "N/A"),
             "watchlist_sector": stock_meta.get("sector", "N/A"),
+            "watchlist_subcategory": stock_meta.get("subcategory", ""),
             "report_number": report_num,
             "total_stocks": total,
             "generated_date": datetime.date.today().isoformat(),
