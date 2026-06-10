@@ -179,7 +179,7 @@ def build_report(data):
 <div class="topbar">
   <div class="topbar-left">
     <span class="w-mark">W<span>.</span></span>
-    <span style="font-size:13px;color:#555">StockPulse</span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
     <span class="report-num">Report {stock_num} of {total_stocks}</span>
   </div>
   <span style="font-size:12px;color:#555">{date_str}</span>
