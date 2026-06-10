@@ -79,27 +79,28 @@ def get_fred_value(series_id):
 
 
 def get_fear_greed():
-    try:
-        r = requests.get(
-            "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
-            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.cnn.com/"},
-            timeout=10
-        )
-        if r.status_code == 200 and r.text.strip():
-            data = r.json()
-            score = round(data["fear_and_greed"]["score"])
-            rating = data["fear_and_greed"]["rating"].replace("_", " ").title()
-            return score, rating
-    except Exception:
-        pass
-    try:
-        r = requests.get("https://api.alternative.me/fng/?limit=1", timeout=10)
-        data = r.json()
-        score = int(data["data"][0]["value"])
-        rating = data["data"][0]["value_classification"]
-        return score, rating
-    except Exception:
-        pass
+    """Fetch CNN Fear & Greed Index (stock market sentiment, 0-100).
+    No fallback to alternative.me — that measures crypto, not stocks."""
+    endpoints = [
+        "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+        "https://production.dataviz.cnn.io/index/fearandgreed/graphdata/",
+    ]
+    for url in endpoints:
+        try:
+            r = requests.get(url, headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                "Referer": "https://edition.cnn.com/markets/fear-and-greed",
+                "Accept": "application/json",
+            }, timeout=12)
+            if r.status_code == 200 and r.text.strip():
+                data = r.json()
+                fg = data.get("fear_and_greed", {})
+                score = round(fg.get("score", 0))
+                rating = fg.get("rating", "").replace("_", " ").title()
+                if score > 0:
+                    return score, rating
+        except Exception:
+            pass
     return "—", "—"
 
 
@@ -304,7 +305,7 @@ def build_index():
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
     <span class="w-mark">W<span>.</span></span>
-    <a href="../" class="back">← Wesley's Projects</a>
+    <span style="font-size:13px;color:#555">StockPulse</span>
   </div>
   <span style="font-size:12px;color:#555">Updated {today}</span>
 </div>
