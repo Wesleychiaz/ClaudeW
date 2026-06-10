@@ -86,8 +86,12 @@ def get_stock_data(ticker):
                 content = n.get("content", {})
                 title = content.get("title", "") if isinstance(content, dict) else ""
                 pub = content.get("pubDate", "") if isinstance(content, dict) else ""
+                url = ""
+                if isinstance(content, dict):
+                    canonical = content.get("canonicalUrl", {})
+                    url = canonical.get("url", "") if isinstance(canonical, dict) else ""
                 if title:
-                    news_items.append({"title": title, "date": pub[:10] if pub else ""})
+                    news_items.append({"title": title, "date": pub[:10] if pub else "", "url": url})
     except Exception:
         pass
 
