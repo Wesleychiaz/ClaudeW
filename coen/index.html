@@ -2,986 +2,885 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#7C5CFF">
+<meta name="description" content="Coen's Sound Adventure — a playful, interactive game to practise English speech sounds, listening and describing.">
 <title>Coen's Sound Adventure 🌟</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+
+<!-- PWA: installable / add to home screen -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sound Adventure">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
   :root {
-    --sky: #4FC3F7;
-    --sun: #FFD54F;
-    --grass: #66BB6A;
-    --coral: #FF7043;
-    --purple: #CE93D8;
-    --cream: #FFF8E7;
-    --dark: #2D3748;
-    --card-bg: #FFFFFF;
-    --shadow: 0 8px 32px rgba(0,0,0,0.13);
-    --radius: 24px;
+    --sky:   #38BDF8;
+    --grape: #7C5CFF;
+    --sun:   #FFC53D;
+    --coral: #FF7A59;
+    --grass: #34D399;
+    --pink:  #FF6FB5;
+    --ink:   #20223A;
+    --ink-soft: #5A5E80;
+    --card: #FFFFFF;
+    --radius: 28px;
+    --shadow-sm: 0 4px 14px rgba(40,30,90,.10);
+    --shadow:    0 14px 40px rgba(60,40,120,.16);
+    --shadow-lg: 0 26px 70px rgba(60,40,120,.22);
+    --ease: cubic-bezier(.22,1,.36,1);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; }
 
   body {
-    font-family: 'Nunito', sans-serif;
-    background: linear-gradient(160deg, #E3F2FD 0%, #FFF9C4 50%, #E8F5E9 100%);
-    min-height: 100vh;
+    font-family: 'Nunito', system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 90% at 50% -10%, #EAE2FF 0%, transparent 55%),
+      linear-gradient(165deg, #F2F7FF 0%, #FCF4FF 45%, #EAFBF4 100%);
+    min-height: 100dvh;
     overflow-x: hidden;
+    position: relative;
   }
 
-  /* ─── STARS background ─── */
-  .bg-stars {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image:
-      radial-gradient(circle, #FFD54F 1px, transparent 1px),
-      radial-gradient(circle, #CE93D8 1.5px, transparent 1.5px),
-      radial-gradient(circle, #4FC3F7 1px, transparent 1px);
-    background-size: 120px 120px, 80px 80px, 200px 200px;
-    background-position: 10px 20px, 60px 80px, 40px 140px;
-    opacity: 0.25;
+  /* Three.js / canvas bubble layer */
+  #bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s ease;
+  }
+  #bg-canvas.show { opacity: 1; }
+
+  .app { position: relative; z-index: 1; }
+
+  /* ───────────────── Generic screen handling ───────────────── */
+  .screen { display: none; min-height: 100dvh; padding: clamp(18px, 4vw, 34px); }
+  .screen.active { display: flex; }
+
+  /* ───────────────── HOME ───────────────── */
+  #home {
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    text-align: center; padding-top: clamp(28px, 7vh, 64px);
   }
 
-  /* ─── HOME SCREEN ─── */
-  #home-screen {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; min-height: 100vh;
-    position: relative; z-index: 1; padding: 24px;
-    text-align: center;
+  .mascot {
+    width: clamp(120px, 30vw, 176px); height: clamp(120px, 30vw, 176px);
+    display: grid; place-items: center; position: relative;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 18px 22px rgba(90,60,160,.28));
+    cursor: pointer; user-select: none;
+  }
+  .mascot .face {
+    font-size: clamp(74px, 19vw, 112px); line-height: 1;
+    will-change: transform;
+  }
+  .mascot .ring {
+    position: absolute; inset: -6%; border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--grape), var(--sky), var(--grass), var(--sun), var(--coral), var(--grape));
+    filter: blur(18px); opacity: .45; z-index: -1;
   }
 
+  .eyebrow {
+    font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase;
+    font-size: .76rem; color: var(--grape); margin-bottom: 6px;
+  }
   .home-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(2.2rem, 6vw, 3.8rem);
-    color: var(--dark);
-    line-height: 1.1;
-    text-shadow: 4px 4px 0 rgba(255,213,79,0.5);
-    margin-bottom: 8px;
+    font-family: 'Fredoka', cursive; font-weight: 700;
+    font-size: clamp(2.3rem, 8.5vw, 4.2rem); line-height: 1.02;
+    letter-spacing: -.5px;
+    background: linear-gradient(105deg, var(--grape), var(--sky) 55%, var(--grass));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 10px;
   }
-
   .home-sub {
-    font-size: 1.2rem; color: #555; margin-bottom: 36px;
-    font-weight: 700;
+    font-size: clamp(1rem, 3.4vw, 1.22rem); font-weight: 700; color: var(--ink-soft);
+    max-width: 460px; margin: 0 auto 22px;
   }
 
-  .hero-character {
-    font-size: 7rem; line-height: 1;
-    animation: bounce 2s infinite ease-in-out;
-    margin-bottom: 24px;
+  .streak {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.75); backdrop-filter: blur(8px);
+    border: 1px solid rgba(124,92,255,.18);
+    padding: 9px 18px; border-radius: 100px; box-shadow: var(--shadow-sm);
+    font-weight: 800; color: var(--ink); margin-bottom: 30px;
   }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-16px); }
-  }
-
-  .stars-row {
-    display: flex; gap: 8px; margin-bottom: 32px;
-    font-size: 2rem;
-  }
+  .streak .stars { letter-spacing: 2px; font-size: 1.05rem; }
 
   .lesson-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px; width: 100%; max-width: 900px;
+    display: grid; gap: 18px; width: 100%; max-width: 940px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   }
 
-  .lesson-card {
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    padding: 28px 24px;
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    border: 4px solid transparent;
-    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
-    position: relative;
-    overflow: hidden;
+  .card {
+    position: relative; overflow: hidden;
+    background: var(--card); border-radius: var(--radius);
+    padding: 26px 22px 24px; text-align: left; cursor: pointer;
+    box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.6);
+    will-change: transform;
+    transition: transform .35s var(--ease), box-shadow .35s var(--ease);
   }
-
-  .lesson-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 8px;
-    border-radius: 20px 20px 0 0;
+  .card:active { transform: scale(.97); }
+  @media (hover:hover) {
+    .card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
   }
-
-  .lesson-card.sky::before { background: var(--sky); }
-  .lesson-card.sun::before { background: var(--sun); }
-  .lesson-card.coral::before { background: var(--coral); }
-  .lesson-card.grass::before { background: var(--grass); }
-  .lesson-card.purple::before { background: var(--purple); }
-
-  .lesson-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.16);
+  .card .glow {
+    position: absolute; width: 150px; height: 150px; border-radius: 50%;
+    top: -50px; right: -40px; filter: blur(8px); opacity: .22;
   }
-
-  .lesson-card.sky:hover { border-color: var(--sky); }
-  .lesson-card.sun:hover { border-color: var(--sun); }
-  .lesson-card.coral:hover { border-color: var(--coral); }
-  .lesson-card.grass:hover { border-color: var(--grass); }
-  .lesson-card.purple:hover { border-color: var(--purple); }
-
-  .lesson-emoji { font-size: 3rem; margin-bottom: 12px; display: block; }
-  .lesson-name {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.7rem; color: var(--dark); margin-bottom: 6px;
+  .card .emoji {
+    font-size: 3.1rem; display: block; margin-bottom: 12px;
+    filter: drop-shadow(0 8px 10px rgba(0,0,0,.12));
   }
-  .lesson-desc { font-size: 0.95rem; color: #666; font-weight: 600; }
+  .card .name {
+    font-family: 'Fredoka', cursive; font-weight: 600;
+    font-size: 1.5rem; line-height: 1.1; margin-bottom: 5px;
+  }
+  .card .desc { font-size: .92rem; font-weight: 700; color: var(--ink-soft); }
 
-  .lesson-badge {
+  .pill {
     position: absolute; top: 18px; right: 18px;
-    background: #f0f0f0; border-radius: 20px;
-    padding: 4px 10px; font-size: 0.8rem; font-weight: 800;
-    color: #888;
+    font-size: .72rem; font-weight: 800; color: var(--ink-soft);
+    background: #F1EEFB; padding: 5px 11px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .pill.done { background: #E6FAF1; color: #0E9F6E; }
+
+  .card.sky   .glow { background: var(--sky); }
+  .card.sun   .glow { background: var(--sun); }
+  .card.coral .glow { background: var(--coral); }
+  .card.grass .glow { background: var(--grass); }
+  .card.grape .glow { background: var(--grape); }
+
+  .grownups {
+    margin-top: 30px; font-size: .92rem; font-weight: 700; color: var(--ink-soft);
+  }
+  .grownups button {
+    background: none; border: none; color: var(--grape); font-weight: 800;
+    cursor: pointer; font-size: .92rem; text-decoration: underline; text-underline-offset: 3px;
   }
 
-  .lesson-badge.done {
-    background: #E8F5E9; color: var(--grass);
+  /* ───────────────── LESSON ───────────────── */
+  #lesson { flex-direction: column; align-items: center; }
+
+  .topbar {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; max-width: 760px; margin-bottom: 22px;
+  }
+  .iconbtn {
+    flex: none; width: 52px; height: 52px; border-radius: 50%;
+    background: var(--card); border: 1px solid rgba(124,92,255,.16);
+    box-shadow: var(--shadow-sm); cursor: pointer;
+    font-size: 1.4rem; display: grid; place-items: center; color: var(--ink);
+    transition: transform .2s var(--ease);
+  }
+  .iconbtn:active { transform: scale(.9); }
+  .topbar h2 {
+    font-family: 'Fredoka', cursive; font-weight: 600; font-size: 1.4rem; flex: 1;
   }
 
-  /* ─── LESSON SCREEN ─── */
-  #lesson-screen {
-    display: none;
-    min-height: 100vh;
-    position: relative; z-index: 1;
-    padding: 24px;
-    flex-direction: column;
-    align-items: center;
+  .progress-track {
+    width: 100%; max-width: 760px; height: 12px; border-radius: 100px;
+    background: rgba(124,92,255,.14); overflow: hidden; margin-bottom: 26px;
+  }
+  .progress-fill {
+    height: 100%; width: 0%; border-radius: 100px;
+    background: linear-gradient(90deg, var(--grass), var(--sky), var(--grape));
+    transition: width .6s var(--ease);
   }
 
-  #lesson-screen.active { display: flex; }
-
-  .lesson-header {
-    display: flex; align-items: center; gap: 16px;
-    width: 100%; max-width: 720px;
-    margin-bottom: 24px;
-  }
-
-  .back-btn {
-    background: white; border: 3px solid #e0e0e0;
-    border-radius: 50%; width: 52px; height: 52px;
-    font-size: 1.4rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.15s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .back-btn:hover { transform: scale(1.1); }
-
-  .lesson-title-bar {
-    flex: 1;
-  }
-
-  .lesson-title-bar h2 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.8rem; color: var(--dark);
-  }
-
-  .progress-bar-wrap {
-    background: #e8e8e8; border-radius: 12px; height: 14px;
-    overflow: hidden; margin-top: 6px;
-  }
-  .progress-bar-fill {
-    height: 100%; border-radius: 12px;
-    background: linear-gradient(90deg, #66BB6A, #4FC3F7);
-    transition: width 0.5s ease;
-  }
-
-  /* ─── STEP CARD ─── */
   .step-card {
-    background: white;
-    border-radius: 32px;
-    padding: 36px 32px;
-    box-shadow: var(--shadow);
-    width: 100%; max-width: 720px;
-    text-align: center;
-    animation: slideIn 0.35s ease;
+    position: relative; width: 100%; max-width: 760px;
+    background: var(--card); border-radius: var(--radius);
+    padding: clamp(24px, 5vw, 40px); box-shadow: var(--shadow);
+    text-align: center; will-change: transform, opacity;
   }
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 16px; border-radius: 100px; margin-bottom: 18px;
+    font-size: .8rem; font-weight: 800; letter-spacing: .6px; text-transform: uppercase;
+  }
+  .badge.listen   { background: #E6F4FF; color: #0277BD; }
+  .badge.say      { background: #E6FAF1; color: #0E9F6E; }
+  .badge.choose   { background: #FFF6E0; color: #C77700; }
+  .badge.describe { background: #F3ECFF; color: #6D3BD6; }
+
+  .instruction {
+    font-size: clamp(1.12rem, 3.6vw, 1.5rem); font-weight: 800;
+    line-height: 1.35; margin-bottom: 22px;
   }
 
-  .step-type-badge {
-    display: inline-block;
-    padding: 6px 18px; border-radius: 20px;
-    font-size: 0.85rem; font-weight: 800;
-    text-transform: uppercase; letter-spacing: 1px;
-    margin-bottom: 20px;
+  .phoneme {
+    display: inline-flex; flex-direction: column; align-items: center;
+    background: linear-gradient(135deg, #F3ECFF, #FFF0F8);
+    border: 2px dashed rgba(124,92,255,.4); border-radius: 22px;
+    padding: 14px 30px; margin: 6px auto 22px;
+  }
+  .phoneme small {
+    font-size: .72rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--grape); margin-bottom: 2px;
+  }
+  .phoneme .p {
+    font-family: 'Fredoka', cursive; font-weight: 700; font-size: 2.6rem; color: #5B27C4;
   }
 
-  .step-type-badge.listen { background: #E3F2FD; color: #1565C0; }
-  .step-type-badge.say { background: #E8F5E9; color: #2E7D32; }
-  .step-type-badge.choose { background: #FFF8E1; color: #E65100; }
-  .step-type-badge.describe { background: #F3E5F5; color: #6A1B9A; }
+  .btn-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 8px 0; }
 
-  .step-instruction {
-    font-size: clamp(1.2rem, 3.5vw, 1.6rem);
-    font-weight: 800; color: var(--dark);
-    line-height: 1.4; margin-bottom: 28px;
+  .speak-btn {
+    appearance: none; border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.05rem; color: #fff;
+    background: linear-gradient(135deg, var(--sky), #0284C7);
+    padding: 14px 24px; border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(56,189,248,.36);
+    display: inline-flex; align-items: center; gap: 9px;
+    transition: transform .18s var(--ease), box-shadow .18s var(--ease);
   }
+  .speak-btn:active { transform: scale(.94); }
+  @media (hover:hover){ .speak-btn:hover { transform: translateY(-3px); } }
+  .speak-btn.big { font-size: 1.2rem; padding: 18px 32px; }
+  .speak-btn.lilac { background: linear-gradient(135deg, var(--grape), #5B27C4); box-shadow: 0 8px 20px rgba(124,92,255,.4); }
+  .speak-btn.green { background: linear-gradient(135deg, var(--grass), #0E9F6E); box-shadow: 0 8px 20px rgba(52,211,153,.4); }
+  .speak-btn.amber { background: linear-gradient(135deg, var(--sun), #E69100); color:#3a2c00; box-shadow: 0 8px 20px rgba(255,197,61,.45); }
+  .speak-btn.coral { background: linear-gradient(135deg, var(--coral), #E0512F); box-shadow: 0 8px 20px rgba(255,122,89,.4); }
 
-  /* Big word display */
-  .big-word {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(3rem, 10vw, 6rem);
-    color: var(--dark);
-    margin: 16px 0;
-    position: relative;
-    display: inline-block;
+  /* choice tiles */
+  .choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0 4px; }
+  .choice {
+    appearance: none; cursor: pointer; background: #fff;
+    border: 3px solid #ECE9F6; border-radius: 22px;
+    padding: 16px 20px; min-width: 124px;
+    box-shadow: var(--shadow-sm);
+    font-family: 'Fredoka', cursive; font-weight: 600;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    transition: transform .18s var(--ease), border-color .18s, background .18s;
   }
+  .choice .ce { font-size: 2.6rem; line-height: 1; }
+  .choice small { font-size: .92rem; color: var(--ink-soft); font-weight: 800; }
+  .choice:active { transform: scale(.94); }
+  @media (hover:hover){ .choice:hover { transform: translateY(-4px); border-color: var(--sky); } }
+  .choice.correct { background: #E6FAF1; border-color: var(--grass); }
+  .choice.wrong   { background: #FFECEC; border-color: #FB7185; }
 
-  .big-word .highlight {
-    color: var(--coral);
-    position: relative;
+  /* record widget */
+  .recorder {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    align-items: center; margin: 18px 0 4px;
+    background: #FBFAFF; border: 1px solid rgba(124,92,255,.14);
+    border-radius: 20px; padding: 14px;
   }
-
-  .big-word .highlight::after {
-    content: '';
-    position: absolute; bottom: -4px; left: 0; right: 0;
-    height: 5px; background: var(--coral);
-    border-radius: 4px;
+  .rec-btn {
+    appearance: none; border: none; cursor: pointer; color: #fff;
+    font-family: 'Nunito'; font-weight: 800; font-size: 1rem;
+    padding: 13px 22px; border-radius: 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--pink), #E0428C);
+    box-shadow: 0 8px 18px rgba(255,111,181,.4);
+    transition: transform .18s var(--ease);
   }
+  .rec-btn:active { transform: scale(.94); }
+  .rec-btn.recording { background: linear-gradient(135deg, #EF4444, #B91C1C); animation: recpulse 1s infinite; }
+  .rec-btn[disabled] { opacity: .4; cursor: default; }
+  @keyframes recpulse { 0%,100%{ box-shadow:0 0 0 0 rgba(239,68,68,.5);} 50%{ box-shadow:0 0 0 12px rgba(239,68,68,0);} }
+  .rec-hint { font-size: .82rem; font-weight: 800; color: var(--ink-soft); width: 100%; }
 
-  .word-emoji {
-    font-size: clamp(4rem, 12vw, 7rem);
-    display: block; margin: 16px auto;
-    animation: pop 0.4s ease;
+  .tip {
+    text-align: left; background: #FFF8E6; border: 2px solid #FFE08A;
+    border-radius: 20px; padding: 15px 20px; margin-top: 22px;
+    font-weight: 700; color: #6B4E00; font-size: .98rem;
   }
+  .tip b { color: #B97A00; }
+  .tip .tl { display:block; font-size:.74rem; text-transform:uppercase; letter-spacing:1px; color:#C7860A; margin-bottom:5px; }
 
-  @keyframes pop {
-    0% { transform: scale(0.5); opacity: 0; }
-    70% { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
+  .scene {
+    background: linear-gradient(135deg, #EEF4FF, #FBEEFF);
+    border-radius: 24px; padding: 26px; margin: 18px 0;
   }
+  .scene .chars { font-size: clamp(3.4rem, 14vw, 5rem); letter-spacing: 10px; display: block; }
+  .scene small { color: var(--ink-soft); font-weight: 800; font-size: .95rem; }
 
-  /* Sound button */
-  .sound-btn {
-    background: linear-gradient(135deg, #4FC3F7, #0288D1);
-    color: white; border: none;
-    border-radius: 20px; padding: 16px 36px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.2rem; font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(79,195,247,0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
-    display: inline-flex; align-items: center; gap: 10px;
-    margin: 8px;
-  }
-
-  .sound-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(79,195,247,0.5); }
-  .sound-btn:active { transform: scale(0.96); }
-
-  .sound-btn.big {
-    font-size: 1.5rem; padding: 20px 48px;
-    border-radius: 24px;
-  }
-
-  /* Choice buttons */
-  .choices {
-    display: flex; flex-wrap: wrap;
-    gap: 16px; justify-content: center;
-    margin: 24px 0;
-  }
-
-  .choice-btn {
-    background: white;
-    border: 4px solid #e0e0e0;
-    border-radius: 20px;
-    padding: 18px 28px;
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.8rem;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s, background 0.15s;
-    min-width: 140px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  }
-
-  .choice-btn:hover { transform: scale(1.06); border-color: var(--sky); }
-  .choice-btn.correct { background: #E8F5E9; border-color: var(--grass); animation: shake-right 0.4s; }
-  .choice-btn.wrong { background: #FFEBEE; border-color: #EF5350; animation: shake 0.4s; }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
-  }
-
-  @keyframes shake-right {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
-  }
-
-  /* Nav buttons */
-  .nav-row {
-    display: flex; justify-content: center; gap: 16px;
-    margin-top: 32px;
-  }
-
+  .nav { display: flex; justify-content: center; margin-top: 26px; }
   .next-btn {
-    background: linear-gradient(135deg, #66BB6A, #43A047);
-    color: white; border: none;
-    border-radius: 20px; padding: 18px 48px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.3rem; font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(102,187,106,0.4);
-    transition: transform 0.15s, opacity 0.2s;
+    appearance: none; border: none; cursor: pointer; color: #fff;
+    font-family: 'Nunito'; font-weight: 900; font-size: 1.2rem;
+    padding: 17px 46px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--grass), #0E9F6E);
+    box-shadow: 0 12px 28px rgba(52,211,153,.4);
     display: inline-flex; align-items: center; gap: 10px;
+    transition: transform .18s var(--ease), opacity .2s;
   }
-  .next-btn:hover { transform: translateY(-3px); }
-  .next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .next-btn:active { transform: scale(.95); }
+  @media (hover:hover){ .next-btn:hover:not(:disabled){ transform: translateY(-3px);} }
+  .next-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-  /* Tip box */
-  .tip-box {
-    background: #FFF8E1;
-    border: 3px solid #FFD54F;
-    border-radius: 20px;
-    padding: 16px 24px;
-    margin-top: 24px;
-    text-align: left;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #5D4037;
-  }
-
-  .tip-box .tip-label {
-    font-size: 0.85rem; text-transform: uppercase;
-    letter-spacing: 1px; color: #F57F17;
-    margin-bottom: 6px;
-  }
-
-  /* ─── COMPLETE SCREEN ─── */
-  #complete-screen {
-    display: none;
-    min-height: 100vh; align-items: center; justify-content: center;
-    flex-direction: column; text-align: center;
-    position: relative; z-index: 1; padding: 24px;
-  }
-  #complete-screen.active { display: flex; }
-
-  .complete-emoji { font-size: 8rem; animation: bounce 1s infinite ease-in-out; }
-
+  /* ───────────────── COMPLETE ───────────────── */
+  #complete { flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .trophy { font-size: clamp(5rem, 22vw, 8rem); will-change: transform; }
   .complete-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    color: var(--dark); margin: 16px 0 8px;
+    font-family: 'Fredoka', cursive; font-weight: 700;
+    font-size: clamp(2rem, 7vw, 3.4rem); margin: 8px 0 6px;
+    background: linear-gradient(105deg, var(--grape), var(--coral));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .complete-sub { font-size: 1.15rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 18px; }
+  .earned { font-size: 3rem; letter-spacing: 8px; margin-bottom: 26px; }
+  .home-again {
+    appearance: none; border: none; cursor: pointer; color: #fff;
+    font-family: 'Nunito'; font-weight: 900; font-size: 1.15rem;
+    padding: 16px 40px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--coral), #E0512F);
+    box-shadow: 0 12px 28px rgba(255,122,89,.42);
+    transition: transform .18s var(--ease);
+  }
+  .home-again:active { transform: scale(.95); }
+
+  /* confetti */
+  .confetti { position: fixed; top: -24px; width: 12px; height: 12px; z-index: 9999; pointer-events: none; will-change: transform; }
+
+  /* grown-up modal */
+  .modal-bg {
+    position: fixed; inset: 0; z-index: 200; display: none;
+    background: rgba(30,20,60,.45); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 22px;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 26px; max-width: 460px; width: 100%;
+    padding: 30px 28px; box-shadow: var(--shadow-lg); text-align: left;
+  }
+  .modal h3 { font-family:'Fredoka'; font-weight:600; font-size: 1.5rem; margin-bottom: 12px; }
+  .modal p { font-weight: 700; color: var(--ink-soft); line-height: 1.55; margin-bottom: 12px; font-size:.97rem; }
+  .modal ul { margin: 0 0 14px 18px; color: var(--ink-soft); font-weight:700; line-height:1.6; font-size:.95rem; }
+  .modal .close {
+    width: 100%; appearance:none; border:none; cursor:pointer; color:#fff; font-weight:900;
+    font-family:'Nunito'; font-size:1.05rem; padding:14px; border-radius:16px;
+    background: linear-gradient(135deg, var(--grape), #5B27C4);
   }
 
-  .complete-sub { font-size: 1.2rem; color: #666; font-weight: 700; margin-bottom: 32px; }
-
-  .stars-earned { font-size: 3.5rem; letter-spacing: 8px; margin-bottom: 32px; animation: pop 0.5s ease; }
-
-  .home-again-btn {
-    background: linear-gradient(135deg, var(--coral), #E64A19);
-    color: white; border: none;
-    border-radius: 20px; padding: 18px 48px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.3rem; font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(255,112,67,0.4);
-    transition: transform 0.15s;
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .08s !important; }
+    #bg-canvas { display: none; }
   }
-  .home-again-btn:hover { transform: translateY(-3px); }
-
-  /* Confetti */
-  .confetti-piece {
-    position: fixed; width: 12px; height: 12px; border-radius: 3px;
-    pointer-events: none; z-index: 9999;
-    animation: confetti-fall linear forwards;
-  }
-
-  @keyframes confetti-fall {
-    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-  }
-
-  /* Phoneme display */
-  .phoneme-display {
-    background: linear-gradient(135deg, #667eea20, #764ba220);
-    border: 3px dashed #9C27B0;
-    border-radius: 20px;
-    padding: 16px 32px;
-    margin: 16px auto;
-    display: inline-block;
-  }
-
-  .phoneme-label {
-    font-size: 0.8rem; text-transform: uppercase;
-    letter-spacing: 1.5px; color: #9C27B0; font-weight: 800;
-    margin-bottom: 4px;
-  }
-
-  .phoneme-text {
-    font-family: 'Fredoka One', cursive;
-    font-size: 3rem; color: #6A1B9A;
-  }
-
-  /* picture story */
-  .picture-scene {
-    background: linear-gradient(135deg, #E3F2FD, #F3E5F5);
-    border-radius: 24px;
-    padding: 28px;
-    margin: 20px 0;
-    font-size: 6rem;
-    text-align: center;
-  }
-
-  .scene-chars { font-size: 4rem; letter-spacing: 12px; display: block; margin-bottom: 8px; }
-
 </style>
 </head>
 <body>
 
-<div class="bg-stars"></div>
+<canvas id="bg-canvas"></canvas>
 
-<!-- ═══════════════════ HOME SCREEN ═══════════════════ -->
-<div id="home-screen">
-  <div class="hero-character">🦁</div>
-  <h1 class="home-title">Coen's Sound Adventure!</h1>
-  <p class="home-sub">Which sound do you want to practice today? 🎵</p>
-  <div class="stars-row" id="stars-display">⭐⭐⭐</div>
+<div class="app">
 
-  <div class="lesson-grid">
-    <div class="lesson-card sky" onclick="startLesson('s')">
-      <span class="lesson-badge" id="badge-s">3 steps</span>
-      <span class="lesson-emoji">🐍</span>
-      <div class="lesson-name">Snake Sound</div>
-      <div class="lesson-desc">The /s/ at the end of words</div>
+  <!-- ══════════ HOME ══════════ -->
+  <section id="home" class="screen active">
+    <div class="mascot" id="mascot" title="Tap me!">
+      <span class="ring"></span>
+      <span class="face">🦁</span>
     </div>
-    <div class="lesson-card sun" onclick="startLesson('k')">
-      <span class="lesson-badge" id="badge-k">3 steps</span>
-      <span class="lesson-emoji">🤧</span>
-      <div class="lesson-name">Coughing Sound</div>
-      <div class="lesson-desc">The /k/ at the start of words</div>
+    <p class="eyebrow">Speech &amp; English Play</p>
+    <h1 class="home-title">Coen's Sound<br>Adventure</h1>
+    <p class="home-sub">Pick a sound to practise. Listen, say it, record yourself, and earn stars! 🎵</p>
+    <div class="streak">
+      <span>⭐ Stars earned</span>
+      <span class="stars" id="stars-display">☆☆☆☆☆</span>
     </div>
-    <div class="lesson-card coral" onclick="startLesson('ch')">
-      <span class="lesson-badge" id="badge-ch">3 steps</span>
-      <span class="lesson-emoji">🚂</span>
-      <div class="lesson-name">Train Sound</div>
-      <div class="lesson-desc">The "ch" sound in words</div>
+
+    <div class="lesson-grid" id="lesson-grid"></div>
+
+    <p class="grownups">For grown-ups: <button onclick="openModal()">How to help Coen →</button></p>
+  </section>
+
+  <!-- ══════════ LESSON ══════════ -->
+  <section id="lesson" class="screen">
+    <div class="topbar">
+      <button class="iconbtn" onclick="goHome()" aria-label="Back">←</button>
+      <h2 id="lesson-title">Lesson</h2>
+      <span style="font-weight:900; color:var(--ink-soft)" id="counter">1/3</span>
     </div>
-    <div class="lesson-card grass" onclick="startLesson('describe')">
-      <span class="lesson-badge" id="badge-describe">3 steps</span>
-      <span class="lesson-emoji">🖼️</span>
-      <div class="lesson-name">Tell Me!</div>
-      <div class="lesson-desc">Describe what's happening</div>
-    </div>
-    <div class="lesson-card purple" onclick="startLesson('vocab')">
-      <span class="lesson-badge" id="badge-vocab">3 steps</span>
-      <span class="lesson-emoji">🌈</span>
-      <div class="lesson-name">Mix It Up!</div>
-      <div class="lesson-desc">Practice all sounds together</div>
-    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="step-card" id="step-card"></div>
+    <div class="nav"><button class="next-btn" id="next-btn" onclick="nextStep()">Next →</button></div>
+  </section>
+
+  <!-- ══════════ COMPLETE ══════════ -->
+  <section id="complete" class="screen">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2 class="complete-title">You did it, Coen!</h2>
+    <p class="complete-sub" id="complete-msg">Lesson complete!</p>
+    <div class="earned" id="earned">⭐</div>
+    <button class="home-again" onclick="goHome()">🏠 Play more</button>
+  </section>
+
+</div>
+
+<!-- grown-up modal -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3>👋 Helping Coen at home</h3>
+    <p>This is a playful warm-up for the speech sounds and describing skills Coen is working on. A few tips:</p>
+    <ul>
+      <li><b>Model, don't drill.</b> Say the word correctly and let him copy — keep it light and fun.</li>
+      <li><b>Use the record button.</b> Hearing himself next to the model helps him notice the target sound.</li>
+      <li><b>Praise the try,</b> not just the perfect answer. 3–5 minutes a day beats long sessions.</li>
+      <li><b>Stuck on /s/?</b> "Don't drop your snake tail!" — gentle reminders work better than correction.</li>
+    </ul>
+    <p style="font-size:.85rem">Sound comes from your device's voice. Recording stays on the device — nothing is uploaded.</p>
+    <button class="close" onclick="closeModal()">Got it!</button>
   </div>
 </div>
 
-<!-- ═══════════════════ LESSON SCREEN ═══════════════════ -->
-<div id="lesson-screen">
-  <div class="lesson-header">
-    <button class="back-btn" onclick="goHome()">←</button>
-    <div class="lesson-title-bar">
-      <h2 id="lesson-title">Snake Sound 🐍</h2>
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-      </div>
-    </div>
-    <div style="font-size:1.5rem" id="step-counter">1 / 3</div>
-  </div>
-
-  <div class="step-card" id="step-card">
-    <!-- content injected by JS -->
-  </div>
-
-  <div class="nav-row">
-    <button class="next-btn" id="next-btn" onclick="nextStep()">
-      Next ➡️
-    </button>
-  </div>
-</div>
-
-<!-- ═══════════════════ COMPLETE SCREEN ═══════════════════ -->
-<div id="complete-screen">
-  <div class="complete-emoji">🎉</div>
-  <h2 class="complete-title">Amazing job, Coen!</h2>
-  <p class="complete-sub" id="complete-msg">You finished the Snake Sound lesson!</p>
-  <div class="stars-earned" id="stars-earned">⭐⭐⭐</div>
-  <button class="home-again-btn" onclick="goHome()">🏠 Play More!</button>
-</div>
+<!-- libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
-// ─── TTS Helper ───
-function speak(text, rate = 0.78, pitch = 1.1) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-SG';
-  u.rate = rate;
-  u.pitch = pitch;
-  // prefer a child-friendly or female voice if available
+/* ═══════════════════ Text-to-speech ═══════════════════ */
+let preferredVoice = null;
+function pickVoice() {
   const voices = speechSynthesis.getVoices();
-  const pref = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Karen')));
-  if (pref) u.voice = pref;
+  preferredVoice = voices.find(v => /en/i.test(v.lang) && /(Samantha|Karen|Tessa|Female|Google UK English Female|Catherine)/i.test(v.name))
+    || voices.find(v => /^en/i.test(v.lang)) || null;
+}
+if ('speechSynthesis' in window) {
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text, rate = 0.82, pitch = 1.12) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = rate; u.pitch = pitch;
+  if (preferredVoice) u.voice = preferredVoice;
   speechSynthesis.speak(u);
 }
 
-// load voices async
-window.speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+/* ═══════════════════ Progress (localStorage) ═══════════════════ */
+const STORE_KEY = 'coen-sound-adventure-v2';
+let completed = {};
+try { completed = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { completed = {}; }
+function saveProgress() { try { localStorage.setItem(STORE_KEY, JSON.stringify(completed)); } catch (e) {} }
 
-// ─── LESSONS DATA ───
+/* ═══════════════════ Lesson content ═══════════════════ */
+function speakBtn(label, say, emoji, cls = '') {
+  return `<button class="speak-btn ${cls}" onclick="speak('${say}', 0.7)">🔊 ${emoji} ${label}</button>`;
+}
+function sayPic(emoji, word, hint) {
+  return `<button class="choice" onclick="speak('${word}',0.7); pulse(this)">
+    <span class="ce">${emoji}</span><small>${hint}</small></button>`;
+}
+function recorder() {
+  return `<div class="recorder">
+    <span class="rec-hint">🎤 Your turn — record yourself, then listen back!</span>
+    <button class="rec-btn" id="rec-toggle" onclick="toggleRecord(this)">● Record</button>
+    <button class="rec-btn" id="rec-play" onclick="playRecording()" style="background:linear-gradient(135deg,var(--grape),#5B27C4)" disabled>▶ Play mine</button>
+  </div>`;
+}
+
 const lessons = {
-  s: {
-    title: "Snake Sound 🐍",
-    color: "sky",
-    completedMsg: "You practiced your snake /s/ sound!",
+  s: { title: "Snake Sound 🐍", color: "sky", emoji: "🐍", desc: "The /s/ at the END of words",
+    msg: "You practised your snake /s/ sound!",
     steps: [
-      {
-        type: "listen",
-        instruction: "Listen to the 🐍 SNAKE sound! It goes at the END of words.",
-        render() {
-          return `
-            <span class="step-type-badge listen">👂 Listen First</span>
-            <p class="step-instruction">The snake says <b>/ssss/</b> at the END of words!<br>Tap the buttons to hear them.</p>
-            <div class="phoneme-display">
-              <div class="phoneme-label">Target Sound</div>
-              <div class="phoneme-text">/s/</div>
-            </div>
-            <div style="margin-top:24px">
-              ${wordBtn('thi...s', 'this', '👉')}
-              ${wordBtn('hou...se', 'house', '🏠')}
-              ${wordBtn('bu...s', 'bus', '🚌')}
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Remember</div>
-              The /s/ is the TAIL of the word. Don't drop your tail! 🐍
-            </div>`;
-        }
-      },
-      {
-        type: "say",
-        instruction: "Now it's YOUR turn! Tap each picture and say the whole word!",
-        render() {
-          return `
-            <span class="step-type-badge say">🗣️ Say It!</span>
-            <p class="step-instruction">Tap the picture, listen, then YOU say it!</p>
-            <div class="choices">
-              ${picWordBtn('🏠', 'house', 'hou...se')}
-              ${picWordBtn('🚌', 'bus', 'bu...s')}
-              ${picWordBtn('🐱', 'cats', 'cat...s')}
-              ${picWordBtn('👟', 'boots', 'boo...ts')}
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Try this</div>
-              If you forget, Mummy or Daddy can say: <br><em>"You dropped your tail sound — try again with the /s/!"</em>
-            </div>`;
-        }
-      },
-      {
-        type: "choose",
-        instruction: "Which one has the /s/ SNAKE sound at the end? Tap it! 🐍",
-        render() {
-          return `
-            <span class="step-type-badge choose">🎯 Choose!</span>
-            <p class="step-instruction">Which word ends with the snake /s/ sound?</p>
-            <div style="margin: 16px 0">
-              ${wordBtn('Listen: cat', 'cat', '🐱')}
-              ${wordBtn('Listen: bus', 'bus', '🚌')}
-              ${wordBtn('Listen: dog', 'dog', '🐶')}
-            </div>
-            <div class="choices" id="choices-s">
-              <button class="choice-btn" onclick="checkChoice(this, true)">🚌<br><small>bus</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false)">🐱<br><small>cat</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false)">🐶<br><small>dog</small></button>
-            </div>`;
-        }
-      }
-    ]
-  },
+      { type:"listen", render:()=>`
+        <span class="badge listen">👂 Listen first</span>
+        <p class="instruction">The snake says <b>/ssss/</b> at the END of words. Tap to hear them!</p>
+        <div class="phoneme"><small>Target sound</small><span class="p">/s/</span></div>
+        <div class="btn-row">
+          ${speakBtn('this','this','👉')}${speakBtn('house','house','🏠')}${speakBtn('bus','bus','🚌')}
+        </div>
+        <div class="tip"><span class="tl">💡 Remember</span>The /s/ is the <b>tail</b> of the word. Don't drop your tail! 🐍</div>`},
+      { type:"say", render:()=>`
+        <span class="badge say">🗣️ Say it</span>
+        <p class="instruction">Tap a picture, listen, then YOU say the whole word.</p>
+        <div class="choices">
+          ${sayPic('🏠','house','hou‑se')}${sayPic('🚌','bus','bu‑s')}
+          ${sayPic('🐱','cats','cat‑s')}${sayPic('👟','boots','boo‑ts')}
+        </div>
+        ${recorder()}`},
+      { type:"choose", correct:1, render:()=>`
+        <span class="badge choose">🎯 Choose</span>
+        <p class="instruction">Which word <b>ends</b> with the snake /s/ sound?</p>
+        <div class="choices">
+          <button class="choice" onclick="check(this,false,'cat')"><span class="ce">🐱</span><small>cat</small></button>
+          <button class="choice" onclick="check(this,true,'bus. Yes! The s is at the end!')"><span class="ce">🚌</span><small>bus</small></button>
+          <button class="choice" onclick="check(this,false,'dog')"><span class="ce">🐶</span><small>dog</small></button>
+        </div>`}
+    ]},
 
-  k: {
-    title: "Coughing Sound 🤧",
-    color: "sun",
-    completedMsg: "You practiced your coughing /k/ sound!",
+  k: { title: "Coughing Sound 🤧", color: "sun", emoji: "🤧", desc: "The /k/ at the START of words",
+    msg: "You practised your coughing /k/ sound!",
     steps: [
-      {
-        type: "listen",
-        instruction: "Listen to the COUGHING sound! /k/ goes at the START.",
-        render() {
-          return `
-            <span class="step-type-badge listen">👂 Listen First</span>
-            <p class="step-instruction">The coughing sound <b>/k/</b> is at the START of words!<br>Feel your throat go "k-k-k"! 🤧</p>
-            <div class="phoneme-display">
-              <div class="phoneme-label">Target Sound</div>
-              <div class="phoneme-text">/k/</div>
-            </div>
-            <div style="margin-top:24px">
-              ${wordBtn('k...at', 'cat', '🐱')}
-              ${wordBtn('k...up', 'cup', '☕')}
-              ${wordBtn('k...ey', 'key', '🔑')}
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Tip</div>
-              Gently brush your throat with your hand to feel the /k/ sound! 🤚
-            </div>`;
-        }
-      },
-      {
-        type: "say",
-        instruction: "Tap and repeat! Can you say the /k/ at the start?",
-        render() {
-          return `
-            <span class="step-type-badge say">🗣️ Say It!</span>
-            <p class="step-instruction">Tap to hear, then say the whole word!</p>
-            <div class="choices">
-              ${picWordBtn('🐱', 'cat', 'k...at')}
-              ${picWordBtn('☕', 'cup', 'k...up')}
-              ${picWordBtn('🔑', 'key', 'k...ey')}
-              ${picWordBtn('🦘', 'kangaroo', 'k...angaroo')}
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Remember</div>
-              "I heard you say 'tup' — can you say it with your coughing sound? <em>Cup!</em>"
-            </div>`;
-        }
-      },
-      {
-        type: "choose",
-        instruction: "Which picture starts with the /k/ coughing sound?",
-        render() {
-          return `
-            <span class="step-type-badge choose">🎯 Choose!</span>
-            <p class="step-instruction">Which word starts with the coughing /k/ sound?</p>
-            <div style="margin: 16px 0">
-              ${wordBtn('Listen: cup', 'cup', '☕')}
-              ${wordBtn('Listen: dog', 'dog', '🐶')}
-              ${wordBtn('Listen: sun', 'sun', '☀️')}
-            </div>
-            <div class="choices">
-              <button class="choice-btn" onclick="checkChoice(this, false)">🐶<br><small>dog</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, true)">☕<br><small>cup</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false)">☀️<br><small>sun</small></button>
-            </div>`;
-        }
-      }
-    ]
-  },
+      { type:"listen", render:()=>`
+        <span class="badge listen">👂 Listen first</span>
+        <p class="instruction">The coughing sound <b>/k/</b> is at the START. Feel your throat go "k‑k‑k"! 🤧</p>
+        <div class="phoneme"><small>Target sound</small><span class="p">/k/</span></div>
+        <div class="btn-row">
+          ${speakBtn('cat','cat','🐱','amber')}${speakBtn('cup','cup','☕','amber')}${speakBtn('key','key','🔑','amber')}
+        </div>
+        <div class="tip"><span class="tl">💡 Tip</span>Gently rest a hand on your throat to <b>feel</b> the /k/ buzz! 🤚</div>`},
+      { type:"say", render:()=>`
+        <span class="badge say">🗣️ Say it</span>
+        <p class="instruction">Tap to hear, then say the whole word with a strong /k/.</p>
+        <div class="choices">
+          ${sayPic('🐱','cat','k‑at')}${sayPic('☕','cup','k‑up')}
+          ${sayPic('🔑','key','k‑ey')}${sayPic('🦘','kangaroo','k‑angaroo')}
+        </div>
+        ${recorder()}`},
+      { type:"choose", correct:1, render:()=>`
+        <span class="badge choose">🎯 Choose</span>
+        <p class="instruction">Which word <b>starts</b> with the coughing /k/ sound?</p>
+        <div class="choices">
+          <button class="choice" onclick="check(this,false,'dog')"><span class="ce">🐶</span><small>dog</small></button>
+          <button class="choice" onclick="check(this,true,'cup. Yes! K‑k‑cup!')"><span class="ce">☕</span><small>cup</small></button>
+          <button class="choice" onclick="check(this,false,'sun')"><span class="ce">☀️</span><small>sun</small></button>
+        </div>`}
+    ]},
 
-  ch: {
-    title: "Train Sound 🚂",
-    color: "coral",
-    completedMsg: "You practiced your train 'ch' sound!",
+  ch: { title: "Train Sound 🚂", color: "coral", emoji: "🚂", desc: 'The "ch" sound in words',
+    msg: "You practised your train 'ch' sound!",
     steps: [
-      {
-        type: "listen",
-        instruction: "The train goes CHOO CHOO! Practice the 'ch' sound!",
-        render() {
-          return `
-            <span class="step-type-badge listen">👂 Listen First</span>
-            <p class="step-instruction">The train sound <b>"ch"</b> — like a train going fast! 🚂</p>
-            <div class="phoneme-display">
-              <div class="phoneme-label">Target Sound</div>
-              <div class="phoneme-text">"ch"</div>
-            </div>
-            <div style="margin-top: 20px">
-              ${wordBtn('choo choo!', 'choo choo', '🚂')}
-              ${wordBtn('chee!', 'chee', '😁')}
-              ${wordBtn('chair', 'chair', '🪑')}
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Tip</div>
-              Ask Mummy or Daddy to gently press both your cheeks inwards to help make the "ch" sound! 😊
-            </div>`;
-        }
-      },
-      {
-        type: "say",
-        instruction: "Now say the TRAIN sound! Tap each picture!",
-        render() {
-          return `
-            <span class="step-type-badge say">🗣️ Say It!</span>
-            <p class="step-instruction">Tap to hear, then say it with your train "ch" sound!</p>
-            <div class="choices">
-              ${picWordBtn('🪑', 'chair', 'ch...air')}
-              ${picWordBtn('🍫', 'chocolate', 'ch...ocolate')}
-              ${picWordBtn('⌚', 'watch', 'wat...ch')}
-              ${picWordBtn('🚂', 'choo choo', 'ch...oo')}
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Remember</div>
-              "I heard you say 'tair' — remember this word has your train sound! <em>Chair!</em>"
-            </div>`;
-        }
-      },
-      {
-        type: "choose",
-        instruction: "Which word has the 'ch' TRAIN sound? Tap it! 🚂",
-        render() {
-          return `
-            <span class="step-type-badge choose">🎯 Choose!</span>
-            <p class="step-instruction">Which word has the train "ch" sound?</p>
-            <div style="margin: 16px 0">
-              ${wordBtn('Listen: chair', 'chair', '🪑')}
-              ${wordBtn('Listen: table', 'table', '🪞')}
-              ${wordBtn('Listen: ball', 'ball', '⚽')}
-            </div>
-            <div class="choices">
-              <button class="choice-btn" onclick="checkChoice(this, false)">⚽<br><small>ball</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false)">🪞<br><small>table</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, true)">🪑<br><small>chair</small></button>
-            </div>`;
-        }
-      }
-    ]
-  },
+      { type:"listen", render:()=>`
+        <span class="badge listen">👂 Listen first</span>
+        <p class="instruction">The train sound <b>"ch"</b> — like a train going fast! 🚂</p>
+        <div class="phoneme"><small>Target sound</small><span class="p">"ch"</span></div>
+        <div class="btn-row">
+          ${speakBtn('choo choo','choo choo','🚂','coral')}${speakBtn('chair','chair','🪑','coral')}${speakBtn('cheese','cheese','🧀','coral')}
+        </div>
+        <div class="tip"><span class="tl">💡 Tip</span>Round your lips and let the air puff: <b>ch‑ch‑ch!</b> 😊</div>`},
+      { type:"say", render:()=>`
+        <span class="badge say">🗣️ Say it</span>
+        <p class="instruction">Tap to hear, then say it with your train "ch" sound!</p>
+        <div class="choices">
+          ${sayPic('🪑','chair','ch‑air')}${sayPic('🍫','chocolate','ch‑ocolate')}
+          ${sayPic('⌚','watch','wat‑ch')}${sayPic('🚂','choo choo','ch‑oo')}
+        </div>
+        ${recorder()}`},
+      { type:"choose", correct:2, render:()=>`
+        <span class="badge choose">🎯 Choose</span>
+        <p class="instruction">Which word has the train "ch" sound?</p>
+        <div class="choices">
+          <button class="choice" onclick="check(this,false,'ball')"><span class="ce">⚽</span><small>ball</small></button>
+          <button class="choice" onclick="check(this,false,'table')"><span class="ce">🪑</span><small>table</small></button>
+          <button class="choice" onclick="check(this,true,'chair. Yes! Ch‑ch‑chair!')"><span class="ce">🪑</span><small>chair</small></button>
+        </div>`}
+    ]},
 
-  describe: {
-    title: "Tell Me! 🖼️",
-    color: "grass",
-    completedMsg: "Great describing — you told me Who, What, and How they feel!",
+  describe: { title: "Tell Me! 🖼️", color: "grass", emoji: "🖼️", desc: "Describe what's happening",
+    msg: "You told me Who, What and How they feel — brilliant!",
     steps: [
-      {
-        type: "listen",
-        instruction: "Look at the picture. We need to answer 3 things!",
-        render() {
-          return `
-            <span class="step-type-badge listen">👂 Listen First</span>
-            <p class="step-instruction">When we look at a picture, we say 3 things:</p>
-            <div class="choices" style="flex-direction:column; align-items:center">
-              <button class="sound-btn" onclick="speak('Number 1. Who is in the picture?', 0.8)">🔊 1️⃣ Who is in the picture?</button>
-              <button class="sound-btn" onclick="speak('Number 2. What happened in the picture?', 0.8)">🔊 2️⃣ What happened?</button>
-              <button class="sound-btn" onclick="speak('Number 3. How does the character feel?', 0.8)">🔊 3️⃣ How do they feel?</button>
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Remember</div>
-              3 things: <b>Who? What happened? How do they feel?</b>
-            </div>`;
-        }
-      },
-      {
-        type: "describe",
-        instruction: "Look at this picture! Can you tell me the 3 things?",
-        render() {
-          return `
-            <span class="step-type-badge describe">🖼️ Describe!</span>
-            <p class="step-instruction">Look at this picture. Tap each question and answer it!</p>
-            <div class="picture-scene">
-              <span class="scene-chars">👦🐕🌳</span>
-              <small style="font-size:0.9rem; color:#666; display:block">A boy is playing with his dog in the park</small>
-            </div>
-            <div class="choices" style="flex-direction:column; align-items:center">
-              <button class="sound-btn" onclick="speak('Who is in the picture?', 0.78)" style="background: linear-gradient(135deg, #CE93D8, #9C27B0)">🔊 Who is in the picture?</button>
-              <button class="sound-btn" onclick="speak('What happened in the picture?', 0.78)" style="background: linear-gradient(135deg, #66BB6A, #2E7D32)">🔊 What happened?</button>
-              <button class="sound-btn" onclick="speak('How does the boy feel?', 0.78)" style="background: linear-gradient(135deg, #FFD54F, #F57F17); color:#333">🔊 How does he feel?</button>
-            </div>`;
-        }
-      },
-      {
-        type: "choose",
-        instruction: "How does the boy feel? Tap the right face! 😊",
-        render() {
-          return `
-            <span class="step-type-badge choose">🎯 Choose!</span>
-            <div class="picture-scene">
-              <span class="scene-chars">👦🐕🌳</span>
-            </div>
-            <p class="step-instruction">The boy is playing with his dog.<br>How does he feel?</p>
-            <div class="choices">
-              <button class="choice-btn" onclick="checkChoice(this, true); speak('Happy! The boy feels happy because he is playing with his dog.')">😄<br><small>Happy</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false); speak('Sad. Try again!')">😢<br><small>Sad</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false); speak('Angry. Try again!')">😠<br><small>Angry</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false); speak('Scared. Try again!')">😨<br><small>Scared</small></button>
-            </div>`;
-        }
-      }
-    ]
-  },
+      { type:"listen", render:()=>`
+        <span class="badge describe">🖼️ Big idea</span>
+        <p class="instruction">When we look at a picture, we say <b>3 things</b>:</p>
+        <div class="btn-row" style="flex-direction:column; align-items:stretch; max-width:340px; margin:0 auto;">
+          <button class="speak-btn lilac" onclick="speak('Number one. Who is in the picture?',0.82)">🔊 1️⃣ Who is in it?</button>
+          <button class="speak-btn green" onclick="speak('Number two. What is happening?',0.82)">🔊 2️⃣ What is happening?</button>
+          <button class="speak-btn amber" onclick="speak('Number three. How do they feel?',0.82)">🔊 3️⃣ How do they feel?</button>
+        </div>
+        <div class="tip"><span class="tl">💡 Remember</span><b>Who? What happened? How do they feel?</b></div>`},
+      { type:"describe", render:()=>`
+        <span class="badge describe">🖼️ Describe</span>
+        <p class="instruction">Look at the picture. Tap each question and answer out loud!</p>
+        <div class="scene"><span class="chars">👦🐕🌳</span><small>A boy is playing with his dog in the park</small></div>
+        <div class="btn-row" style="flex-direction:column; align-items:stretch; max-width:340px; margin:0 auto;">
+          <button class="speak-btn lilac" onclick="speak('Who is in the picture?',0.8)">🔊 Who is in it?</button>
+          <button class="speak-btn green" onclick="speak('What is happening?',0.8)">🔊 What is happening?</button>
+          <button class="speak-btn amber" onclick="speak('How does the boy feel?',0.8)">🔊 How does he feel?</button>
+        </div>
+        ${recorder()}`},
+      { type:"choose", correct:0, render:()=>`
+        <span class="badge choose">🎯 Choose</span>
+        <div class="scene"><span class="chars">👦🐕🌳</span></div>
+        <p class="instruction">The boy is playing with his dog. How does he feel?</p>
+        <div class="choices">
+          <button class="choice" onclick="check(this,true,'Happy! He feels happy playing with his dog.')"><span class="ce">😄</span><small>Happy</small></button>
+          <button class="choice" onclick="check(this,false,'Sad. Try again!')"><span class="ce">😢</span><small>Sad</small></button>
+          <button class="choice" onclick="check(this,false,'Angry. Try again!')"><span class="ce">😠</span><small>Angry</small></button>
+          <button class="choice" onclick="check(this,false,'Scared. Try again!')"><span class="ce">😨</span><small>Scared</small></button>
+        </div>`}
+    ]},
 
-  vocab: {
-    title: "Mix It Up! 🌈",
-    color: "purple",
-    completedMsg: "You practiced all your sounds together — amazing!",
+  mix: { title: "Mix It Up! 🌈", color: "grape", emoji: "🌈", desc: "Practise all the sounds together",
+    msg: "You mixed all your sounds together — superstar!",
     steps: [
-      {
-        type: "listen",
-        instruction: "Let's practice ALL your sounds together! 🎉",
-        render() {
-          return `
-            <span class="step-type-badge listen">👂 Warm Up!</span>
-            <p class="step-instruction">Tap each sound to warm up your mouth muscles!</p>
-            <div style="margin: 20px 0">
-              <button class="sound-btn big" onclick="speak('sssss. Snake sound!', 0.6)" style="background:linear-gradient(135deg, #4FC3F7, #0288D1)">🐍 /ssss/</button>
-              <button class="sound-btn big" onclick="speak('k k k. Coughing sound!', 0.65)" style="background:linear-gradient(135deg, #FFD54F, #F9A825); color:#333">🤧 /k-k-k/</button>
-              <button class="sound-btn big" onclick="speak('choo choo. Train sound!', 0.65)" style="background:linear-gradient(135deg, #FF7043, #BF360C)">🚂 ch-ch!</button>
-            </div>
-            <div class="tip-box">
-              <div class="tip-label">💡 Great job!</div>
-              You're warming up all three sounds. Let's use them in words!
-            </div>`;
-        }
-      },
-      {
-        type: "say",
-        instruction: "Tap each picture and say the whole word clearly!",
-        render() {
-          return `
-            <span class="step-type-badge say">🗣️ Say It All!</span>
-            <p class="step-instruction">Each word has one of your special sounds! Tap and repeat!</p>
-            <div class="choices">
-              ${picWordBtn('🐱', 'cat', '/k/ — cat')}
-              ${picWordBtn('🏠', 'house', 'hous...e')}
-              ${picWordBtn('🚂', 'train', 'tr...ain')}
-              ${picWordBtn('☕', 'cup', '/k/ — cup')}
-              ${picWordBtn('🐍', 'snake', 'snak...e')}
-              ${picWordBtn('🪑', 'chair', 'ch...air')}
-            </div>`;
-        }
-      },
-      {
-        type: "choose",
-        instruction: "What sound do you hear at the START of 'chair'? 🪑",
-        render() {
-          return `
-            <span class="step-type-badge choose">🎯 Big Challenge!</span>
-            <p class="step-instruction">Listen to the word. What sound is at the START?</p>
-            ${wordBtn('Listen: chair', 'chair', '🪑')}
-            <div class="choices" style="margin-top:20px">
-              <button class="choice-btn" onclick="checkChoice(this, false); speak('That is the snake sound. Try again!')" style="font-size:2.5rem">🐍<br><small>/s/</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, false); speak('That is the coughing sound. Try again!')" style="font-size:2.5rem">🤧<br><small>/k/</small></button>
-              <button class="choice-btn" onclick="checkChoice(this, true); speak('Yes! The train sound! Ch ch chair!')" style="font-size:2.5rem">🚂<br><small>"ch"</small></button>
-            </div>`;
-        }
-      }
-    ]
-  }
+      { type:"listen", render:()=>`
+        <span class="badge listen">👂 Warm up</span>
+        <p class="instruction">Tap each sound to warm up your mouth!</p>
+        <div class="btn-row">
+          <button class="speak-btn big" onclick="speak('ssss. Snake!',0.6)">🐍 /ssss/</button>
+          <button class="speak-btn big amber" onclick="speak('k k k. Coughing!',0.65)">🤧 /k‑k/</button>
+          <button class="speak-btn big coral" onclick="speak('choo choo. Train!',0.65)">🚂 ch‑ch</button>
+        </div>
+        <div class="tip"><span class="tl">💡 Great</span>All three sounds ready — now let's use them in words!</div>`},
+      { type:"say", render:()=>`
+        <span class="badge say">🗣️ Say it all</span>
+        <p class="instruction">Each word hides one of your special sounds. Tap and repeat!</p>
+        <div class="choices">
+          ${sayPic('🐱','cat','/k/ cat')}${sayPic('🏠','house','hous‑e')}${sayPic('🪑','chair','ch‑air')}
+          ${sayPic('☕','cup','/k/ cup')}${sayPic('🐍','snake','snak‑e')}${sayPic('🚌','bus','bu‑s')}
+        </div>
+        ${recorder()}`},
+      { type:"choose", correct:2, render:()=>`
+        <span class="badge choose">🎯 Big challenge</span>
+        <p class="instruction">What sound is at the <b>start</b> of "chair"? 🪑</p>
+        <div class="btn-row">${speakBtn('Listen: chair','chair','🪑','coral')}</div>
+        <div class="choices" style="margin-top:18px">
+          <button class="choice" onclick="check(this,false,'That is the snake sound. Try again!')"><span class="ce">🐍</span><small>/s/</small></button>
+          <button class="choice" onclick="check(this,false,'That is the coughing sound. Try again!')"><span class="ce">🤧</span><small>/k/</small></button>
+          <button class="choice" onclick="check(this,true,'Yes! The train sound. Ch‑ch‑chair!')"><span class="ce">🚂</span><small>"ch"</small></button>
+        </div>`}
+    ]}
 };
 
-// ─── Button helpers ───
-function wordBtn(label, speakText, emoji) {
-  return `<button class="sound-btn" onclick="speak('${speakText}', 0.7)">🔊 ${emoji} ${label}</button>`;
+/* ═══════════════════ Build home cards ═══════════════════ */
+function buildHome() {
+  const grid = document.getElementById('lesson-grid');
+  grid.innerHTML = Object.entries(lessons).map(([id, l]) => `
+    <div class="card ${l.color}" onclick="startLesson('${id}')">
+      <span class="glow"></span>
+      <span class="pill ${completed[id] ? 'done' : ''}" id="pill-${id}">${completed[id] ? '✓ Done' : '3 steps'}</span>
+      <span class="emoji">${l.emoji}</span>
+      <div class="name">${l.title.replace(/[\u{1F000}-\u{1FFFF}☀-➿]/gu,'').trim()}</div>
+      <div class="desc">${l.desc}</div>
+    </div>`).join('');
+  updateStars();
+}
+function updateStars() {
+  const n = Object.values(completed).filter(Boolean).length;
+  document.getElementById('stars-display').textContent = '⭐'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
 }
 
-function picWordBtn(emoji, word, hint) {
-  return `
-    <button class="choice-btn" onclick="speak('${word}', 0.7); this.classList.add('correct'); setTimeout(() => this.classList.remove('correct'), 600)">
-      <span style="font-size:2.5rem">${emoji}</span><br>
-      <small style="font-size:0.85rem; color:#888">${hint}</small>
-    </button>`;
-}
+/* ═══════════════════ Flow / state ═══════════════════ */
+let curId = null, curStep = 0, answered = false;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ─── State ───
-let currentLesson = null;
-let currentStep = 0;
-let choiceAnswered = false;
-const completed = {};
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
 function startLesson(id) {
-  currentLesson = id;
-  currentStep = 0;
-  choiceAnswered = false;
-  document.getElementById('home-screen').style.display = 'none';
-  document.getElementById('complete-screen').classList.remove('active');
-  const ls = document.getElementById('lesson-screen');
-  ls.classList.add('active');
+  curId = id; curStep = 0;
   document.getElementById('lesson-title').textContent = lessons[id].title;
+  showScreen('lesson');
   renderStep();
 }
 
 function renderStep() {
-  const lesson = lessons[currentLesson];
-  const step = lesson.steps[currentStep];
-  const total = lesson.steps.length;
-  choiceAnswered = false;
-
-  document.getElementById('step-counter').textContent = `${currentStep + 1} / ${total}`;
-  document.getElementById('progress-fill').style.width = `${((currentStep) / total) * 100}%`;
+  const l = lessons[curId], step = l.steps[curStep], total = l.steps.length;
+  answered = false;
+  document.getElementById('counter').textContent = `${curStep + 1}/${total}`;
+  document.getElementById('progress').style.width = `${(curStep / total) * 100}%`;
 
   const card = document.getElementById('step-card');
   card.innerHTML = step.render();
-  card.style.animation = 'none';
-  requestAnimationFrame(() => { card.style.animation = 'slideIn 0.35s ease'; });
+  if (!reduce) gsap.fromTo(card, { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: 'power3.out' });
+  if (!reduce) gsap.fromTo(card.querySelectorAll('.choice, .speak-btn, .phoneme, .tip, .scene, .recorder'),
+    { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: .4, stagger: .05, delay: .12, ease: 'power2.out' });
 
-  const nextBtn = document.getElementById('next-btn');
-  if (step.type === 'choose') {
-    nextBtn.disabled = true;
-  } else {
-    nextBtn.disabled = false;
-  }
+  resetRecorder();
+  document.getElementById('next-btn').disabled = (step.type === 'choose');
 }
 
-function checkChoice(btn, isCorrect) {
-  if (choiceAnswered) return;
-  choiceAnswered = true;
-  if (isCorrect) {
+function pulse(el) {
+  el.classList.add('correct');
+  if (!reduce) gsap.fromTo(el, { scale: 1 }, { scale: 1.12, duration: .15, yoyo: true, repeat: 1, ease: 'power2.out' });
+  setTimeout(() => el.classList.remove('correct'), 500);
+}
+
+function check(btn, correct, say) {
+  if (answered) return;
+  if (correct) {
+    answered = true;
     btn.classList.add('correct');
-    speak('Yes! Well done, Coen! Great job!', 0.85, 1.2);
+    if (!reduce) gsap.fromTo(btn, { scale: 1 }, { scale: 1.15, duration: .2, yoyo: true, repeat: 1 });
+    speak('Yes! Well done, Coen! ' + say, 0.86, 1.2);
     document.getElementById('next-btn').disabled = false;
-    launchConfetti(8);
+    burst(10);
   } else {
     btn.classList.add('wrong');
-    speak('Oops! Try again!', 0.85, 1.1);
-    setTimeout(() => {
-      btn.classList.remove('wrong');
-      choiceAnswered = false;
-    }, 700);
+    if (!reduce) gsap.fromTo(btn, { x: 0 }, { x: 8, duration: .07, repeat: 5, yoyo: true });
+    speak('Oops! ' + say, 0.86, 1.1);
+    setTimeout(() => btn.classList.remove('wrong'), 600);
   }
 }
 
 function nextStep() {
-  const lesson = lessons[currentLesson];
-  if (currentStep < lesson.steps.length - 1) {
-    currentStep++;
-    renderStep();
-  } else {
-    finishLesson();
-  }
+  const l = lessons[curId];
+  if (curStep < l.steps.length - 1) { curStep++; renderStep(); }
+  else finishLesson();
 }
 
 function finishLesson() {
-  completed[currentLesson] = true;
-  const badge = document.getElementById(`badge-${currentLesson}`);
-  if (badge) { badge.textContent = '✅ Done!'; badge.classList.add('done'); }
-
-  document.getElementById('lesson-screen').classList.remove('active');
-  document.getElementById('complete-screen').classList.add('active');
-  document.getElementById('complete-msg').textContent = lessons[currentLesson].completedMsg;
-  document.getElementById('progress-fill').style.width = '100%';
-
-  launchConfetti(30);
-  setTimeout(() => speak(`Amazing job, Coen! You finished the ${lessons[currentLesson].title} lesson! You are a superstar!`, 0.85, 1.15), 400);
+  if (!completed[curId]) { completed[curId] = true; saveProgress(); }
+  const pill = document.getElementById('pill-' + curId);
+  if (pill) { pill.textContent = '✓ Done'; pill.classList.add('done'); }
+  document.getElementById('complete-msg').textContent = lessons[curId].msg;
+  const n = Object.values(completed).filter(Boolean).length;
+  document.getElementById('earned').textContent = '⭐'.repeat(Math.max(1, n));
+  showScreen('complete');
+  if (!reduce) gsap.fromTo('#trophy', { scale: 0, rotate: -30 }, { scale: 1, rotate: 0, duration: .8, ease: 'elastic.out(1,.5)' });
+  burst(60);
+  setTimeout(() => speak(`Amazing job, Coen! You finished ${lessons[curId].title.replace(/[^a-zA-Z ]/g,'')}! You are a superstar!`, 0.86, 1.16), 350);
 }
 
 function goHome() {
-  document.getElementById('lesson-screen').classList.remove('active');
-  document.getElementById('complete-screen').classList.remove('active');
-  document.getElementById('home-screen').style.display = 'flex';
+  speechSynthesis && speechSynthesis.cancel();
+  stopStream();
+  showScreen('home');
   updateStars();
+  if (!reduce) gsap.fromTo('.card', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .5, stagger: .06, ease: 'power3.out' });
 }
 
-function updateStars() {
-  const count = Object.keys(completed).length;
-  const stars = '⭐'.repeat(count) + '☆'.repeat(Math.max(0, 5 - count));
-  document.getElementById('stars-display').textContent = stars || '☆☆☆☆☆';
+/* ═══════════════════ Record & playback ═══════════════════ */
+let mediaRecorder = null, chunks = [], recURL = null, micStream = null;
+function resetRecorder() {
+  if (recURL) { URL.revokeObjectURL(recURL); recURL = null; }
+  chunks = [];
 }
-
-// ─── Confetti ───
-function launchConfetti(n) {
-  const colors = ['#FFD54F','#4FC3F7','#FF7043','#66BB6A','#CE93D8','#FF8A65'];
-  for (let i = 0; i < n; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.cssText = `
-        left: ${Math.random() * 100}vw;
-        top: -20px;
-        background: ${colors[Math.floor(Math.random() * colors.length)]};
-        animation-duration: ${1.5 + Math.random() * 2}s;
-        animation-delay: ${Math.random() * 0.5}s;
-        transform: rotate(${Math.random() * 360}deg);
-        width: ${8 + Math.random() * 12}px;
-        height: ${8 + Math.random() * 12}px;
-        border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
-      `;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 4000);
-    }, i * 60);
+function stopStream() {
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  mediaRecorder = null;
+}
+async function toggleRecord(btn) {
+  if (!window.MediaRecorder || !navigator.mediaDevices) {
+    btn.parentElement.querySelector('.rec-hint').textContent = '🎤 Recording is not supported on this device.';
+    return;
   }
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    return;
+  }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(micStream);
+    chunks = [];
+    mediaRecorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      recURL = URL.createObjectURL(new Blob(chunks, { type: 'audio/webm' }));
+      btn.textContent = '● Record'; btn.classList.remove('recording');
+      const play = document.getElementById('rec-play'); if (play) play.disabled = false;
+      stopStream();
+    };
+    mediaRecorder.start();
+    btn.textContent = '■ Stop'; btn.classList.add('recording');
+  } catch (e) {
+    btn.parentElement.querySelector('.rec-hint').textContent = '🎤 Please allow the microphone to record.';
+  }
+}
+function playRecording() {
+  if (recURL) { speechSynthesis && speechSynthesis.cancel(); new Audio(recURL).play(); }
+}
+
+/* ═══════════════════ Confetti (GSAP) ═══════════════════ */
+function burst(n) {
+  if (reduce) return;
+  const colors = ['#7C5CFF', '#38BDF8', '#34D399', '#FFC53D', '#FF7A59', '#FF6FB5'];
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.background = colors[i % colors.length];
+    el.style.borderRadius = Math.random() > .5 ? '50%' : '3px';
+    document.body.appendChild(el);
+    gsap.to(el, {
+      y: window.innerHeight + 60, x: (Math.random() - .5) * 240,
+      rotation: Math.random() * 720, duration: 1.8 + Math.random() * 1.6,
+      ease: 'power1.in', delay: Math.random() * .3,
+      onComplete: () => el.remove()
+    });
+  }
+}
+
+/* ═══════════════════ Mascot wiggle ═══════════════════ */
+document.getElementById('mascot').addEventListener('click', function () {
+  const greetings = ['Hello Coen!', 'Let us play!', 'Roar! Ready to learn?', 'You can do it!'];
+  speak(greetings[Math.floor(Math.random() * greetings.length)], 0.9, 1.2);
+  if (!reduce) gsap.fromTo(this.querySelector('.face'),
+    { rotation: -12 }, { rotation: 0, duration: 1, ease: 'elastic.out(1,.3)' });
+});
+
+/* ═══════════════════ Modal ═══════════════════ */
+function openModal() { document.getElementById('modal').classList.add('show'); }
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+/* ═══════════════════ Three.js floating bubbles ═══════════════════ */
+(function initBackground() {
+  if (reduce || !window.THREE) return;
+  const canvas = document.getElementById('bg-canvas');
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  } catch (e) { return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+  renderer.setSize(innerWidth, innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+  camera.position.z = 18;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(5, 8, 10); scene.add(dir);
+
+  const palette = [0x7C5CFF, 0x38BDF8, 0x34D399, 0xFFC53D, 0xFF7A59, 0xFF6FB5];
+  const bubbles = [];
+  const geo = new THREE.SphereGeometry(1, 24, 24);
+  const N = innerWidth < 640 ? 9 : 16;
+  for (let i = 0; i < N; i++) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: palette[i % palette.length], transparent: true, opacity: 0.5,
+      roughness: 0.25, metalness: 0.1
+    });
+    const m = new THREE.Mesh(geo, mat);
+    const s = 0.6 + Math.random() * 1.8;
+    m.scale.setScalar(s);
+    m.position.set((Math.random() - .5) * 30, (Math.random() - .5) * 20, (Math.random() - .5) * 10);
+    m.userData = { sp: 0.2 + Math.random() * 0.5, ph: Math.random() * Math.PI * 2, x: m.position.x };
+    scene.add(m); bubbles.push(m);
+  }
+
+  let running = true, t = 0;
+  function loop() {
+    if (!running) return;
+    t += 0.005;
+    bubbles.forEach(b => {
+      b.position.y += b.userData.sp * 0.02;
+      b.position.x = b.userData.x + Math.sin(t + b.userData.ph) * 1.2;
+      b.rotation.x += 0.003; b.rotation.y += 0.004;
+      if (b.position.y > 12) b.position.y = -12;
+    });
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  loop();
+  requestAnimationFrame(() => canvas.classList.add('show'));
+
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+  document.addEventListener('visibilitychange', () => {
+    running = !document.hidden;
+    if (running) loop();
+  });
+})();
+
+/* ═══════════════════ Service worker (offline / installable) ═══════════════════ */
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+/* ═══════════════════ Init ═══════════════════ */
+buildHome();
+if (!reduce) {
+  gsap.from('.mascot', { scale: 0, duration: .9, ease: 'elastic.out(1,.5)' });
+  gsap.from('.home-title', { y: 20, opacity: 0, duration: .7, delay: .1, ease: 'power3.out' });
+  gsap.from('.home-sub, .streak', { y: 16, opacity: 0, duration: .6, delay: .25, stagger: .1, ease: 'power2.out' });
+  gsap.from('.card', { y: 28, opacity: 0, duration: .6, delay: .35, stagger: .08, ease: 'power3.out' });
 }
 </script>
 </body>

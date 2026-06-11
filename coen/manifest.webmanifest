@@ -1,0 +1,27 @@
+{
+  "name": "Coen's Sound Adventure",
+  "short_name": "Sound Adventure",
+  "description": "A playful, interactive game to practise English speech sounds, listening and describing.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F7FF",
+  "theme_color": "#7C5CFF",
+  "lang": "en",
+  "categories": ["education", "kids"],
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
