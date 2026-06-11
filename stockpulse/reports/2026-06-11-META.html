@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — META | 2026-06-11</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 4 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-11</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">META</span>
+      <span class="company-name">Meta Platforms, Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$570.98</span>
+      <span class="day-change" style="color:#f87171">-2.33% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Cloud / AI Platform</span>
+      <span class="tag">Communication Services</span>
+      &nbsp;Internet Content & Information
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$1449.39B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.229</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#4ade8022;color:#4ade80;border:1px solid #4ade8044">STRONG BUY</span>
+        <span class="macro-sub">59 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#f87171;font-weight:600">-2.33%</td></tr><tr><td>5 Days</td><td style="color:#f87171;font-weight:600">-9.02%</td></tr><tr><td>1 Month</td><td style="color:#f87171;font-weight:600">-4.66%</td></tr><tr><td>3 Months</td><td style="color:#f87171;font-weight:600">-12.73%</td></tr><tr><td>6 Months</td><td style="color:#f87171;font-weight:600">-12.38%</td></tr><tr><td>YTD</td><td style="color:#f87171;font-weight:600">-12.14%</td></tr><tr><td>1 Year</td><td style="color:#f87171;font-weight:600">-17.49%</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:18%"></div></div>
+          <div class="range-labels"><span>$520.26</span><span style="color:#f97316">$570.98</span><span>$796.25</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$828.80</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $700.00 — $1,015.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">17.08M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$214.96B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +33.10%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$25.56B</p>
+        <p class="card-sub">Cash: $81.18B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+62.40%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">81.90%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">40.60%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">32.80%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">21.3x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">15.8x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">6.7x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">5.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$86.77B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$81.18B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <p id="analysis-text">Meta Platforms operates the world's largest social connectivity ecosystem — Facebook, Instagram, WhatsApp, and Messenger — serving over 3.3 billion daily active people. In the AI landscape, Meta is a dual-role <strong>Enabler</strong>: it develops and open-sources frontier AI models (the Llama family) used by millions of developers globally, while simultaneously deploying AI at unprecedented scale to power ad targeting, content ranking, and its Reality Labs hardware division. This combination of open-source AI leadership and a captive monetisation engine of 3.3 billion users makes Meta one of the most structurally advantaged companies in the AI era.</p>
+
+      <h3>Bull Case</h3>
+      <ul>
+        <li><strong>Exceptional growth with expanding margins:</strong> Revenue grew 33.1% YoY to $214.96B TTM while earnings grew even faster at +62.4% YoY — a sign of genuine operating leverage as AI-powered ad products lift monetisation without proportional cost growth.</li>
+        <li><strong>Extreme valuation anomaly:</strong> A forward P/E of 15.8x on 62%+ earnings growth implies a PEG ratio well below 0.5 — the market is deeply mispricing this growth rate relative to virtually every mega-cap tech peer growing at a fraction of this speed.</li>
+        <li><strong>Fortress balance sheet:</strong> $81.18B in cash against $86.77B in debt means Meta is nearly net debt neutral at a $1.45T market cap. With $25.56B in annual FCF, there's ample capital for continued buybacks and AI infrastructure spend simultaneously.</li>
+        <li><strong>Unified analyst conviction:</strong> 59 analysts rate META a Strong Buy with a mean target of $828.80 (+45% from $570.98) and a high of $1,015 — unusually broad consensus for a company this large.</li>
+      </ul>
+
+      <h3>Bear Case</h3>
+      <ul>
+        <li><strong>Persistent underperformance despite strong fundamentals:</strong> META is down 17.49% over the past year despite exceptional earnings growth, suggesting the market is discounting structural risks — likely regulatory, antitrust, and brand exposure — that pure financial metrics don't capture.</li>
+        <li><strong>Escalating regulatory wave:</strong> Canada's proposed under-16 social media ban (June 11) is the latest signal of a global legislative trend targeting Meta's core platforms. EU and US constraints on data usage, ad targeting, or platform structure could compress the monetisation engine that drives these margins.</li>
+        <li><strong>AI capex drag with uncertain returns:</strong> Reality Labs losses and $35–40B+ in annual AI infrastructure spend are suppressing what could otherwise be a far stronger FCF yield. If AI-driven monetisation gains materialise slower than guided, the market will continue penalising the investment cycle.</li>
+      </ul>
+
+      <div class="verdict-box">
+        <p class="verdict-label">Verdict</p>
+        <p class="verdict-text">BUY</p>
+        <p class="verdict-sub">A 15.8x forward P/E on 62%+ earnings growth with $81B in cash, 81.9% gross margins, and a dominant global ad network trading near its 52-week low is a compelling setup. With the Fear &amp; Greed Index at 12 (Extreme Fear), sentiment headwinds are already priced in — the risk/reward skews strongly positive for patient holders. Time horizon: 12–18 months.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-10</span><a href="https://finance.yahoo.com/video/jeremy-strong-becomes-mark-zuckerberg-in-social-network-sequel-202255265.html" target="_blank" rel="noopener" class="news-link">Jeremy Strong becomes Mark Zuckerberg in 'Social Network' sequel ↗</a></li><li><span class="news-date">2026-06-10</span><a href="https://finance.yahoo.com/video/ai-stocks-mangos-ascends-replacing-faang-position-200651767.html" target="_blank" rel="noopener" class="news-link">AI stocks: MANGOS ascends, replacing FAANG position ↗</a></li><li><span class="news-date">2026-06-11</span><a href="https://www.trefis.com/articles/602300/broadcom-stock-and-the-two-customers-in-the-shadows/2026-06-10" target="_blank" rel="noopener" class="news-link">Broadcom Stock And The Two Customers In The Shadows ↗</a></li><li><span class="news-date">2026-06-11</span><a href="https://www.fool.com/investing/2026/06/10/2-bargain-artificial-intelligence-ai-stocks-to-buy/" target="_blank" rel="noopener" class="news-link">2 Bargain Artificial Intelligence (AI) Stocks to Buy Now Down Around 25% From Their All-Time Highs ↗</a></li><li><span class="news-date">2026-06-11</span><a href="https://www.wsj.com/tech/canada-proposes-social-media-ban-for-children-under-16-b5de4030?siteid=yhoof2&yptr=yahoo" target="_blank" rel="noopener" class="news-link">Canada Proposes Social-Media Ban for Children Under 16 ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-11 02:20 UTC.
+  </div>
+
+</div>
+</body>
+</html>
