@@ -3,371 +3,665 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>W. — Programme Manager</title>
+<title>W. — Wesley Chia · I build AI tools, dashboards & experiments</title>
+<meta name="description" content="Wesley Chia — Programme Manager at GovTech Singapore. I build AI tools, dashboards and experiments with Claude. Powered by curiosity.">
+<meta name="author" content="Wesley Chia">
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="W. — Wesley Chia">
+<meta property="og:description" content="I build AI tools, dashboards & experiments. Powered by curiosity.">
+<meta property="og:url" content="https://wesleychiaz.github.io/ClaudeW/">
+<meta property="og:image" content="https://wesleychiaz.github.io/ClaudeW/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="W. — Wesley Chia">
+<meta name="twitter:description" content="I build AI tools, dashboards & experiments. Powered by curiosity.">
+<meta name="twitter:image" content="https://wesleychiaz.github.io/ClaudeW/og-image.png">
+<meta name="theme-color" content="#0f0f0f">
+
+<!-- Favicon: W. mark, inline so it ships with the page -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f0f0f'/%3E%3Ctext x='6' y='23' font-family='Arial Black,Arial,sans-serif' font-size='20' font-weight='900' fill='%23ffffff'%3EW%3C/text%3E%3Ccircle cx='25.5' cy='21.5' r='3' fill='%23f97316'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+:root{
+  --void:#0f0f0f;
+  --carbon:#1a1a1a;
+  --border:#2a2a2a;
+  --mist:#888888;
+  --white:#ffffff;
+  --spark:#f97316;
+  --ember:#fb923c;
+  --maxw:1160px;
+}
 
-  body {
-    background: #0e0e0e;
-    color: #f0f0f0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+*{margin:0;padding:0;box-sizing:border-box;}
 
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    padding: 20px 36px;
-    z-index: 100;
-  }
+html{scroll-behavior:smooth;}
 
-  .nav-name { display: flex; flex-direction: column; }
-  .nav-name span:first-child { font-size: 15px; font-weight: 600; }
-  .nav-name span:last-child { font-size: 12px; color: #888; margin-top: 1px; }
+body{
+  background:var(--void);
+  color:var(--white);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+  line-height:1.5;
+}
 
-  .logo {
-    display: flex;
-    align-items: baseline;
-    gap: 1px;
-    margin-bottom: 4px;
-  }
+a{color:inherit;text-decoration:none;}
 
-  .logo-w {
-    font-size: 22px;
-    font-weight: 800;
-    color: #f0f0f0;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
+::selection{background:rgba(249,115,22,0.3);color:#fff;}
 
-  .logo-dot {
-    width: 7px;
-    height: 7px;
-    background: #f97316;
-    border-radius: 50%;
-    display: inline-block;
-    margin-left: 1px;
-    margin-bottom: 3px;
-    flex-shrink: 0;
-  }
+/* film grain + vignette so the black never looks flat */
+body::after{
+  content:"";
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:radial-gradient(120% 80% at 50% 0%,transparent 55%,rgba(0,0,0,0.55) 100%);
+}
 
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 100px 24px 0;
-  }
+/* ---------- custom cursor (desktop only) ---------- */
+.cursor-dot,.cursor-ring{
+  position:fixed;top:0;left:0;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+}
+.cursor-dot{width:6px;height:6px;background:#fff;}
+.cursor-ring{
+  width:34px;height:34px;
+  border:1px solid rgba(255,255,255,0.6);
+  transition:width .25s ease,height .25s ease,background .25s ease,border-color .25s ease;
+}
+.cursor-ring.grow{width:54px;height:54px;background:rgba(249,115,22,0.18);border-color:var(--spark);}
+@media (hover:none),(pointer:coarse){.cursor-dot,.cursor-ring{display:none;}}
 
-  .hero-inner { max-width: 1100px; width: 100%; }
+/* ---------- nav ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px clamp(20px,5vw,52px);
+  transition:background .35s ease,backdrop-filter .35s ease,border-color .35s ease,padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled{
+  background:rgba(15,15,15,0.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding-top:14px;padding-bottom:14px;
+}
+.brand{display:flex;flex-direction:column;line-height:1;}
+.mark{display:flex;align-items:baseline;font-weight:900;font-size:24px;letter-spacing:-.04em;}
+.mark .dot{width:7px;height:7px;background:var(--spark);border-radius:50%;margin-left:2px;align-self:flex-end;margin-bottom:3px;box-shadow:0 0 10px rgba(249,115,22,.7);}
+.brand small{font-size:11px;color:var(--mist);letter-spacing:.04em;margin-top:5px;}
+.nav-links{display:flex;gap:30px;align-items:center;}
+.nav-links a{font-size:13px;color:var(--mist);font-weight:500;letter-spacing:.02em;transition:color .2s;position:relative;}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-4px;height:1px;width:0;background:var(--spark);transition:width .25s ease;}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{width:100%;}
+@media(max-width:680px){.nav-links{display:none;}}
 
-  .hero-window {
-    background: #141414;
-    border: 1px solid #222;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-  }
+/* ---------- hero ---------- */
+.hero{
+  position:relative;
+  min-height:100svh;
+  display:flex;align-items:center;
+  padding:0 clamp(20px,5vw,52px);
+  overflow:hidden;
+}
+#hero-canvas{position:absolute;inset:0;z-index:0;display:block;}
+.hero-inner{position:relative;z-index:2;max-width:var(--maxw);width:100%;margin:0 auto;}
 
-  .window-bar {
-    background: #1c1c1c;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    border-bottom: 1px solid #222;
-  }
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;text-transform:uppercase;letter-spacing:.18em;
+  color:var(--mist);font-weight:600;margin-bottom:28px;
+  border:1px solid var(--border);border-radius:999px;padding:7px 14px;
+  background:rgba(26,26,26,.5);backdrop-filter:blur(4px);
+}
+.eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--spark);box-shadow:0 0 0 0 rgba(249,115,22,.6);animation:pulse 2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(249,115,22,.55);}70%{box-shadow:0 0 0 9px rgba(249,115,22,0);}100%{box-shadow:0 0 0 0 rgba(249,115,22,0);}}
 
-  .dot { width: 12px; height: 12px; border-radius: 50%; }
-  .dot-red { background: #ff5f57; }
-  .dot-yellow { background: #febc2e; }
-  .dot-green { background: #28c840; }
+.hero-title{
+  font-size:clamp(44px,8.5vw,108px);
+  font-weight:800;
+  line-height:1.02;
+  letter-spacing:-.035em;
+  margin-bottom:32px;
+}
+.hero-title .w{display:inline-block;overflow:hidden;vertical-align:top;}
+.hero-title .w b{display:inline-block;font-weight:inherit;will-change:transform;}
+.hero-title .em b{font-style:italic;font-weight:300;color:#cfcfcf;background:linear-gradient(120deg,var(--ember),var(--spark));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
 
-  .window-content { padding: 72px 64px 80px; }
+.hero-sub{max-width:520px;color:var(--mist);font-size:clamp(15px,1.7vw,18px);line-height:1.7;margin-bottom:14px;}
+.hero-sub strong{color:#e6e6e6;font-weight:600;}
+.hero-tagline{font-size:13px;color:#5a5a5a;letter-spacing:.02em;margin-bottom:40px;}
 
-  .hero-headline {
-    font-size: clamp(40px, 6.5vw, 72px);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: 32px;
-  }
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:14px;font-weight:600;letter-spacing:.01em;
+  padding:13px 24px;border-radius:8px;
+  transition:transform .25s ease,background .25s ease,border-color .25s ease,color .25s;
+  will-change:transform;
+}
+.btn-primary{background:var(--spark);color:#0f0f0f;}
+.btn-primary:hover{background:var(--ember);}
+.btn-ghost{border:1px solid var(--border);color:var(--mist);background:rgba(26,26,26,.4);}
+.btn-ghost:hover{border-color:var(--spark);color:var(--white);}
+.btn .arrow{transition:transform .25s ease;}
+.btn:hover .arrow{transform:translateX(4px);}
 
-  .hero-headline em { font-style: italic; font-weight: 300; color: #ccc; }
-  .hero-sub { font-size: 15px; color: #999; line-height: 1.7; max-width: 460px; margin-bottom: 8px; }
-  .hero-sub strong { color: #ddd; font-weight: 500; }
-  .hero-sub-2 { font-size: 14px; color: #666; margin-bottom: 48px; }
+.scroll-cue{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:#555;
+}
+.scroll-cue .track{width:1px;height:46px;background:linear-gradient(var(--spark),transparent);position:relative;overflow:hidden;}
+.scroll-cue .track::after{content:"";position:absolute;top:-50%;left:0;width:100%;height:50%;background:var(--spark);animation:drop 1.8s infinite;}
+@keyframes drop{0%{top:-50%;}100%{top:120%;}}
 
-  .projects-inner { border-top: 1px solid #1e1e1e; padding-top: 44px; }
+/* ---------- shared section ---------- */
+.section{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:clamp(80px,12vw,140px) clamp(20px,5vw,52px);}
+.kicker{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--spark);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.kicker::before{content:"";width:24px;height:1px;background:var(--spark);}
+.section-title{font-size:clamp(30px,4.5vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin-bottom:18px;}
+.section-lead{color:var(--mist);font-size:clamp(15px,1.7vw,17px);max-width:560px;line-height:1.7;}
 
-  .category-block { margin-bottom: 44px; }
-  .category-block:last-child { margin-bottom: 0; }
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:0.85fr 1.15fr;gap:clamp(32px,6vw,72px);align-items:center;}
+.about-photo{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--border);aspect-ratio:695/841;}
+.about-photo img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.02) contrast(1.02);}
+.about-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(15,15,15,.55));}
+.about-photo .glow{position:absolute;inset:-1px;border-radius:18px;box-shadow:inset 0 0 0 1px rgba(249,115,22,.0);transition:box-shadow .4s ease;pointer-events:none;}
+.about-photo:hover .glow{box-shadow:inset 0 0 0 1px rgba(249,115,22,.55),0 0 50px rgba(249,115,22,.18);}
+.about-photo .badge{position:absolute;left:16px;bottom:16px;z-index:2;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#fff;background:rgba(15,15,15,.6);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:999px;padding:7px 13px;}
+.about-photo .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--spark);box-shadow:0 0 8px var(--spark);}
 
-  .category-divider {
-    border: none;
-    border-top: 1px solid #1e1e1e;
-    margin-bottom: 44px;
-  }
+.about-body p{color:var(--mist);font-size:clamp(15px,1.7vw,17px);line-height:1.8;margin-bottom:20px;}
+.about-body p strong{color:#e8e8e8;font-weight:600;}
+.about-body .lead{color:#e8e8e8;font-size:clamp(18px,2.3vw,24px);font-weight:600;line-height:1.5;letter-spacing:-.01em;}
+.about-body .lead em{font-style:italic;font-weight:400;background:linear-gradient(120deg,var(--ember),var(--spark));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+.stats{display:flex;gap:clamp(20px,4vw,48px);margin-top:34px;flex-wrap:wrap;}
+.stat .num{font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1;}
+.stat .num span{color:var(--spark);}
+.stat .lbl{font-size:12px;color:var(--mist);margin-top:8px;letter-spacing:.02em;}
 
-  .section-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #f97316;
-    font-weight: 600;
-  }
+@media(max-width:760px){
+  .about-grid{grid-template-columns:1fr;}
+  .about-photo{max-width:380px;margin:0 auto;width:100%;}
+}
 
-  .section-count {
-    font-size: 10px;
-    color: #444;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 999px;
-    padding: 2px 8px;
-    letter-spacing: 0.05em;
-  }
+/* ---------- work / filter ---------- */
+.work-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:40px;}
+.filters{display:flex;gap:8px;flex-wrap:wrap;}
+.filter{
+  font-size:13px;font-weight:600;color:var(--mist);
+  border:1px solid var(--border);background:transparent;
+  border-radius:999px;padding:9px 18px;cursor:pointer;
+  transition:color .2s,border-color .2s,background .2s;
+  font-family:inherit;
+}
+.filter:hover{color:var(--white);border-color:#3a3a3a;}
+.filter.active{color:#0f0f0f;background:var(--spark);border-color:var(--spark);}
+.filter .c{opacity:.6;font-weight:500;margin-left:5px;}
+.filter.active .c{opacity:.75;}
 
-  .project-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-  }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
 
-  .card {
-    background: #0e0e0e;
-    border: 1px solid #222;
-    border-radius: 10px;
-    padding: 22px;
-    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-    text-decoration: none;
-    display: block;
-    color: inherit;
-    cursor: pointer;
-  }
+.card{
+  position:relative;
+  background:var(--carbon);
+  border:1px solid var(--border);
+  border-radius:14px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s;
+  will-change:transform;
+}
+.card::before{
+  content:"";position:absolute;inset:0;z-index:3;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(249,115,22,.10),transparent 45%);
+  opacity:0;transition:opacity .35s;pointer-events:none;
+}
+.card:hover{transform:translateY(-6px);border-color:rgba(249,115,22,.55);box-shadow:0 22px 46px -14px rgba(0,0,0,.75),0 0 0 1px rgba(249,115,22,.12);}
+.card:hover::before{opacity:1;}
 
-  .card:hover {
-    border-color: #f97316;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.1);
-  }
+.card-thumb{position:relative;aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--border);background:#111;}
+.card-thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1);}
+.card:hover .card-thumb img{transform:scale(1.06);}
+.card-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(15,15,15,.5));}
 
-  .card-icon { font-size: 20px; margin-bottom: 12px; }
-  .card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #e8e8e8; }
-  .card-desc { font-size: 13px; color: #666; line-height: 1.6; }
+.card-live{position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--spark);background:rgba(15,15,15,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(249,115,22,.35);border-radius:999px;padding:5px 10px;}
+.card-live .d{width:5px;height:5px;border-radius:50%;background:var(--spark);box-shadow:0 0 6px var(--spark);}
 
-  .card-tag {
-    display: inline-block;
-    margin-top: 12px;
-    font-size: 11px;
-    border-radius: 999px;
-    padding: 3px 10px;
-    color: #555;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-  }
+.card-body{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1;}
+.card-title{font-size:16px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px;}
+.card-desc{font-size:13.5px;color:var(--mist);line-height:1.6;flex:1;}
+.card-go{margin-top:16px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#666;transition:color .25s;}
+.card:hover .card-go{color:var(--spark);}
+.card-go .arrow{transition:transform .25s;}
+.card:hover .card-go .arrow{transform:translateX(4px);}
+.card.hide{display:none;}
 
-  .live-tag {
-    color: #f97316;
-    background: rgba(249, 115, 22, 0.08);
-    border-color: rgba(249, 115, 22, 0.3);
-    font-weight: 600;
-  }
+/* ---------- footer ---------- */
+footer{position:relative;z-index:2;border-top:1px solid var(--border);}
+.footer-inner{max-width:var(--maxw);margin:0 auto;padding:48px clamp(20px,5vw,52px);}
+.footer-cta{font-size:clamp(28px,5vw,56px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:40px;max-width:760px;}
+.footer-cta em{font-style:italic;font-weight:300;color:var(--mist);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:28px;border-top:1px solid var(--border);}
+.footer-bottom span{font-size:12.5px;color:#555;}
+.footer-bottom .mark{font-size:18px;}
 
-  footer {
-    border-top: 1px solid #1a1a1a;
-    padding: 24px 36px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1100px;
-    margin: 40px auto 0;
-  }
+/* ---------- reveal base (GSAP toggles this) ---------- */
+.reveal{opacity:0;transform:translateY(28px);}
+.reveal.in{opacity:1;transform:none;transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1);}
 
-  footer span { font-size: 12px; color: #444; }
+@media(prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;}
+  .reveal{opacity:1!important;transform:none!important;}
+  .pulse,.scroll-cue .track::after{animation:none!important;}
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-name">
-    <div class="logo">
-      <span class="logo-w">W</span><span class="logo-dot"></span>
-    </div>
-    <span style="font-size:12px;color:#888;">Programme Manager</span>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<nav id="nav">
+  <a href="#top" class="brand" data-cursor>
+    <span class="mark">W<span class="dot"></span></span>
+    <small>Wesley Chia · Programme Manager</small>
+  </a>
+  <div class="nav-links">
+    <a href="#about" data-cursor>About</a>
+    <a href="#work" data-cursor>Work</a>
+    <a href="#footer" data-cursor>Connect</a>
   </div>
 </nav>
 
-<section class="hero">
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <canvas id="hero-canvas"></canvas>
   <div class="hero-inner">
-    <div class="hero-window">
-      <div class="window-bar">
-        <div class="dot dot-red"></div>
-        <div class="dot dot-yellow"></div>
-        <div class="dot dot-green"></div>
-      </div>
-      <div class="window-content">
-        <h1 class="hero-headline">
-          I build AI tools,<br>dashboards &amp; <em>experiments.</em>
-        </h1>
-        <p class="hero-sub">
-          <strong>Programme Manager.</strong> Exploring how AI can improve everyday life —
-          from personal finance and health to how we work.
-        </p>
-        <p class="hero-sub-2">Built with Claude. Powered by curiosity.</p>
+    <span class="eyebrow"><span class="pulse"></span>Building in the margins · Singapore</span>
+    <h1 class="hero-title">
+      <span class="w"><b>I</b></span> <span class="w"><b>build</b></span> <span class="w"><b>AI</b></span> <span class="w"><b>tools,</b></span><br>
+      <span class="w"><b>dashboards</b></span> <span class="w"><b>&amp;</b></span> <span class="w em"><b>experiments.</b></span>
+    </h1>
+    <p class="hero-sub"><strong>Programme Manager.</strong> Exploring how AI can improve everyday life — from personal finance and health to how we learn and work.</p>
+    <p class="hero-tagline">Built with Claude. Powered by curiosity.</p>
+    <div class="hero-cta">
+      <a href="#work" class="btn btn-primary" data-cursor>See the work <span class="arrow">→</span></a>
+      <a href="#about" class="btn btn-ghost" data-cursor>About me</a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><span class="track"></span></div>
+</header>
 
-        <div class="projects-inner">
-
-          <!-- 1. TOOLS & FINANCE -->
-          <div class="category-block">
-            <div class="section-header">
-              <span class="section-label">💰 Finance & Tools</span>
-              <span style="font-size:11px;color:#f97316;background:rgba(249,115,22,0.12);border:1px solid #f97316;border-radius:999px;padding:2px 8px;font-weight:700;">3 projects</span>
-            </div>
-            <div class="project-cards">
-              <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" target="_blank" class="card">
-                <div class="card-icon">📈</div>
-                <div class="card-title">StockPulse</div>
-                <div class="card-desc">Daily AI stock analysis — one company per weekday across the AI ecosystem. Enablers & adopters.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/dashboard/" target="_blank" class="card">
-                <div class="card-icon">🌅</div>
-                <div class="card-title">Morning Investor Dashboard</div>
-                <div class="card-desc">A morning briefing tool for staying on top of markets and investments.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/mortgagecalculator/" target="_blank" class="card">
-                <div class="card-icon">🏠</div>
-                <div class="card-title">Wesley's Mortgage Planner</div>
-                <div class="card-desc">Built to make sense of the numbers behind homeownership — calculate repayments and plan ahead.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-            </div>
-          </div>
-
-          <hr class="category-divider">
-
-          <!-- 2. HEALTH & WELLNESS -->
-          <div class="category-block">
-            <div class="section-header">
-              <span class="section-label">🏃 Health & Wellness</span>
-              <span style="font-size:11px;color:#f97316;background:rgba(249,115,22,0.12);border:1px solid #f97316;border-radius:999px;padding:2px 8px;font-weight:700;">1 project</span>
-            </div>
-            <div class="project-cards">
-              <a href="https://wesleychiaz.github.io/ClaudeW/whealth/" target="_blank" class="card">
-                <div class="card-icon">💪</div>
-                <div class="card-title">Whealth</div>
-                <div class="card-desc">From surgery bed to sustainable habits — Wesley's personal health tracker, built in recovery.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-            </div>
-          </div>
-
-          <hr class="category-divider">
-
-          <!-- 3. EDUCATION & LEARNING -->
-          <div class="category-block">
-            <div class="section-header">
-              <span class="section-label">📚 Education & Learning</span>
-              <span style="font-size:11px;color:#f97316;background:rgba(249,115,22,0.12);border:1px solid #f97316;border-radius:999px;padding:2px 8px;font-weight:700;">5 projects</span>
-            </div>
-            <div class="project-cards">
-              <a href="https://wesleychiaz.github.io/ClaudeW/BridgeED/" target="_blank" class="card">
-                <div class="card-icon">🎓</div>
-                <div class="card-title">BridgeED</div>
-                <div class="card-desc">An automated parental reinforcement platform that syncs with SLS, turning weekly lessons into 1-minute family rituals.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/Chocho/" target="_blank" class="card">
-                <div class="card-icon">🌸</div>
-                <div class="card-title">Chocho's Japanese Learning Companion</div>
-                <div class="card-desc">A personal language tool built for Chocho — translating English & Burmese to Japanese, one word at a time.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/slsreit/" target="_blank" class="card">
-                <div class="card-icon">🏢</div>
-                <div class="card-title">REITs for SSL</div>
-                <div class="card-desc">Everything Sim Soon Lian needs to know about REITs, in one place.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/chia/" target="_blank" class="card">
-                <div class="card-icon">🐾</div>
-                <div class="card-title">Learning with Paw Patrol</div>
-                <div class="card-desc">Built for the Chia kids — a fun Mandarin & English learning adventure featuring their favourite pups.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/coen/" target="_blank" class="card">
-                <div class="card-icon">🗣️</div>
-                <div class="card-title">Coen's Lesson Helper</div>
-                <div class="card-desc">Built to support Coen's speech and language journey — a simple tool to keep sessions structured and fun.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-            </div>
-          </div>
-
-          <hr class="category-divider">
-
-          <!-- 4. GAMES -->
-          <div class="category-block">
-            <div class="section-header">
-              <span class="section-label">🎮 Games</span>
-              <span style="font-size:11px;color:#f97316;background:rgba(249,115,22,0.12);border:1px solid #f97316;border-radius:999px;padding:2px 8px;font-weight:700;">5 projects</span>
-            </div>
-            <div class="project-cards">
-              <a href="https://wesleychiaz.github.io/ClaudeW/snake/" target="_blank" class="card">
-                <div class="card-icon">🐍</div>
-                <div class="card-title">Snake</div>
-                <div class="card-desc">A classic Snake game, rebuilt for fun — how long can you last?</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/flappybird/" target="_blank" class="card">
-                <div class="card-icon">🐦</div>
-                <div class="card-title">Flappy Bird</div>
-                <div class="card-desc">The infamous one-tap game, rebuilt — tap to fly, try not to rage quit.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/tetris/" target="_blank" class="card">
-                <div class="card-icon">🟦</div>
-                <div class="card-title">Tetris</div>
-                <div class="card-desc">The block-stacking classic, rebuilt. Clear lines, keep calm, don't let it stack up.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/blackjack/" target="_blank" class="card">
-                <div class="card-icon">🃏</div>
-                <div class="card-title">Blackjack</div>
-                <div class="card-desc">Hit or stand? A classic card game rebuilt — beat the dealer without going bust.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-              <a href="https://wesleychiaz.github.io/ClaudeW/chinesechess/" target="_blank" class="card">
-                <div class="card-icon">♟️</div>
-                <div class="card-title">象棋 — Chinese Chess</div>
-                <div class="card-desc">A timeless battle of wits. Move your general, protect your palace, conquer the board.</div>
-                <span class="card-tag live-tag">● Live</span>
-              </a>
-            </div>
-          </div>
-
-        </div>
+<!-- ============ ABOUT ============ -->
+<section class="section" id="about">
+  <div class="kicker reveal">About</div>
+  <div class="about-grid">
+    <div class="about-photo reveal">
+      <img src="Wesley.jpg" alt="Wesley Chia" loading="lazy">
+      <span class="badge"><span class="dot"></span>Wesley Chia</span>
+      <span class="glow"></span>
+    </div>
+    <div class="about-body">
+      <p class="lead reveal">I'm a Programme Manager at <strong style="color:inherit">GovTech Singapore</strong> who builds in the margins — turning everyday problems into small tools, <em>one weekend at a time.</em></p>
+      <p class="reveal">Most of these projects started as something in my own life: a health scare, a mortgage decision, helping people I love learn something new. So I built a tool for it — with Claude as my pair, shipping fast and keeping it personal.</p>
+      <p class="reveal">I care about making AI feel <strong>useful and human</strong>, not hype-y. If it doesn't make a real day a little better, it doesn't ship.</p>
+      <div class="stats reveal">
+        <div class="stat"><div class="num">14<span>+</span></div><div class="lbl">Live projects</div></div>
+        <div class="stat"><div class="num">4</div><div class="lbl">Domains explored</div></div>
+        <div class="stat"><div class="num">100<span>%</span></div><div class="lbl">Built with Claude</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<footer>
-  <span>Wesley © 2026</span>
-  <span>Built with Claude</span>
+<!-- ============ WORK ============ -->
+<section class="section" id="work">
+  <div class="work-head">
+    <div>
+      <div class="kicker reveal">Selected work</div>
+      <h2 class="section-title reveal">Things I've shipped.</h2>
+      <p class="section-lead reveal">Fourteen live experiments across finance, health, education and play. Every one solves a real problem — or was just fun to build.</p>
+    </div>
+    <div class="filters reveal" id="filters">
+      <button class="filter active" data-filter="all">All <span class="c">14</span></button>
+      <button class="filter" data-filter="finance">💰 Finance <span class="c">3</span></button>
+      <button class="filter" data-filter="health">🏃 Health <span class="c">1</span></button>
+      <button class="filter" data-filter="education">📚 Learning <span class="c">5</span></button>
+      <button class="filter" data-filter="games">🎮 Games <span class="c">5</span></button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <!-- FINANCE -->
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" target="_blank" rel="noopener" class="card reveal" data-cat="finance" data-cursor>
+      <div class="card-thumb"><img src="thumbs/stockpulse.jpg" alt="StockPulse preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">StockPulse</div>
+        <div class="card-desc">Daily AI stock analysis — one company per weekday across the AI ecosystem. Enablers &amp; adopters.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/dashboard/" target="_blank" rel="noopener" class="card reveal" data-cat="finance" data-cursor>
+      <div class="card-thumb"><img src="thumbs/dashboard.jpg" alt="Morning Investor Dashboard preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Morning Investor Dashboard</div>
+        <div class="card-desc">A morning briefing tool for staying on top of markets and investments.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/mortgagecalculator/" target="_blank" rel="noopener" class="card reveal" data-cat="finance" data-cursor>
+      <div class="card-thumb"><img src="thumbs/mortgagecalculator.jpg" alt="Mortgage Planner preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Wesley's Mortgage Planner</div>
+        <div class="card-desc">Built to make sense of the numbers behind homeownership — calculate repayments and plan ahead.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <!-- HEALTH -->
+    <a href="https://wesleychiaz.github.io/ClaudeW/whealth/" target="_blank" rel="noopener" class="card reveal" data-cat="health" data-cursor>
+      <div class="card-thumb"><img src="thumbs/whealth.jpg" alt="Whealth preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Whealth</div>
+        <div class="card-desc">From surgery bed to sustainable habits — my personal health tracker, built in recovery.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <!-- EDUCATION -->
+    <a href="https://wesleychiaz.github.io/ClaudeW/BridgeED/" target="_blank" rel="noopener" class="card reveal" data-cat="education" data-cursor>
+      <div class="card-thumb"><img src="thumbs/bridgeed.jpg" alt="BridgeED preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">BridgeED</div>
+        <div class="card-desc">An automated parental reinforcement platform that syncs with SLS, turning weekly lessons into 1-minute family rituals.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/Chocho/" target="_blank" rel="noopener" class="card reveal" data-cat="education" data-cursor>
+      <div class="card-thumb"><img src="thumbs/chocho.jpg" alt="Chocho's Japanese Companion preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Chocho's Japanese Companion</div>
+        <div class="card-desc">A personal language tool built for Chocho — translating English &amp; Burmese to Japanese, one word at a time.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/slsreit/" target="_blank" rel="noopener" class="card reveal" data-cat="education" data-cursor>
+      <div class="card-thumb"><img src="thumbs/slsreit.jpg" alt="REITs for SSL preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">REITs for SSL</div>
+        <div class="card-desc">Everything Sim Soon Lian needs to know about REITs, in one place.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/chia/" target="_blank" rel="noopener" class="card reveal" data-cat="education" data-cursor>
+      <div class="card-thumb"><img src="thumbs/chia.jpg" alt="Learning with Paw Patrol preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Learning with Paw Patrol</div>
+        <div class="card-desc">Built for the Chia kids — a fun Mandarin &amp; English learning adventure with their favourite pups.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/coen/" target="_blank" rel="noopener" class="card reveal" data-cat="education" data-cursor>
+      <div class="card-thumb"><img src="thumbs/coen.jpg" alt="Coen's Lesson Helper preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Coen's Lesson Helper</div>
+        <div class="card-desc">Built to support Coen's speech and language journey — keeping sessions structured and fun.</div>
+        <div class="card-go">Open <span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <!-- GAMES -->
+    <a href="https://wesleychiaz.github.io/ClaudeW/snake/" target="_blank" rel="noopener" class="card reveal" data-cat="games" data-cursor>
+      <div class="card-thumb"><img src="thumbs/snake.jpg" alt="Snake preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Snake</div>
+        <div class="card-desc">A classic Snake game, rebuilt for fun — how long can you last?</div>
+        <div class="card-go">Play <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/flappybird/" target="_blank" rel="noopener" class="card reveal" data-cat="games" data-cursor>
+      <div class="card-thumb"><img src="thumbs/flappybird.jpg" alt="Flappy Bird preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Flappy Bird</div>
+        <div class="card-desc">The infamous one-tap game, rebuilt — tap to fly, try not to rage quit.</div>
+        <div class="card-go">Play <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/tetris/" target="_blank" rel="noopener" class="card reveal" data-cat="games" data-cursor>
+      <div class="card-thumb"><img src="thumbs/tetris.jpg" alt="Tetris preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Tetris</div>
+        <div class="card-desc">The block-stacking classic, rebuilt. Clear lines, keep calm, don't let it stack up.</div>
+        <div class="card-go">Play <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/blackjack/" target="_blank" rel="noopener" class="card reveal" data-cat="games" data-cursor>
+      <div class="card-thumb"><img src="thumbs/blackjack.jpg" alt="Blackjack preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">Blackjack</div>
+        <div class="card-desc">Hit or stand? A classic card game rebuilt — beat the dealer without going bust.</div>
+        <div class="card-go">Play <span class="arrow">→</span></div>
+      </div>
+    </a>
+    <a href="https://wesleychiaz.github.io/ClaudeW/chinesechess/" target="_blank" rel="noopener" class="card reveal" data-cat="games" data-cursor>
+      <div class="card-thumb"><img src="thumbs/chinesechess.jpg" alt="Chinese Chess preview" loading="lazy" width="640" height="400"><span class="card-live"><span class="d"></span>Live</span></div>
+      <div class="card-body">
+        <div class="card-title">象棋 — Chinese Chess</div>
+        <div class="card-desc">A timeless battle of wits. Move your general, protect your palace, conquer the board.</div>
+        <div class="card-go">Play <span class="arrow">→</span></div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-cta reveal">Got an idea worth building? <em>Let's make it real.</em></div>
+    <div class="footer-bottom">
+      <span class="mark">W<span class="dot" style="display:inline-block;width:6px;height:6px;background:var(--spark);border-radius:50%;margin-left:2px;"></span></span>
+      <span>Wesley Chia © 2026 · Built with Claude</span>
+    </div>
+  </div>
 </footer>
 
+<!-- ===================== SCRIPTS ===================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch = window.matchMedia('(hover:none),(pointer:coarse)').matches;
+
+  /* ---------- NAV scroll state ---------- */
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 24);
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* ---------- Custom cursor ---------- */
+  if(!isTouch){
+    const dot = document.querySelector('.cursor-dot');
+    const ring = document.querySelector('.cursor-ring');
+    let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+    window.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY;
+      dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`; });
+    (function loop(){ rx+=(mx-rx)*0.18; ry+=(my-ry)*0.18;
+      ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+      requestAnimationFrame(loop); })();
+    document.querySelectorAll('[data-cursor], a, button').forEach(el=>{
+      el.addEventListener('mouseenter',()=>ring.classList.add('grow'));
+      el.addEventListener('mouseleave',()=>ring.classList.remove('grow'));
+    });
+  }
+
+  /* ---------- Card spotlight (pointer-follow glow) ---------- */
+  if(!isTouch){
+    document.querySelectorAll('.card').forEach(card=>{
+      card.addEventListener('pointermove',e=>{
+        const r=card.getBoundingClientRect();
+        card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+        card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+      });
+    });
+  }
+
+  /* ---------- GSAP reveals + hero intro ---------- */
+  if(window.gsap){
+    gsap.registerPlugin(ScrollTrigger);
+
+    if(!reduceMotion){
+      const tl = gsap.timeline({delay:.15});
+      tl.from('.eyebrow',{y:18,opacity:0,duration:.6,ease:'power3.out'})
+        .from('.hero-title b',{yPercent:115,duration:.9,ease:'power4.out',stagger:.05},'-=.3')
+        .from('.hero-sub',{y:20,opacity:0,duration:.6,ease:'power3.out'},'-=.4')
+        .from('.hero-tagline',{y:16,opacity:0,duration:.5,ease:'power3.out'},'-=.45')
+        .from('.hero-cta > *',{y:18,opacity:0,duration:.5,stagger:.1,ease:'power3.out'},'-=.35')
+        .from('.scroll-cue',{opacity:0,duration:.6},'-=.2');
+    }
+
+    // generic reveals
+    gsap.utils.toArray('.reveal').forEach(el=>{
+      ScrollTrigger.create({trigger:el,start:'top 88%',once:true,
+        onEnter:()=>el.classList.add('in')});
+    });
+    // stagger the project grid a touch
+    ScrollTrigger.batch('#grid .card',{start:'top 90%',once:true,
+      onEnter:b=>gsap.to(b,{opacity:1,y:0,duration:.6,stagger:.06,ease:'power3.out'})});
+  } else {
+    document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+  }
+
+  /* ---------- Project filter ---------- */
+  const filters = document.querySelectorAll('.filter');
+  const cards = Array.from(document.querySelectorAll('#grid .card'));
+  filters.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      filters.forEach(f=>f.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      cards.forEach(card=>{
+        const show = (f==='all'||card.dataset.cat===f);
+        if(window.gsap && !reduceMotion){
+          if(show){ card.classList.remove('hide');
+            gsap.fromTo(card,{opacity:0,scale:.96,y:10},{opacity:1,scale:1,y:0,duration:.4,ease:'power2.out',clearProps:'transform'});
+          } else {
+            gsap.to(card,{opacity:0,scale:.96,duration:.25,ease:'power1.in',onComplete:()=>card.classList.add('hide')});
+          }
+        } else { card.classList.toggle('hide',!show); }
+      });
+      if(window.ScrollTrigger) ScrollTrigger.refresh();
+    });
+  });
+
+  /* ---------- Three.js particle constellation ---------- */
+  (function heroField(){
+    if(!window.THREE) return;
+    const canvas = document.getElementById('hero-canvas');
+    const hero = document.getElementById('top');
+    if(reduceMotion){ // static, subtle gradient instead of an animated field
+      canvas.style.background='radial-gradient(60% 60% at 75% 25%,rgba(249,115,22,.10),transparent 60%)';
+      return;
+    }
+
+    const renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60,1,0.1,100);
+    camera.position.z = 22;
+
+    const COUNT = window.innerWidth < 760 ? 340 : 900;
+    const positions = new Float32Array(COUNT*3);
+    const colors = new Float32Array(COUNT*3);
+    const spark = new THREE.Color(0xf97316);
+    const ember = new THREE.Color(0xfb923c);
+    const white = new THREE.Color(0xffffff);
+    for(let i=0;i<COUNT;i++){
+      positions[i*3]   = (Math.random()-0.5)*46;
+      positions[i*3+1] = (Math.random()-0.5)*30;
+      positions[i*3+2] = (Math.random()-0.5)*30;
+      const r = Math.random();
+      const c = r>0.86 ? spark : (r>0.7 ? ember : white);
+      colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+    geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+
+    // soft round sprite
+    const c = document.createElement('canvas'); c.width=c.height=64;
+    const ctx=c.getContext('2d');
+    const g=ctx.createRadialGradient(32,32,0,32,32,32);
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(.35,'rgba(255,255,255,.55)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,64,64);
+    const tex=new THREE.CanvasTexture(c);
+
+    const mat = new THREE.PointsMaterial({
+      size:0.42, map:tex, vertexColors:true, transparent:true,
+      depthWrite:false, blending:THREE.AdditiveBlending, opacity:.9
+    });
+    const points = new THREE.Points(geo,mat);
+    scene.add(points);
+
+    let tx=0,ty=0, cx=0,cy=0;
+    window.addEventListener('mousemove',e=>{
+      tx=(e.clientX/innerWidth-0.5); ty=(e.clientY/innerHeight-0.5);
+    });
+
+    function resize(){
+      const w=hero.clientWidth, h=hero.clientHeight;
+      renderer.setSize(w,h,false);
+      camera.aspect=w/h; camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize',resize); resize();
+
+    // pause when hero off-screen / tab hidden
+    let visible=true, running=true;
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(([e])=>{visible=e.isIntersecting; if(visible&&running)tick();},
+        {threshold:0}).observe(hero);
+    }
+    document.addEventListener('visibilitychange',()=>{running=!document.hidden; if(running&&visible)tick();});
+
+    let raf=0;
+    function tick(){
+      if(!visible||!running){cancelAnimationFrame(raf);return;}
+      raf=requestAnimationFrame(tick);
+      points.rotation.y += 0.0006;
+      points.rotation.x += 0.0002;
+      cx += (tx-cx)*0.04; cy += (ty-cy)*0.04;
+      camera.position.x = cx*6;
+      camera.position.y = -cy*4;
+      camera.lookAt(scene.position);
+      renderer.render(scene,camera);
+    }
+    tick();
+  })();
+
+})();
+</script>
 </body>
 </html>
