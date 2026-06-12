@@ -1,5 +1,5 @@
 /* Dino Discovery — offline service worker */
-const CACHE = 'dino-discovery-v3';
+const CACHE = 'dino-discovery-v4';
 const ASSETS = [
   './',
   './index.html',

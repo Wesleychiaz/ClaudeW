@@ -190,7 +190,7 @@
     padding: clamp(22px, 5vw, 38px); box-shadow: var(--shadow); text-align: center;
   }
   .hero-art { width: min(86%, 380px); margin: 0 auto 4px; }
-  .hero-art svg { width: 100%; height: auto; display: block; will-change: transform; }
+  .hero-art svg, .hero-art img { width: 100%; height: auto; display: block; will-change: transform; }
 
   .dino-name {
     font-family: 'Fredoka', cursive; font-weight: 700;
@@ -689,7 +689,7 @@ function openDino(id) {
   showScreen('profile');
   if (!reduce) {
     gsap.fromTo('.profile-card', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: 'power3.out' });
-    gsap.fromTo('.hero-art svg', { scale: .6, opacity: 0 }, { scale: 1, opacity: 1, duration: .8, ease: 'elastic.out(1,.6)', delay: .1 });
+    gsap.fromTo('.hero-art svg, .hero-art img', { scale: .6, opacity: 0 }, { scale: 1, opacity: 1, duration: .8, ease: 'elastic.out(1,.6)', delay: .1 });
     gsap.fromTo('#profile-card .stat, #profile-card .fact, #profile-card .compare, #profile-card .sound-row',
       { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: .4, stagger: .06, delay: .25, ease: 'power2.out' });
     idleBob();
@@ -754,17 +754,82 @@ let bobTween = null;
 function idleBob() {
   if (reduce) return;
   if (bobTween) bobTween.kill();
-  bobTween = gsap.to('.hero-art svg', { y: -10, duration: 1.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+  bobTween = gsap.to('.hero-art svg, .hero-art img', { y: -10, duration: 1.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+}
+
+/* ═══════════════════ Roar synth (Web Audio) ═══════════════════ */
+/* A growly roar generated in-browser — no audio files, works offline.
+   Pitch & length scale with the dinosaur's size; the flyer gets a screech. */
+let audioCtx = null;
+function getAudio() {
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function distortionCurve(ctx, amount) {
+  const ws = ctx.createWaveShaper(), n = 1024, c = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const x = i / n * 2 - 1; c[i] = (1 + amount) * x / (1 + amount * Math.abs(x)); }
+  ws.curve = c; ws.oversample = '4x'; return ws;
+}
+function playRoar(dino) {
+  const ctx = getAudio(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const len = dino.length || 8;
+  const flyer = dino.id === 'ptero';
+  // base pitch: bigger dino = deeper; flyer = high screech
+  const f0 = flyer ? 300 : len >= 12 ? 70 : len >= 10 ? 85 : len >= 7 ? 110 : len >= 4 ? 150 : 210;
+  const dur = flyer ? 0.7 : len >= 10 ? 1.35 : len >= 4 ? 1.05 : 0.75;
+
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.0001, t);
+  master.gain.exponentialRampToValueAtTime(0.9, t + 0.07);
+  master.gain.setValueAtTime(0.85, t + dur * 0.5);
+  master.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  const dist = distortionCurve(ctx, flyer ? 4 : len >= 7 ? 14 : 8);
+  master.connect(dist); dist.connect(ctx.destination);
+
+  // "open mouth" filter sweep
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass'; lp.Q.value = 7;
+  lp.frequency.setValueAtTime(700, t);
+  lp.frequency.linearRampToValueAtTime(flyer ? 3200 : 1900, t + dur * 0.28);
+  lp.frequency.linearRampToValueAtTime(450, t + dur);
+  lp.connect(master);
+
+  // vibrato (the growl wobble)
+  const lfo = ctx.createOscillator(); lfo.frequency.value = flyer ? 45 : len >= 7 ? 24 : 32;
+  const lfoGain = ctx.createGain(); lfoGain.gain.value = flyer ? 40 : len >= 7 ? 16 : 28;
+  lfo.connect(lfoGain); lfo.start(t); lfo.stop(t + dur + 0.05);
+
+  [['square', 0], ['sawtooth', 8]].forEach(([type, det]) => {
+    const o = ctx.createOscillator(); o.type = type; o.detune.value = det;
+    o.frequency.setValueAtTime(f0 * 1.5, t);
+    o.frequency.exponentialRampToValueAtTime(f0, t + 0.16);
+    o.frequency.exponentialRampToValueAtTime(f0 * (flyer ? 1.1 : 0.68), t + dur);
+    lfoGain.connect(o.detune);
+    o.connect(lp); o.start(t); o.stop(t + dur + 0.05);
+  });
+
+  // breathy noise texture
+  const nlen = Math.floor(ctx.sampleRate * (dur + 0.1));
+  const nbuf = ctx.createBuffer(1, nlen, ctx.sampleRate), nd = nbuf.getChannelData(0);
+  for (let i = 0; i < nlen; i++) nd[i] = Math.random() * 2 - 1;
+  const ns = ctx.createBufferSource(); ns.buffer = nbuf;
+  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = flyer ? 2600 : 1200; bp.Q.value = 0.8;
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(flyer ? 0.35 : 0.22, t + 0.09);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  ns.connect(bp); bp.connect(ng); ng.connect(master);
+  ns.start(t); ns.stop(t + dur + 0.05);
 }
 
 function doRoar() {
   const dino = d();
-  const sound = dino.diet === 'plant' ? 'Hello! I am a friendly plant muncher!'
-            : dino.diet === 'fish' ? 'Splash! I love catching fish!'
-            : 'ROAAAR! I am ' + dino.short + '!';
-  speak(sound, 0.8, dino.length > 10 ? 0.7 : 1.15);
-  if (!reduce) gsap.fromTo('.hero-art svg', { scale: 1 }, { scale: 1.12, duration: .18, yoyo: true, repeat: 1, ease: 'power2.out' });
-  burst(14);
+  speechSynthesis && speechSynthesis.cancel();
+  playRoar(dino);
+  if (!reduce) gsap.fromTo('.hero-art svg, .hero-art img', { scale: 1 }, { scale: 1.14, rotation: -2, duration: .16, yoyo: true, repeat: 1, ease: 'power2.out' });
+  burst(16);
 }
 
 function discover(id) {
@@ -788,7 +853,7 @@ function prevDino() { curIndex = (curIndex - 1 + dinos.length) % dinos.length; r
 function animTransition() {
   window.scrollTo(0,0);
   if (!reduce) {
-    gsap.fromTo('.hero-art svg', { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: 'power3.out' });
+    gsap.fromTo('.hero-art svg, .hero-art img', { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: 'power3.out' });
     idleBob();
   }
   setTimeout(() => speak(d().name, 0.82), 200);
