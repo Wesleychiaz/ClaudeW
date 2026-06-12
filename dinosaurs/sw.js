@@ -1,5 +1,5 @@
 /* Dino Discovery — offline service worker */
-const CACHE = 'dino-discovery-v5';
+const CACHE = 'dino-discovery-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -26,18 +26,30 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache-first for our assets, fall back to network; static app, so this is plenty.
 self.addEventListener('fetch', (e) => {
   const { request } = e;
   if (request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((res) => {
+
+  // Network-first for the page itself, so updates show up without a hard refresh.
+  // Falls back to the cached page when offline.
+  const isDoc = request.mode === 'navigate' || request.destination === 'document';
+  if (isDoc) {
+    e.respondWith(
+      fetch(request).then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
         return res;
-      }).catch(() => cached);
-    })
+      }).catch(() => caches.match(request).then((c) => c || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-first for static assets (artwork, libraries, fonts) — fast and offline-friendly.
+  e.respondWith(
+    caches.match(request).then((cached) => cached || fetch(request).then((res) => {
+      const copy = res.clone();
+      caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
+      return res;
+    }).catch(() => cached))
   );
 });
