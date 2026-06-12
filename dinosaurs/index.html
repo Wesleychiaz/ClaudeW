@@ -782,8 +782,8 @@ function playRoar(dino) {
 
   const master = ctx.createGain();
   master.gain.setValueAtTime(0.0001, t);
-  master.gain.exponentialRampToValueAtTime(0.9, t + 0.07);
-  master.gain.setValueAtTime(0.85, t + dur * 0.5);
+  master.gain.exponentialRampToValueAtTime(0.4, t + 0.07);
+  master.gain.setValueAtTime(0.36, t + dur * 0.5);
   master.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   const dist = distortionCurve(ctx, flyer ? 4 : len >= 7 ? 14 : 8);
   master.connect(dist); dist.connect(ctx.destination);
@@ -818,7 +818,7 @@ function playRoar(dino) {
   const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = flyer ? 2600 : 1200; bp.Q.value = 0.8;
   const ng = ctx.createGain();
   ng.gain.setValueAtTime(0.0001, t);
-  ng.gain.exponentialRampToValueAtTime(flyer ? 0.35 : 0.22, t + 0.09);
+  ng.gain.exponentialRampToValueAtTime(flyer ? 0.16 : 0.1, t + 0.09);
   ng.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   ns.connect(bp); bp.connect(ng); ng.connect(master);
   ns.start(t); ns.stop(t + dur + 0.05);
