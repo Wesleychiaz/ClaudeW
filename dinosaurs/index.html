@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2FA56A">
+<meta name="description" content="Dino Discovery — a playful, interactive way for kids to meet dinosaurs, learn to say their names, see how each one looks, and play a dino quiz.">
+<title>Dino Discovery 🦕</title>
+
+<!-- PWA: installable / add to home screen -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dino Discovery">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --sky:   #38BDF8;
+    --grape: #7C5CFF;
+    --sun:   #FFC53D;
+    --coral: #FF7A59;
+    --grass: #2FA56A;
+    --leaf:  #34D399;
+    --pink:  #FF6FB5;
+    --teal:  #14B8A6;
+    --olive: #7E9B3E;
+    --ink:   #1E2A22;
+    --ink-soft: #5B6B60;
+    --card: #FFFFFF;
+    --radius: 28px;
+    --shadow-sm: 0 4px 14px rgba(20,60,40,.10);
+    --shadow:    0 14px 40px rgba(20,70,45,.16);
+    --shadow-lg: 0 26px 70px rgba(20,70,45,.22);
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 90% at 50% -10%, #DFF6E4 0%, transparent 55%),
+      linear-gradient(165deg, #EFFAF0 0%, #F4FBE9 45%, #E6F7FF 100%);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Three.js floating spores layer */
+  #bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s ease;
+  }
+  #bg-canvas.show { opacity: 1; }
+
+  .app { position: relative; z-index: 1; }
+
+  /* ───────── Generic screens ───────── */
+  .screen { display: none; min-height: 100dvh; padding: clamp(18px, 4vw, 34px); }
+  .screen.active { display: flex; }
+
+  /* ───────── HOME ───────── */
+  #home {
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    text-align: center; padding-top: clamp(24px, 6vh, 56px);
+  }
+
+  .mascot {
+    width: clamp(150px, 42vw, 230px); position: relative;
+    margin-bottom: 2px; cursor: pointer; user-select: none;
+    filter: drop-shadow(0 16px 18px rgba(30,90,55,.26));
+  }
+  .mascot svg, .mascot img { width: 100%; height: auto; display: block; will-change: transform; }
+  /* dino artwork can be an SVG (drawn) or a PNG cut-out (from supplied art) — both fill their slot */
+  .thumb img, .hero-art img, .quiz-art img { width: 100%; height: auto; display: block; }
+  .mascot .ring {
+    position: absolute; inset: 6% 14%; border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--grass), var(--sky), var(--sun), var(--coral), var(--grape), var(--grass));
+    filter: blur(22px); opacity: .38; z-index: -1;
+  }
+
+  .eyebrow {
+    font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase;
+    font-size: .76rem; color: var(--grass); margin-bottom: 4px;
+  }
+  .home-title {
+    font-family: 'Fredoka', cursive; font-weight: 700;
+    font-size: clamp(2.4rem, 9vw, 4.4rem); line-height: 1.0;
+    letter-spacing: -.5px;
+    background: linear-gradient(105deg, var(--grass), var(--sky) 55%, var(--grape));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 10px;
+  }
+  .home-sub {
+    font-size: clamp(1rem, 3.4vw, 1.2rem); font-weight: 700; color: var(--ink-soft);
+    max-width: 480px; margin: 0 auto 20px;
+  }
+
+  .streak {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.78); backdrop-filter: blur(8px);
+    border: 1px solid rgba(47,165,106,.22);
+    padding: 9px 18px; border-radius: 100px; box-shadow: var(--shadow-sm);
+    font-weight: 800; color: var(--ink); margin-bottom: 26px;
+  }
+  .streak .eggs { letter-spacing: 2px; font-size: 1.05rem; }
+
+  .grid {
+    display: grid; gap: 18px; width: 100%; max-width: 980px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .card {
+    position: relative; overflow: hidden;
+    background: var(--card); border-radius: var(--radius);
+    padding: 18px 18px 20px; text-align: center; cursor: pointer;
+    box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.6);
+    will-change: transform;
+    transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+  }
+  .card:active { transform: scale(.97); }
+  @media (hover:hover) { .card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); } }
+  .card .glow {
+    position: absolute; width: 170px; height: 170px; border-radius: 50%;
+    top: -60px; right: -50px; filter: blur(10px); opacity: .20;
+  }
+  .card .thumb { width: 78%; max-width: 190px; margin: 2px auto 8px; }
+  .card .thumb svg { width: 100%; height: auto; display: block; }
+  .card .name {
+    font-family: 'Fredoka', cursive; font-weight: 600;
+    font-size: 1.32rem; line-height: 1.05; margin-bottom: 3px;
+  }
+  .card .say { font-size: .82rem; font-weight: 800; color: var(--ink-soft); font-style: italic; }
+
+  .diet-badge {
+    position: absolute; top: 14px; left: 14px;
+    font-size: .72rem; font-weight: 800; padding: 5px 10px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .diet-badge.plant { background: #E6FAF1; color: #0E9F6E; }
+  .diet-badge.meat  { background: #FFECEC; color: #D6455D; }
+  .diet-badge.fish  { background: #E6F4FF; color: #0277BD; }
+
+  .met-badge {
+    position: absolute; top: 14px; right: 14px;
+    font-size: 1.1rem; opacity: 0; transform: scale(0);
+    transition: transform .3s var(--ease), opacity .3s;
+  }
+  .card.met .met-badge { opacity: 1; transform: scale(1); }
+
+  /* special tiles (quiz / surprise) */
+  .card.special { color: #fff; }
+  .card.special .name, .card.special .say { color: #fff; }
+  .card.quiz   { background: linear-gradient(140deg, #FFB02E, #FF7A59); }
+  .card.random { background: linear-gradient(140deg, var(--grape), #5B27C4); }
+  .card.special .big-emoji { font-size: 3.4rem; display:block; margin: 14px 0 10px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.18)); }
+
+  .grownups { margin-top: 28px; font-size: .92rem; font-weight: 700; color: var(--ink-soft); }
+  .grownups button {
+    background: none; border: none; color: var(--grass); font-weight: 800;
+    cursor: pointer; font-size: .92rem; text-decoration: underline; text-underline-offset: 3px;
+  }
+
+  /* ───────── shared topbar ───────── */
+  .topbar { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 760px; margin: 0 auto 18px; }
+  .iconbtn {
+    flex: none; width: 52px; height: 52px; border-radius: 50%;
+    background: var(--card); border: 1px solid rgba(47,165,106,.18);
+    box-shadow: var(--shadow-sm); cursor: pointer;
+    font-size: 1.4rem; display: grid; place-items: center; color: var(--ink);
+    transition: transform .2s var(--ease);
+  }
+  .iconbtn:active { transform: scale(.9); }
+  .topbar h2 { font-family: 'Fredoka', cursive; font-weight: 600; font-size: 1.35rem; flex: 1; text-align:left; }
+
+  /* ───────── PROFILE ───────── */
+  #profile { flex-direction: column; align-items: center; }
+  .profile-card {
+    position: relative; width: 100%; max-width: 760px; overflow: hidden;
+    background: var(--card); border-radius: var(--radius);
+    padding: clamp(22px, 5vw, 38px); box-shadow: var(--shadow); text-align: center;
+  }
+  .hero-art { width: min(86%, 380px); margin: 0 auto 4px; }
+  .hero-art svg { width: 100%; height: auto; display: block; will-change: transform; }
+
+  .dino-name {
+    font-family: 'Fredoka', cursive; font-weight: 700;
+    font-size: clamp(1.9rem, 6.5vw, 2.8rem); line-height: 1.05; margin-top: 6px;
+  }
+  .dino-say {
+    font-size: clamp(1rem, 3.4vw, 1.18rem); font-weight: 800; color: var(--ink-soft);
+    font-style: italic; margin-top: 2px;
+  }
+  .dino-meaning { font-weight: 800; color: var(--grass); margin-top: 6px; font-size: .98rem; }
+
+  .sound-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 18px 0 6px; }
+  .pill-btn {
+    appearance: none; border: none; cursor: pointer; color: #fff;
+    font-family: 'Nunito'; font-weight: 800; font-size: 1.05rem;
+    padding: 14px 24px; border-radius: 18px;
+    display: inline-flex; align-items: center; gap: 9px;
+    transition: transform .18s var(--ease);
+  }
+  .pill-btn:active { transform: scale(.93); }
+  @media (hover:hover){ .pill-btn:hover { transform: translateY(-3px); } }
+  .pill-btn.say-name { background: linear-gradient(135deg, var(--sky), #0284C7); box-shadow: 0 8px 20px rgba(56,189,248,.36); }
+  .pill-btn.roar { background: linear-gradient(135deg, var(--coral), #E0512F); box-shadow: 0 8px 20px rgba(255,122,89,.4); font-size: 1.15rem; }
+
+  .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 4px; }
+  .stat {
+    background: #F4FAF5; border: 1px solid rgba(47,165,106,.16);
+    border-radius: 16px; padding: 10px 16px; min-width: 96px;
+  }
+  .stat .k { font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--ink-soft); }
+  .stat .v { font-family:'Fredoka'; font-weight: 600; font-size: 1.1rem; margin-top: 2px; }
+
+  /* size comparison */
+  .compare { background: linear-gradient(135deg, #EEF7FF, #F1FBE9); border-radius: 22px; padding: 18px 18px 14px; margin: 18px 0; text-align: left; }
+  .compare h4 { font-family:'Fredoka'; font-weight:600; font-size:1.05rem; margin-bottom: 12px; text-align:center; }
+  .cmp-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .cmp-row .lbl { width: 78px; flex:none; font-weight: 800; font-size: .8rem; color: var(--ink-soft); }
+  .cmp-bar { flex: 1; height: 26px; background: #fff; border-radius: 100px; overflow: hidden; border:1px solid rgba(47,165,106,.14); position: relative; }
+  .cmp-fill { height: 100%; border-radius: 100px; display:flex; align-items:center; justify-content:flex-end; padding-right: 8px; font-size: .9rem; transform-origin: left; }
+
+  .facts { text-align: left; margin: 14px 0 4px; display: flex; flex-direction: column; gap: 10px; }
+  .fact {
+    background: #FFF8E6; border: 2px solid #FFE08A; border-radius: 18px;
+    padding: 13px 16px; font-weight: 700; color: #6B4E00; font-size: .98rem;
+    cursor: pointer; display: flex; gap: 10px; align-items: flex-start;
+    transition: transform .15s var(--ease);
+  }
+  .fact:active { transform: scale(.98); }
+  .fact .fi { font-size: 1.25rem; line-height: 1.2; flex:none; }
+
+  .discover-btn {
+    appearance: none; border: none; cursor: pointer; color: #fff; width: 100%;
+    font-family: 'Nunito'; font-weight: 900; font-size: 1.15rem;
+    padding: 16px; border-radius: 20px; margin-top: 18px;
+    background: linear-gradient(135deg, var(--grass), #0E8F5A);
+    box-shadow: 0 12px 28px rgba(47,165,106,.4);
+    transition: transform .18s var(--ease);
+  }
+  .discover-btn:active { transform: scale(.96); }
+  .discover-btn.done { background: linear-gradient(135deg, #94A3B8, #64748B); box-shadow:none; }
+
+  .profile-nav { display: flex; gap: 12px; width: 100%; max-width: 760px; margin-top: 16px; }
+  .profile-nav button {
+    flex: 1; appearance: none; border: none; cursor: pointer;
+    font-family: 'Nunito'; font-weight: 800; font-size: 1rem; color: var(--ink);
+    background: var(--card); border: 1px solid rgba(47,165,106,.18);
+    box-shadow: var(--shadow-sm); padding: 14px; border-radius: 18px;
+    transition: transform .18s var(--ease);
+  }
+  .profile-nav button:active { transform: scale(.96); }
+
+  /* ───────── QUIZ ───────── */
+  #quiz { flex-direction: column; align-items: center; }
+  .progress-track { width: 100%; max-width: 760px; height: 12px; border-radius: 100px; background: rgba(47,165,106,.16); overflow: hidden; margin-bottom: 22px; }
+  .progress-fill { height: 100%; width: 0%; border-radius: 100px; background: linear-gradient(90deg, var(--leaf), var(--sky), var(--grape)); transition: width .6s var(--ease); }
+  .quiz-card {
+    position: relative; width: 100%; max-width: 760px;
+    background: var(--card); border-radius: var(--radius);
+    padding: clamp(22px, 5vw, 38px); box-shadow: var(--shadow); text-align: center;
+  }
+  .quiz-q { font-size: clamp(1.15rem, 3.8vw, 1.5rem); font-weight: 800; line-height: 1.3; margin-bottom: 6px; }
+  .quiz-art { width: min(70%, 300px); margin: 8px auto 14px; }
+  .quiz-art svg { width: 100%; height: auto; display:block; }
+  .quiz-art.silhouette svg, .quiz-art.silhouette img { filter: brightness(0) saturate(0) opacity(.82); }
+  .choices { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 8px; }
+  @media (min-width: 520px){ .choices.two { grid-template-columns: 1fr 1fr; } }
+  .choice {
+    appearance: none; cursor: pointer; background: #fff;
+    border: 3px solid #E5EFE8; border-radius: 18px; padding: 16px 18px;
+    box-shadow: var(--shadow-sm); font-family: 'Fredoka', cursive; font-weight: 600; font-size: 1.15rem;
+    transition: transform .15s var(--ease), border-color .15s, background .15s;
+  }
+  .choice:active { transform: scale(.96); }
+  @media (hover:hover){ .choice:hover { transform: translateY(-3px); border-color: var(--sky); } }
+  .choice.correct { background: #E6FAF1; border-color: var(--grass); }
+  .choice.wrong   { background: #FFECEC; border-color: #FB7185; }
+  .quiz-next {
+    appearance: none; border: none; cursor: pointer; color: #fff;
+    font-family: 'Nunito'; font-weight: 900; font-size: 1.15rem;
+    padding: 16px 44px; border-radius: 20px; margin-top: 20px;
+    background: linear-gradient(135deg, var(--grass), #0E8F5A);
+    box-shadow: 0 12px 28px rgba(47,165,106,.4);
+    transition: transform .18s var(--ease), opacity .2s;
+  }
+  .quiz-next:disabled { opacity: .35; cursor: not-allowed; }
+  .quiz-next:active:not(:disabled) { transform: scale(.96); }
+
+  /* ───────── CELEBRATE ───────── */
+  #celebrate { flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .trophy { font-size: clamp(5rem, 22vw, 8rem); will-change: transform; }
+  .celebrate-title {
+    font-family: 'Fredoka', cursive; font-weight: 700;
+    font-size: clamp(2rem, 7vw, 3.4rem); margin: 8px 0 6px;
+    background: linear-gradient(105deg, var(--grass), var(--coral));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .celebrate-sub { font-size: 1.15rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 18px; max-width: 420px; }
+  .earned { font-size: 2.4rem; letter-spacing: 6px; margin-bottom: 24px; }
+  .home-again {
+    appearance: none; border: none; cursor: pointer; color: #fff;
+    font-family: 'Nunito'; font-weight: 900; font-size: 1.15rem;
+    padding: 16px 40px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--coral), #E0512F);
+    box-shadow: 0 12px 28px rgba(255,122,89,.42);
+    transition: transform .18s var(--ease);
+  }
+  .home-again:active { transform: scale(.95); }
+
+  .confetti { position: fixed; top: -24px; width: 12px; height: 12px; z-index: 9999; pointer-events: none; will-change: transform; }
+
+  /* grown-up modal */
+  .modal-bg { position: fixed; inset: 0; z-index: 200; display: none; background: rgba(15,40,25,.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 22px; }
+  .modal-bg.show { display: flex; }
+  .modal { background: #fff; border-radius: 26px; max-width: 470px; width: 100%; padding: 30px 28px; box-shadow: var(--shadow-lg); text-align: left; }
+  .modal h3 { font-family:'Fredoka'; font-weight:600; font-size: 1.5rem; margin-bottom: 12px; }
+  .modal p { font-weight: 700; color: var(--ink-soft); line-height: 1.55; margin-bottom: 12px; font-size:.97rem; }
+  .modal ul { margin: 0 0 14px 18px; color: var(--ink-soft); font-weight:700; line-height:1.6; font-size:.95rem; }
+  .modal .close { width: 100%; appearance:none; border:none; cursor:pointer; color:#fff; font-weight:900; font-family:'Nunito'; font-size:1.05rem; padding:14px; border-radius:16px; background: linear-gradient(135deg, var(--grass), #0E8F5A); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .08s !important; }
+    #bg-canvas { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="app">
+
+  <!-- ══════════ HOME ══════════ -->
+  <section id="home" class="screen active">
+    <div class="mascot" id="mascot" title="Tap me!">
+      <span class="ring"></span>
+      <span id="mascot-svg"></span>
+    </div>
+    <p class="eyebrow">Roar &amp; Explore</p>
+    <h1 class="home-title">Dino<br>Discovery</h1>
+    <p class="home-sub">Meet the dinosaurs! Tap one to hear its name, see how it looks, and discover amazing facts. 🦴</p>
+    <div class="streak">
+      <span>🥚 Dinos met</span>
+      <span class="eggs" id="eggs-display">0 / 8</span>
+    </div>
+
+    <div class="grid" id="dino-grid"></div>
+
+    <p class="grownups">For grown-ups: <button onclick="openModal()">How to explore together →</button></p>
+  </section>
+
+  <!-- ══════════ PROFILE ══════════ -->
+  <section id="profile" class="screen">
+    <div class="topbar">
+      <button class="iconbtn" onclick="goHome()" aria-label="Back">←</button>
+      <h2 id="profile-title">Dinosaur</h2>
+    </div>
+    <div class="profile-card" id="profile-card"></div>
+    <div class="profile-nav">
+      <button onclick="prevDino()">← Dino before</button>
+      <button onclick="nextDino()">Next dino →</button>
+    </div>
+  </section>
+
+  <!-- ══════════ QUIZ ══════════ -->
+  <section id="quiz" class="screen">
+    <div class="topbar">
+      <button class="iconbtn" onclick="goHome()" aria-label="Back">←</button>
+      <h2>Dino Quiz 🦴</h2>
+      <span style="font-weight:900; color:var(--ink-soft)" id="quiz-counter">1/5</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="quiz-progress"></div></div>
+    <div class="quiz-card" id="quiz-card"></div>
+    <button class="quiz-next" id="quiz-next" onclick="nextQuestion()" disabled>Next →</button>
+  </section>
+
+  <!-- ══════════ CELEBRATE ══════════ -->
+  <section id="celebrate" class="screen">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2 class="celebrate-title" id="celebrate-title">Brilliant!</h2>
+    <p class="celebrate-sub" id="celebrate-sub"></p>
+    <div class="earned" id="earned">⭐</div>
+    <button class="home-again" onclick="goHome()">🏠 Back to dinos</button>
+  </section>
+
+</div>
+
+<!-- grown-up modal -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3>👋 Exploring dinosaurs together</h3>
+    <p>This is a playful first encyclopaedia of dinosaurs — built to feed a young dino-fan's curiosity. A few ideas:</p>
+    <ul>
+      <li><b>Say the names out loud.</b> Tap “Say my name” and copy it together — big science words are fun to master!</li>
+      <li><b>Look at the shapes.</b> Each dino is drawn so kids learn to recognise plates, frills, horns, sails and clubs.</li>
+      <li><b>Plant-eater or meat-eater?</b> The colour-coded badges teach herbivore / carnivore at a glance.</li>
+      <li><b>Play the Dino Quiz</b> once you’ve met a few — it rewards looking closely.</li>
+    </ul>
+    <p style="font-size:.85rem">Names are read by your device’s built-in voice. Everything runs on the device — nothing is uploaded, and it works offline once loaded.</p>
+    <button class="close" onclick="closeModal()">Let’s go! 🦖</button>
+  </div>
+</div>
+
+<!-- libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+/* ═══════════════════ Text-to-speech ═══════════════════ */
+let preferredVoice = null;
+function pickVoice() {
+  const voices = speechSynthesis.getVoices();
+  preferredVoice = voices.find(v => /en/i.test(v.lang) && /(Samantha|Karen|Tessa|Female|Google UK English|Catherine|Daniel)/i.test(v.name))
+    || voices.find(v => /^en/i.test(v.lang)) || null;
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text, rate = 0.85, pitch = 1.06) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = rate; u.pitch = pitch;
+  if (preferredVoice) u.voice = preferredVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ═══════════════════ Progress (localStorage) ═══════════════════ */
+const STORE_KEY = 'dino-discovery-v1';
+let met = {};
+try { met = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { met = {}; }
+function saveProgress() { try { localStorage.setItem(STORE_KEY, JSON.stringify(met)); } catch (e) {} }
+
+/* ═══════════════════ Dinosaur SVG artwork ═══════════════════ */
+/* Each dino is a friendly cartoon with a clear silhouette so kids learn the shape.
+   c1 = body, c2 = belly/light, dk = outline. */
+const DK = '#21342a';
+function svgWrap(inner){ return `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" stroke="${DK}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">${inner}</svg>`; }
+function eye(x,y,r=7){ return `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x+1.5}" cy="${y+1}" r="${r*0.5}" fill="${DK}" stroke="none"/><circle cx="${x+3}" cy="${y-1}" r="1.6" fill="#fff" stroke="none"/>`; }
+
+const ART = {
+  /* T. REX — upright, head high, open jaws, tiny arm, big tail */
+  trex: (a,b)=>svgWrap(`
+    <path d="M14 150 Q50 150 78 138 Q98 128 106 104 Q110 78 122 64 Q132 44 158 42 Q190 40 200 62 Q206 74 214 76 L214 88 Q198 88 188 84 L206 100 Q190 104 176 100 Q172 116 168 130 Q164 150 150 158 Q120 166 96 152 Q55 160 14 150 Z" fill="${a}"/>
+    <path d="M120 132 Q140 142 162 132 Q158 150 150 156 Q124 162 104 152 Q108 140 120 132 Z" fill="${b}" stroke="none"/>
+    <path d="M190 86 l4 6 5 -4 m-3 9 l5 0" stroke="#fff" stroke-width="2"/>
+    ${eye(164,62,8)}
+    <path d="M150 110 q16 2 22 12 q-12 -2 -20 4 Z" fill="${a}"/>
+    <path d="M118 150 q-4 12 -2 18 l15 0 q2 -10 -1 -20 Z" fill="${a}"/>
+    <path d="M140 152 q-3 12 -1 18 l15 0 q3 -10 0 -20 Z" fill="${a}"/>`),
+
+  /* TRICERATOPS — quadruped, big frill, three horns, beak */
+  trike: (a,b)=>svgWrap(`
+    <path d="M16 116 Q8 108 20 102 Q40 94 64 94 Q96 86 124 92 Q150 98 156 118 Q158 136 142 140 Q90 148 50 140 Q26 134 16 116 Z" fill="${a}"/>
+    <path d="M50 132 Q95 140 144 132 Q142 142 132 144 Q90 150 56 142 Z" fill="${b}" stroke="none"/>
+    <path d="M196 90 L210 52 L216 92 Z" fill="${b}"/>
+    <path d="M176 92 L184 56 L198 94 Z" fill="${b}"/>
+    <path d="M150 74 Q206 68 208 114 Q208 138 172 138 Q152 120 150 98 Q149 84 150 74 Z" fill="${a}"/>
+    <path d="M192 96 Q228 96 228 118 Q228 134 202 136 Q186 130 184 112 Q184 100 192 96 Z" fill="${a}"/>
+    <path d="M226 110 q9 5 0 13 Z" fill="${a}"/>
+    <path d="M224 112 L238 102 L233 120 Z" fill="${b}"/>
+    ${eye(206,110,5.5)}
+    <path d="M58 140 l0 24 13 0 0 -24 Z" fill="${a}"/>
+    <path d="M120 140 l0 24 13 0 0 -24 Z" fill="${a}"/>`),
+
+  /* STEGOSAURUS — quadruped, row of back plates, thagomizer tail */
+  stego: (a,b)=>svgWrap(`
+    <path d="M18 122 Q8 114 22 108 Q48 92 82 82 Q112 68 142 84 Q170 98 196 114 Q210 118 208 128 Q202 138 188 134 Q176 128 168 122 Q150 130 110 130 Q58 134 30 130 Q18 128 18 122 Z" fill="${a}"/>
+    <path d="M50 124 Q110 136 168 122 L166 130 Q110 140 56 130 Z" fill="${b}" stroke="none"/>
+    <path d="M62 86 l-8 -24 20 16 Z" fill="${b}"/>
+    <path d="M90 80 l-4 -30 18 22 Z" fill="${b}"/>
+    <path d="M120 76 l0 -32 16 28 Z" fill="${b}"/>
+    <path d="M150 84 l8 -28 12 28 Z" fill="${b}"/>
+    <path d="M24 108 l-16 -8 m18 0 l-16 4" stroke="${DK}" stroke-width="3.5"/>
+    ${eye(192,120,5)}
+    <path d="M60 130 l0 26 12 0 0 -26 Z" fill="${a}"/>
+    <path d="M120 130 l0 26 12 0 0 -26 Z" fill="${a}"/>`),
+
+  /* BRACHIOSAURUS — quadruped, very long neck up to a small head */
+  brachio: (a,b)=>svgWrap(`
+    <path d="M14 142 Q6 134 18 130 Q40 124 62 122 Q104 112 134 124 Q152 132 152 146 Q150 158 132 158 Q80 162 40 154 Q22 152 14 142 Z" fill="${a}"/>
+    <path d="M60 134 Q100 142 146 132 L144 150 Q100 156 64 150 Z" fill="${b}" stroke="none"/>
+    <path d="M116 124 Q126 70 148 44 Q158 28 178 30 Q192 32 188 48 Q182 58 170 54 Q160 76 154 122 Q138 128 116 124 Z" fill="${a}"/>
+    <path d="M178 30 Q194 30 190 46 Q186 56 174 52 Z" fill="${a}"/>
+    ${eye(182,40,4.5)}
+    <path d="M56 152 l0 24 13 0 0 -24 Z" fill="${a}"/>
+    <path d="M110 150 l0 26 13 0 0 -26 Z" fill="${a}"/>
+    <path d="M30 150 l0 22 12 0 0 -22 Z" fill="${b}"/>`),
+
+  /* VELOCIRAPTOR — sleek biped, raised legs, feather tufts, speed lines */
+  raptor: (a,b)=>svgWrap(`
+    <path d="M12 92 Q4 88 14 82 Q56 74 92 84 Q116 66 146 66 Q186 64 204 86 L204 96 Q186 98 170 94 Q150 98 132 98 Q112 102 94 98 Q60 102 30 98 Q14 98 12 92 Z" fill="${a}"/>
+    <path d="M96 98 Q120 102 150 96 Q150 108 138 112 Q112 116 96 108 Z" fill="${b}" stroke="none"/>
+    <path d="M186 80 q14 -2 18 6 q-10 0 -16 4 Z" fill="${a}"/>
+    <path d="M188 88 l14 2" stroke="#fff" stroke-width="2"/>
+    ${eye(182,80,5.5)}
+    <path d="M40 86 q-24 -6 -32 -16 q16 2 26 6 Z" fill="${b}"/>
+    <path d="M150 96 q16 6 18 18 q-10 -6 -18 -2 Z" fill="${a}"/>
+    <path d="M96 102 q-8 24 -22 30 l11 5 q18 -14 23 -33 Z" fill="${a}"/>
+    <path d="M124 104 q-2 26 -8 34 l14 0 q6 -16 6 -34 Z" fill="${a}"/>
+    <path d="M74 132 l-18 4 m20 3 l-16 7" stroke="${DK}" stroke-width="3"/>`),
+
+  /* SPINOSAURUS — biped with one tall sail + crocodile snout */
+  spino: (a,b)=>svgWrap(`
+    <path d="M14 134 Q6 128 16 122 Q40 100 56 96 Q70 70 96 66 Q150 60 168 92 Q188 90 206 102 Q190 110 176 106 Q172 124 168 138 Q164 156 150 160 Q120 166 98 154 Q60 158 30 150 Q16 146 14 134 Z" fill="${a}"/>
+    <path d="M100 138 Q140 148 164 136 Q160 154 150 158 Q122 164 104 154 Z" fill="${b}" stroke="none"/>
+    <path d="M54 92 Q60 40 104 34 Q150 38 158 94 Z" fill="${b}"/>
+    <path d="M78 38 L80 88 M104 34 L104 90 M130 40 L130 90" stroke="${DK}" stroke-width="2.5" fill="none"/>
+    <path d="M168 92 l42 8 -42 8" fill="${a}"/>
+    <path d="M176 96 l26 4 -26 4" stroke="#fff" stroke-width="2"/>
+    ${eye(160,86,5.5)}
+    <path d="M104 152 l0 22 13 0 0 -22 Z" fill="${a}"/>
+    <path d="M138 152 l0 22 13 0 0 -22 Z" fill="${a}"/>`),
+
+  /* PTERANODON — flying reptile, wings spread, head crest, long beak */
+  ptero: (a,b)=>svgWrap(`
+    <path d="M118 78 Q66 44 14 58 Q58 74 96 90 Q60 92 28 110 Q82 108 120 96 Z" fill="${a}"/>
+    <path d="M122 78 Q174 44 226 58 Q182 74 144 90 Q180 92 212 110 Q158 108 120 96 Z" fill="${a}"/>
+    <path d="M104 74 Q116 60 138 66 Q150 74 144 92 Q126 100 110 92 Q100 84 104 74 Z" fill="${b}"/>
+    <path d="M120 62 L156 44 L138 70 Z" fill="${a}"/>
+    <path d="M138 76 l36 6 -34 8" fill="${a}"/>
+    <path d="M142 80 l24 3 -22 5" stroke="#fff" stroke-width="2"/>
+    ${eye(124,74,5)}
+    <path d="M120 96 q4 24 -2 40 l10 0 q6 -18 4 -38 Z" fill="${a}"/>`),
+
+  /* ANKYLOSAURUS — low armoured tank + heavy club tail */
+  anky: (a,b)=>svgWrap(`
+    <path d="M40 142 Q16 140 20 116 Q24 92 70 90 Q140 84 170 108 Q180 118 178 132 Q174 148 152 148 Q90 152 40 142 Z" fill="${a}"/>
+    <path d="M58 128 Q110 138 170 126 L168 142 Q100 148 58 142 Z" fill="${b}" stroke="none"/>
+    <path d="M46 100 l10 -12 12 12 M80 92 l10 -12 12 12 M116 90 l10 -12 12 12 M148 98 l10 -12 12 12" fill="${b}" stroke-width="3"/>
+    <path d="M26 110 l-14 -2 m14 10 l-14 4" stroke="${DK}" stroke-width="3"/>
+    <path d="M170 116 q36 -4 50 14 q-24 16 -50 6 Z" fill="${a}"/>
+    <circle cx="214" cy="126" r="18" fill="${a}"/>
+    ${eye(44,114,5)}
+    <path d="M62 146 l0 22 14 0 0 -22 Z" fill="${a}"/>
+    <path d="M126 146 l0 22 14 0 0 -22 Z" fill="${a}"/>`),
+};
+
+/* ═══════════════════ Dinosaur data ═══════════════════ */
+const dinos = [
+  { id:'trex', img:'art/trex.png', name:'Tyrannosaurus Rex', short:'T. Rex', color:'#3FB873', light:'#BFEBCF', glow:'var(--leaf)',
+    say:'tie-RAN-oh-SOR-us rex', meaning:'Name means “Tyrant Lizard King”',
+    diet:'meat', period:'Cretaceous', length:12, weight:'7,000 kg', height:'4 m tall',
+    facts:[
+      ['🦷','Its teeth were as long as bananas — up to 20 cm — and could crunch right through bone!'],
+      ['💪','Its arms were tiny, but its bite was the strongest of any land animal ever.'],
+      ['👃','It had a huge nose and could smell a meal from far, far away.'],
+    ]},
+  { id:'trike', img:'art/trike.png', name:'Triceratops', short:'Triceratops', color:'#5AC0F0', light:'#CDEEFB', glow:'var(--sky)',
+    say:'try-SERR-uh-tops', meaning:'Name means “Three-Horned Face”',
+    diet:'plant', period:'Cretaceous', length:9, weight:'7,000 kg', height:'3 m tall',
+    facts:[
+      ['🛡️','The big bony frill around its head protected its neck like a shield.'],
+      ['🌿','It used a sharp beak to snip tough plants, then chewed with hundreds of teeth.'],
+      ['🦏','Its three horns could be longer than your arm — great for scaring off a T. Rex!'],
+    ]},
+  { id:'stego', img:'art/stego.png', name:'Stegosaurus', short:'Stegosaurus', color:'#FF8A5C', light:'#FFD7C2', glow:'var(--coral)',
+    say:'STEG-oh-SOR-us', meaning:'Name means “Roof Lizard”',
+    diet:'plant', period:'Jurassic', length:9, weight:'3,500 kg', height:'4 m tall',
+    facts:[
+      ['🪧','The plates on its back may have helped it warm up in the sun and cool down in the shade.'],
+      ['⚔️','Its spiky tail had a name: the “thagomizer” — perfect for swinging at attackers!'],
+      ['🥜','Its brain was only about the size of a walnut, even though its body was huge.'],
+    ]},
+  { id:'brachio', img:'art/brachio.png', name:'Brachiosaurus', short:'Brachiosaurus', color:'#9B7BFF', light:'#DDD2FF', glow:'var(--grape)',
+    say:'BRACK-ee-oh-SOR-us', meaning:'Name means “Arm Lizard”',
+    diet:'plant', period:'Jurassic', length:22, weight:'30,000 kg', height:'12 m tall',
+    facts:[
+      ['🌳','Its neck was so long it could munch leaves from the top of a four-storey building!'],
+      ['⚖️','It weighed as much as five elephants stacked together.'],
+      ['🦒','Its front legs were longer than its back legs — a bit like a giant giraffe.'],
+    ]},
+  { id:'raptor', img:'art/raptor.png', name:'Velociraptor', short:'Velociraptor', color:'#FF7FB1', light:'#FFD3E6', glow:'var(--pink)',
+    say:'vel-OSS-ih-RAP-tor', meaning:'Name means “Swift Thief”',
+    diet:'meat', period:'Cretaceous', length:2, weight:'15 kg', height:'turkey-sized',
+    facts:[
+      ['🪶','Surprise! Velociraptor had feathers, just like a big scary bird.'],
+      ['🐔','In real life it was only about as big as a turkey — much smaller than in the movies.'],
+      ['🦅','It had one huge curved claw on each foot for grabbing dinner.'],
+    ]},
+  { id:'spino', img:'art/spino.png', name:'Spinosaurus', short:'Spinosaurus', color:'#1FC4B0', light:'#BFF0EA', glow:'var(--teal)',
+    say:'SPINE-oh-SOR-us', meaning:'Name means “Spine Lizard”',
+    diet:'fish', period:'Cretaceous', length:15, weight:'7,500 kg', height:'5 m tall',
+    facts:[
+      ['🌊','It loved water and was a great swimmer — it mostly ate big fish!'],
+      ['⛵','The tall sail on its back was made of long bony spines covered in skin.'],
+      ['🦖','It was even longer than T. Rex — one of the biggest meat-eaters ever.'],
+    ]},
+  { id:'ptero', img:'art/ptero.png', name:'Pteranodon', short:'Pteranodon', color:'#FFC53D', light:'#FFEDB8', glow:'var(--sun)',
+    say:'tair-AN-oh-don', meaning:'Name means “Wing Without Tooth”',
+    diet:'fish', period:'Cretaceous', length:7, weight:'25 kg', height:'7 m wingspan',
+    facts:[
+      ['✈️','It could fly! Its wings were as wide as a small car is long.'],
+      ['🐟','It had no teeth — it scooped up fish from the sea with its long beak.'],
+      ['🦴','Fun fact: flying reptiles like this lived with the dinosaurs, but weren’t dinosaurs themselves.'],
+    ]},
+  { id:'anky', img:'art/anky.png', name:'Ankylosaurus', short:'Ankylosaurus', color:'#9DB85A', light:'#E0EAC0', glow:'var(--olive)',
+    say:'an-KY-loh-SOR-us', meaning:'Name means “Fused Lizard”',
+    diet:'plant', period:'Cretaceous', length:8, weight:'6,000 kg', height:'1.7 m tall',
+    facts:[
+      ['🛡️','It was like a walking tank — even its eyelids had bony armour!'],
+      ['🔨','Its tail ended in a heavy club that could whack a predator’s leg.'],
+      ['🌱','Despite its armour, it only ate low plants close to the ground.'],
+    ]},
+  { id:'carno', img:'art/carno.png', name:'Carnotaurus', short:'Carnotaurus', color:'#E8763C', light:'#F7C9A8', glow:'var(--coral)',
+    say:'CAR-no-TOR-us', meaning:'Name means “Meat-eating Bull”',
+    diet:'meat', period:'Cretaceous', length:8, weight:'1,500 kg', height:'3 m tall',
+    facts:[
+      ['🐂','It had two horns above its eyes — like a bull! That’s how it got its name.'],
+      ['🏃','Long, strong legs may have made it one of the fastest big meat-eaters.'],
+      ['🦾','Its arms were even tinier than a T. Rex’s — almost too small to use!'],
+    ]},
+  { id:'para', img:'art/para.png', name:'Parasaurolophus', short:'Parasaurolophus', color:'#F2A93B', light:'#FBE2A8', glow:'var(--sun)',
+    say:'pa-ra-SAW-roh-LOAF-us', meaning:'Name means “Near Crested Lizard”',
+    diet:'plant', period:'Cretaceous', length:10, weight:'2,500 kg', height:'5 m tall',
+    facts:[
+      ['🎺','The long tube on its head could honk and trumpet to call its friends!'],
+      ['🌿','A gentle plant-eater that could walk on two legs OR four.'],
+      ['👂','Each one may have made its very own special sound through its crest.'],
+    ]},
+];
+const byId = Object.fromEntries(dinos.map(d => [d.id, d]));
+const MAX_LEN = Math.max(...dinos.map(d => d.length)); // for size bars
+const dietInfo = { plant:['🌿','Plant-eater','plant'], meat:['🥩','Meat-eater','meat'], fish:['🐟','Fish-eater','fish'] };
+
+/* Render a dino's artwork: use the supplied PNG cut-out if present, otherwise the drawn SVG.
+   To switch a dino to supplied art, add `img:'art/<id>.png'` to its data entry above. */
+function art(d) {
+  return d.img ? `<img src="${d.img}" alt="${d.short}" loading="lazy">` : ART[d.id](d.color, d.light);
+}
+
+/* ═══════════════════ Build home ═══════════════════ */
+function buildHome() {
+  document.getElementById('mascot-svg').innerHTML = art(byId.trex);
+  const grid = document.getElementById('dino-grid');
+  const dinoCards = dinos.map(d => {
+    const [demo,, dcls] = dietInfo[d.diet];
+    return `<div class="card ${met[d.id] ? 'met' : ''}" id="card-${d.id}" onclick="openDino('${d.id}')">
+      <span class="glow" style="background:${d.glow}"></span>
+      <span class="diet-badge ${dcls}">${demo} ${dietInfo[d.diet][1]}</span>
+      <span class="met-badge" title="You met this dino!">🥚</span>
+      <div class="thumb">${art(d)}</div>
+      <div class="name">${d.short}</div>
+      <div class="say">${d.say}</div>
+    </div>`;
+  }).join('');
+  const quizCard = `<div class="card special quiz" onclick="startQuiz()">
+      <span class="big-emoji">🦴</span>
+      <div class="name">Dino Quiz</div>
+      <div class="say">Test what you know!</div>
+    </div>`;
+  const randomCard = `<div class="card special random" onclick="surprise()">
+      <span class="big-emoji">🎲</span>
+      <div class="name">Surprise Me!</div>
+      <div class="say">Meet a random dino</div>
+    </div>`;
+  grid.innerHTML = dinoCards + quizCard + randomCard;
+  updateEggs();
+}
+function updateEggs() {
+  const n = dinos.filter(d => met[d.id]).length;
+  document.getElementById('eggs-display').textContent = `${n} / ${dinos.length}`;
+}
+
+/* ═══════════════════ Screen flow ═══════════════════ */
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function showScreen(id) {
+  speechSynthesis && speechSynthesis.cancel();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ═══════════════════ Dino profile ═══════════════════ */
+let curIndex = 0;
+function openDino(id) {
+  curIndex = dinos.findIndex(d => d.id === id);
+  renderProfile();
+  showScreen('profile');
+  if (!reduce) {
+    gsap.fromTo('.profile-card', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: 'power3.out' });
+    gsap.fromTo('.hero-art svg', { scale: .6, opacity: 0 }, { scale: 1, opacity: 1, duration: .8, ease: 'elastic.out(1,.6)', delay: .1 });
+    gsap.fromTo('#profile-card .stat, #profile-card .fact, #profile-card .compare, #profile-card .sound-row',
+      { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: .4, stagger: .06, delay: .25, ease: 'power2.out' });
+    idleBob();
+  }
+  // gently say the name on open
+  setTimeout(() => speak(d().name, 0.82), 350);
+}
+function d(){ return dinos[curIndex]; }
+
+function sizeBars(dino) {
+  const pct = v => Math.max(6, (v / MAX_LEN) * 100);
+  const row = (lbl, val, emoji, fill, lenLabel) => `
+    <div class="cmp-row">
+      <span class="lbl">${lbl}</span>
+      <div class="cmp-bar"><div class="cmp-fill" style="width:${pct(val)}%;background:${fill}">${emoji}<span style="font-size:.7rem;font-weight:800;margin-left:4px">${lenLabel}</span></div></div>
+    </div>`;
+  return `<div class="compare">
+    <h4>How big? (length)</h4>
+    ${row('You 🧒', 1.2, '', '#FFD7C2', '~1 m')}
+    ${row('School bus', 11, '🚌', '#CDEEFB', '11 m')}
+    ${row(dino.short, dino.length, '', dino.color, dino.length + ' m')}
+  </div>`;
+}
+
+function renderProfile() {
+  const dino = d();
+  document.getElementById('profile-title').textContent = dino.short;
+  const [demo, dlabel] = dietInfo[dino.diet];
+  const card = document.getElementById('profile-card');
+  card.innerHTML = `
+    <span class="glow" style="position:absolute;width:220px;height:220px;border-radius:50%;top:-80px;right:-70px;filter:blur(12px);opacity:.18;background:${dino.glow}"></span>
+    <div class="hero-art">${art(dino)}</div>
+    <h2 class="dino-name">${dino.name}</h2>
+    <p class="dino-say">say it: “${dino.say}”</p>
+    <p class="dino-meaning">${dino.meaning}</p>
+
+    <div class="sound-row">
+      <button class="pill-btn say-name" onclick="speak('${dino.name.replace(/'/g,'')}. ${dino.say.replace(/-/g,' ')}', 0.78)">🔊 Say my name</button>
+      <button class="pill-btn roar" onclick="doRoar()">🦖 ROAR!</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Diet</div><div class="v">${demo} ${dlabel.split('-')[0]}</div></div>
+      <div class="stat"><div class="k">Lived</div><div class="v">${dino.period}</div></div>
+      <div class="stat"><div class="k">Length</div><div class="v">${dino.length} m</div></div>
+      <div class="stat"><div class="k">Size</div><div class="v">${dino.height}</div></div>
+    </div>
+
+    ${sizeBars(dino)}
+
+    <div class="facts">
+      ${dino.facts.map(f => `<div class="fact" onclick="speak(this.dataset.s,0.9)" data-s="${f[1].replace(/"/g,'&quot;')}">
+        <span class="fi">${f[0]}</span><span>${f[1]}</span></div>`).join('')}
+    </div>
+
+    <button class="discover-btn ${met[dino.id] ? 'done' : ''}" id="discover-btn" onclick="discover('${dino.id}')">
+      ${met[dino.id] ? '🥚 Added to your collection!' : '➕ Add to my dino collection'}
+    </button>`;
+}
+
+let bobTween = null;
+function idleBob() {
+  if (reduce) return;
+  if (bobTween) bobTween.kill();
+  bobTween = gsap.to('.hero-art svg', { y: -10, duration: 1.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+}
+
+function doRoar() {
+  const dino = d();
+  const sound = dino.diet === 'plant' ? 'Hello! I am a friendly plant muncher!'
+            : dino.diet === 'fish' ? 'Splash! I love catching fish!'
+            : 'ROAAAR! I am ' + dino.short + '!';
+  speak(sound, 0.8, dino.length > 10 ? 0.7 : 1.15);
+  if (!reduce) gsap.fromTo('.hero-art svg', { scale: 1 }, { scale: 1.12, duration: .18, yoyo: true, repeat: 1, ease: 'power2.out' });
+  burst(14);
+}
+
+function discover(id) {
+  const btn = document.getElementById('discover-btn');
+  if (!met[id]) {
+    met[id] = true; saveProgress();
+    document.getElementById('card-' + id)?.classList.add('met');
+    btn.textContent = '🥚 Added to your collection!'; btn.classList.add('done');
+    speak('Great! You added ' + byId[id].short + ' to your collection!', 0.9, 1.15);
+    burst(40);
+    if (!reduce) gsap.fromTo(btn, { scale: 1 }, { scale: 1.06, duration: .2, yoyo: true, repeat: 1 });
+    updateEggs();
+    if (dinos.every(x => met[x.id])) setTimeout(celebrateAll, 900);
+  } else {
+    speak('You already met ' + byId[id].short + '!', 0.95, 1.15);
+  }
+}
+
+function nextDino() { curIndex = (curIndex + 1) % dinos.length; renderProfile(); animTransition(); }
+function prevDino() { curIndex = (curIndex - 1 + dinos.length) % dinos.length; renderProfile(); animTransition(); }
+function animTransition() {
+  window.scrollTo(0,0);
+  if (!reduce) {
+    gsap.fromTo('.hero-art svg', { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: 'power3.out' });
+    idleBob();
+  }
+  setTimeout(() => speak(d().name, 0.82), 200);
+}
+function surprise() {
+  const pick = dinos[Math.floor(Math.random() * dinos.length)];
+  openDino(pick.id);
+}
+
+/* ═══════════════════ Quiz ═══════════════════ */
+let quizQs = [], qIndex = 0, quizScore = 0, qAnswered = false;
+function buildQuiz() {
+  // Build a fresh mix: "who is this?" (silhouette) + "plant or meat?" questions.
+  const pool = [...dinos].sort(() => Math.random() - .5);
+  const qs = [];
+  pool.slice(0, 3).forEach(dino => {
+    const wrong = dinos.filter(x => x.id !== dino.id).sort(() => Math.random() - .5).slice(0, 2);
+    const opts = [dino, ...wrong].sort(() => Math.random() - .5);
+    qs.push({ type:'who', dino, q:`Which dinosaur is this?`, opts: opts.map(o => ({ label:o.short, correct:o.id === dino.id })) });
+  });
+  pool.slice(3, 5).forEach(dino => {
+    qs.push({ type:'diet', dino, q:`Is the ${dino.short} a plant-eater or a meat-eater?`,
+      opts: [
+        { label:'🌿 Plant-eater', correct: dino.diet === 'plant' },
+        { label:'🥩 Meat-eater', correct: dino.diet === 'meat' || dino.diet === 'fish' },
+      ]});
+  });
+  return qs.sort(() => Math.random() - .5);
+}
+function startQuiz() {
+  quizQs = buildQuiz(); qIndex = 0; quizScore = 0;
+  showScreen('quiz');
+  renderQuestion();
+}
+function renderQuestion() {
+  qAnswered = false;
+  const total = quizQs.length, q = quizQs[qIndex];
+  document.getElementById('quiz-counter').textContent = `${qIndex + 1}/${total}`;
+  document.getElementById('quiz-progress').style.width = `${(qIndex / total) * 100}%`;
+  document.getElementById('quiz-next').disabled = true;
+  const sil = q.type === 'who' ? 'silhouette' : '';
+  const card = document.getElementById('quiz-card');
+  card.innerHTML = `
+    <p class="quiz-q">${q.q}</p>
+    <div class="quiz-art ${sil}">${art(q.dino)}</div>
+    <div class="choices ${q.opts.length === 2 ? 'two' : ''}">
+      ${q.opts.map((o,i) => `<button class="choice" onclick="answer(this, ${o.correct})">${o.label}</button>`).join('')}
+    </div>`;
+  if (!reduce) {
+    gsap.fromTo('.quiz-card', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .45, ease: 'power3.out' });
+    gsap.fromTo('.quiz-art svg', { scale: .7, opacity: 0 }, { scale: 1, opacity: 1, duration: .6, ease: 'back.out(1.6)', delay: .1 });
+    gsap.fromTo('.choice', { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: .35, stagger: .06, delay: .2 });
+  }
+  speak(q.q.replace(/the /gi,''), 0.9);
+}
+function answer(btn, correct) {
+  if (qAnswered) return;
+  if (correct) {
+    qAnswered = true; quizScore++;
+    btn.classList.add('correct');
+    document.querySelector('.quiz-art')?.classList.remove('silhouette');
+    speak('Yes! That is right!', 0.95, 1.2);
+    if (!reduce) gsap.fromTo(btn, { scale: 1 }, { scale: 1.08, duration: .2, yoyo: true, repeat: 1 });
+    document.getElementById('quiz-next').disabled = false;
+    burst(12);
+  } else {
+    btn.classList.add('wrong');
+    speak('Oops, try again!', 0.95, 1.1);
+    if (!reduce) gsap.fromTo(btn, { x: 0 }, { x: 8, duration: .07, repeat: 5, yoyo: true });
+    setTimeout(() => btn.classList.remove('wrong'), 600);
+  }
+}
+function nextQuestion() {
+  if (qIndex < quizQs.length - 1) { qIndex++; renderQuestion(); }
+  else finishQuiz();
+}
+function finishQuiz() {
+  document.getElementById('quiz-progress').style.width = '100%';
+  const total = quizQs.length;
+  document.getElementById('trophy').textContent = quizScore === total ? '🏆' : quizScore >= total/2 ? '🌟' : '🦴';
+  document.getElementById('celebrate-title').textContent = quizScore === total ? 'Perfect score!' : 'Great job!';
+  document.getElementById('celebrate-sub').textContent = `You got ${quizScore} out of ${total} right. ${quizScore === total ? 'You are a true dino expert!' : 'Play again to beat your score!'}`;
+  document.getElementById('earned').textContent = '⭐'.repeat(Math.max(1, Math.round(quizScore / total * 5)));
+  showScreen('celebrate');
+  if (!reduce) gsap.fromTo('#trophy', { scale: 0, rotate: -30 }, { scale: 1, rotate: 0, duration: .8, ease: 'elastic.out(1,.5)' });
+  burst(70);
+  setTimeout(() => speak(`You got ${quizScore} out of ${total}! ${quizScore === total ? 'Amazing, you are a dinosaur expert!' : 'Well done!'}`, 0.9, 1.15), 350);
+}
+function celebrateAll() {
+  document.getElementById('trophy').textContent = '🦕';
+  document.getElementById('celebrate-title').textContent = 'You met them all!';
+  document.getElementById('celebrate-sub').textContent = `You discovered every dinosaur. You are an official Dino Explorer! 🦴`;
+  document.getElementById('earned').textContent = '⭐⭐⭐⭐⭐';
+  showScreen('celebrate');
+  if (!reduce) gsap.fromTo('#trophy', { scale: 0, rotate: -30 }, { scale: 1, rotate: 0, duration: .8, ease: 'elastic.out(1,.5)' });
+  burst(90);
+  setTimeout(() => speak('Wow! You met every dinosaur! You are an official dino explorer!', 0.9, 1.15), 350);
+}
+
+function goHome() { showScreen('home'); updateEggs(); if (!reduce) gsap.fromTo('.card', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .5, stagger: .05, ease: 'power3.out' }); }
+
+/* ═══════════════════ Confetti ═══════════════════ */
+function burst(n) {
+  if (reduce) return;
+  const colors = ['#2FA56A', '#38BDF8', '#34D399', '#FFC53D', '#FF7A59', '#FF6FB5', '#7C5CFF'];
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.background = colors[i % colors.length];
+    el.style.borderRadius = Math.random() > .5 ? '50%' : '3px';
+    document.body.appendChild(el);
+    gsap.to(el, { y: window.innerHeight + 60, x: (Math.random() - .5) * 240, rotation: Math.random() * 720,
+      duration: 1.8 + Math.random() * 1.6, ease: 'power1.in', delay: Math.random() * .3, onComplete: () => el.remove() });
+  }
+}
+
+/* ═══════════════════ Mascot ═══════════════════ */
+document.getElementById('mascot').addEventListener('click', function () {
+  const lines = ['Roar! Let us meet some dinosaurs!', 'Hello explorer!', 'Tap a dinosaur to begin!', 'Dinosaurs are awesome!'];
+  speak(lines[Math.floor(Math.random() * lines.length)], 0.88, 1.1);
+  if (!reduce) gsap.fromTo(this.querySelector('svg'), { rotation: -8 }, { rotation: 0, duration: 1, ease: 'elastic.out(1,.3)' });
+});
+
+/* ═══════════════════ Modal ═══════════════════ */
+function openModal() { document.getElementById('modal').classList.add('show'); }
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+/* ═══════════════════ Three.js floating spores ═══════════════════ */
+(function initBackground() {
+  if (reduce || !window.THREE) return;
+  const canvas = document.getElementById('bg-canvas');
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true }); } catch (e) { return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+  renderer.setSize(innerWidth, innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+  camera.position.z = 18;
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.5); dir.position.set(5, 8, 10); scene.add(dir);
+
+  // soft round sprite texture for spores/pollen
+  const tex = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const g = c.getContext('2d'); const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(.4, 'rgba(255,255,255,.8)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grd; g.beginPath(); g.arc(32, 32, 32, 0, Math.PI * 2); g.fill();
+    return new THREE.CanvasTexture(c);
+  })();
+
+  const palette = [0x2FA56A, 0x34D399, 0x38BDF8, 0xFFC53D, 0xFF7A59];
+  const groups = [];
+  palette.forEach(col => {
+    const N = innerWidth < 640 ? 12 : 22;
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      pos[i*3]   = (Math.random() - .5) * 40;
+      pos[i*3+1] = (Math.random() - .5) * 30;
+      pos[i*3+2] = (Math.random() - .5) * 14;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ size: .9 + Math.random()*.7, map: tex, color: col, transparent: true, opacity: .55, depthWrite: false, blending: THREE.AdditiveBlending });
+    const pts = new THREE.Points(geo, mat);
+    pts.userData = { sp: .002 + Math.random()*.004, ph: Math.random()*Math.PI*2 };
+    scene.add(pts); groups.push(pts);
+  });
+
+  let running = true, t = 0;
+  function loop() {
+    if (!running) return;
+    t += 0.01;
+    groups.forEach(g => {
+      const p = g.geometry.attributes.position.array;
+      for (let i = 1; i < p.length; i += 3) {
+        p[i] += g.userData.sp * 3;            // drift up
+        p[i-1] += Math.sin(t + p[i] * .1) * .003; // gentle sway
+        if (p[i] > 16) p[i] = -16;
+      }
+      g.geometry.attributes.position.needsUpdate = true;
+      g.rotation.z += g.userData.sp * .1;
+    });
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  loop();
+  requestAnimationFrame(() => canvas.classList.add('show'));
+
+  addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+  document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) loop(); });
+})();
+
+/* ═══════════════════ Service worker ═══════════════════ */
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+/* ═══════════════════ Init ═══════════════════ */
+buildHome();
+if (!reduce) {
+  gsap.from('.mascot', { scale: 0, duration: .9, ease: 'elastic.out(1,.5)' });
+  gsap.from('.home-title', { y: 20, opacity: 0, duration: .7, delay: .1, ease: 'power3.out' });
+  gsap.from('.home-sub, .streak', { y: 16, opacity: 0, duration: .6, delay: .25, stagger: .1, ease: 'power2.out' });
+  gsap.from('.card', { y: 28, opacity: 0, duration: .6, delay: .35, stagger: .06, ease: 'power3.out' });
+  // idle sway for the mascot
+  gsap.to('#mascot svg', { y: -8, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1 });
+}
+</script>
+</body>
+</html>

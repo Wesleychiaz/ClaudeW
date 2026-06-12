@@ -1,0 +1,24 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3FD08A"/>
+      <stop offset="1" stop-color="#2FA56A"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g stroke="#143524" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tail + body -->
+    <path d="M150 360 Q90 364 70 290 Q56 230 130 210 Q160 150 250 146 Q360 142 376 232 Q384 300 336 340 Q280 372 150 360 Z" fill="#EAFBF0"/>
+    <!-- head -->
+    <path d="M268 158 Q344 146 376 200 L382 252 Q344 280 282 272 Q252 240 256 196 Q260 168 268 158 Z" fill="#EAFBF0"/>
+    <!-- mouth -->
+    <path d="M340 240 L420 246 L408 270 L342 262 Z" fill="#EAFBF0"/>
+    <path d="M348 244 l10 14 12 -13 12 14 12 -12" fill="none" stroke="#fff" stroke-width="9"/>
+    <!-- legs -->
+    <path d="M232 300 q-8 50 -4 70 l34 0 q4 -28 -4 -70 Z" fill="#EAFBF0"/>
+    <path d="M296 304 q-8 50 -4 70 l34 0 q4 -28 -4 -70 Z" fill="#EAFBF0"/>
+    <!-- eye -->
+    <circle cx="316" cy="200" r="17" fill="#fff" stroke="none"/>
+    <circle cx="319" cy="203" r="8.5" fill="#143524" stroke="none"/>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+{
+  "name": "Dino Discovery",
+  "short_name": "Dino Discovery",
+  "description": "A playful, interactive way for kids to meet dinosaurs, learn to say their names, see how each looks, and play a dino quiz.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFFAF0",
+  "theme_color": "#2FA56A",
+  "lang": "en",
+  "categories": ["education", "kids"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
