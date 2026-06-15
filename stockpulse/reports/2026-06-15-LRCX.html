@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — LRCX | 2026-06-15</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 7 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-15</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">LRCX</span>
+      <span class="company-name">Lam Research Corporation</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$366.81</span>
+      <span class="day-change" style="color:#4ade80">+1.18% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Chip Manufacturing</span>
+      <span class="tag">Technology</span>
+      &nbsp;Semiconductor Equipment & Materials
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$458.72B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.868</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">32 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+1.18%</td></tr><tr><td>5 Days</td><td style="color:#4ade80;font-weight:600">+13.06%</td></tr><tr><td>1 Month</td><td style="color:#4ade80;font-weight:600">+24.16%</td></tr><tr><td>3 Months</td><td style="color:#4ade80;font-weight:600">+72.86%</td></tr><tr><td>6 Months</td><td style="color:#4ade80;font-weight:600">+123.52%</td></tr><tr><td>YTD</td><td style="color:#4ade80;font-weight:600">+98.45%</td></tr><tr><td>1 Year</td><td style="color:#4ade80;font-weight:600">+312.75%</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:98%"></div></div>
+          <div class="range-labels"><span>$87.75</span><span style="color:#f97316">$366.81</span><span>$373.82</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$323.38</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $220.00 — $425.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">9.92M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$21.68B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +23.80%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$4.35B</p>
+        <p class="card-sub">Cash: $4.75B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+40.80%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">50.00%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">35.00%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">30.90%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">69.5x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">46.0x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">21.2x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">43.3x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$3.73B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$4.75B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <h3>Company Overview</h3>
+        <p>Lam Research designs and manufactures etch and deposition equipment — two of the most repeated steps in chip fabrication — making it an indispensable <strong>Enabler</strong> in the AI semiconductor supply chain. Every advanced chip (TSMC N3/N2, HBM, NAND) passes through Lam's chambers dozens of times per wafer, and as 3D architectures and atomic-layer processing proliferate, the number of Lam-performed steps per chip grows alongside complexity.</p>
+
+        <h3>Bull Case</h3>
+        <ul>
+          <li><strong>Exceptional revenue momentum:</strong> $21.68B TTM revenue grew 23.8% YoY — nearly twice the pace of the broader equipment market — with earnings growth of 40.8% YoY demonstrating strong operating leverage as the cycle accelerates. FCF of $4.35B against $4.75B cash and just $3.73B debt leaves the balance sheet in excellent shape.</li>
+          <li><strong>HBM is a structural tailwind, not a trade:</strong> Every HBM stack requires dozens of Lam etch and deposition steps per die. With AI accelerator demand driving explosive HBM capacity expansion (SK Hynix, Samsung, Micron all ramping), Lam's SAM per wafer start is rising — not just the number of wafer starts.</li>
+          <li><strong>Still within reach of analyst targets:</strong> At $366.81 with a consensus mean of $323.38 and high target of $425, there is ~16% upside to the bull case from 32 analysts. Compare this to KLAC, which has already run past all analyst targets — Lam has more room on the table.</li>
+          <li><strong>Solid margins with upside as product mix shifts:</strong> Gross margin of 50.0% and operating margin of 35.0% are strong for capital equipment; as higher-value atomic-layer and GAA-era tools mix up, these should trend further higher.</li>
+        </ul>
+
+        <h3>Bear Case</h3>
+        <ul>
+          <li><strong>China concentration risk is the biggest single variable:</strong> Historically ~30% of Lam's revenue came from China; ongoing BIS export restrictions specifically targeting advanced etch and deposition tools could directly impair a meaningful revenue segment with limited near-term alternative markets.</li>
+          <li><strong>Stock up 312% over 1 year from a depressed base:</strong> LRCX was at $87.75 at its 52-week low — the recovery is extraordinary, but at $366.81 it now sits at 98% of its 52-week high. At 69.5x TTM P/E and 46.0x forward P/E, any guidance softness could trigger a sharp derating.</li>
+          <li><strong>Memory oversupply cycles cut fast:</strong> Lam's NAND exposure is significant; if memory manufacturers slow capex in response to pricing pressure (as they have historically), etch and deposition orders drop quickly and WFE estimates can be revised down 20-30% in a quarter.</li>
+        </ul>
+
+        <div class="verdict-box">
+          <p class="verdict-label">Verdict</p>
+          <p class="verdict-text">BUY — Cycle Momentum With Room to Run</p>
+          <p class="verdict-sub">Lam is the picks-and-shovels beneficiary of both the AI chip buildout and the HBM memory supercycle, with 23.8% revenue growth, 40.8% earnings growth, and a cleaner valuation setup than peer KLAC (still within reach of analyst targets). China export risk is real and worth monitoring, but the structural demand case — more Lam steps per chip as nodes shrink — overrides near-term regulatory noise. Time horizon: 12-18 months; sized appropriately given beta of 1.87.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-13</span><a href="https://finance.yahoo.com/markets/stocks/articles/lam-research-lrcx-stock-fair-221059616.html" target="_blank" rel="noopener" class="news-link">Lam Research (LRCX) Stock Fair Value Edges Higher After Analyst Target Increases ↗</a></li><li><span class="news-date">2026-06-13</span><a href="https://finance.yahoo.com/markets/stocks/articles/lam-research-applied-materials-shares-000520752.html" target="_blank" rel="noopener" class="news-link">Lam Research and Applied Materials Shares Skyrocket, What You Need To Know ↗</a></li><li><span class="news-date">2026-06-12</span><a href="https://finance.yahoo.com/markets/stocks/articles/top-analyst-reports-costco-lam-204100714.html" target="_blank" rel="noopener" class="news-link">Top Analyst Reports for Costco, Lam Research & KLA ↗</a></li><li><span class="news-date">2026-06-12</span><a href="https://finance.yahoo.com/markets/stocks/articles/q1-earnings-outperformers-lam-research-184520504.html" target="_blank" rel="noopener" class="news-link">Q1 Earnings Outperformers: Lam Research (NASDAQ:LRCX) And The Rest Of The Semiconductor Manufacturing Stocks ↗</a></li><li><span class="news-date">2026-06-12</span><a href="https://www.barchart.com/story/news/2437291/s-p-futures-climb-as-u-s-iran-peace-deal-nears-spacex-debut-awaited" target="_blank" rel="noopener" class="news-link">S&P Futures Climb as U.S.-Iran Peace Deal Nears, SpaceX Debut in Focus ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-15 01:52 UTC.
+  </div>
+
+</div>
+</body>
+</html>

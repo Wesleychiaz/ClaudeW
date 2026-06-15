@@ -156,8 +156,11 @@ def advance_watchlist():
 
 
 def main():
-    if len(sys.argv) > 1:
-        ticker = sys.argv[1].upper()
+    peek = "--peek" in sys.argv
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+
+    if args:
+        ticker = args[0].upper()
         report_num = "—"
         total = "—"
         # Look up in watchlist so category/sector/subcategory are populated
@@ -172,6 +175,15 @@ def main():
                     break
         except Exception:
             pass
+    elif peek:
+        # Read current stock without advancing the index
+        with open(WATCHLIST_PATH) as f:
+            wl = json.load(f)
+        idx = wl["current_index"]
+        stock_meta = wl["stocks"][idx]
+        report_num = idx + 1
+        total = len(wl["stocks"])
+        ticker = stock_meta["ticker"]
     else:
         stock_meta, report_num, total = advance_watchlist()
         ticker = stock_meta["ticker"]
