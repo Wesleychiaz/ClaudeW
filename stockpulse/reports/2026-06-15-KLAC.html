@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — KLAC | 2026-06-15</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 8 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-15</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">KLAC</span>
+      <span class="company-name">KLA Corporation</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$254.54</span>
+      <span class="day-change" style="color:#4ade80">+5.55% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Chip Manufacturing</span>
+      <span class="tag">Technology</span>
+      &nbsp;Semiconductor Equipment & Materials
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$332.50B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.504</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">29 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+5.55%</td></tr><tr><td>5 Days</td><td style="color:#4ade80;font-weight:600">+20.75%</td></tr><tr><td>1 Month</td><td style="color:#4ade80;font-weight:600">+37.79%</td></tr><tr><td>3 Months</td><td style="color:#4ade80;font-weight:600">+79.65%</td></tr><tr><td>6 Months</td><td style="color:#4ade80;font-weight:600">+108.30%</td></tr><tr><td>YTD</td><td style="color:#4ade80;font-weight:600">+100.24%</td></tr><tr><td>1 Year</td><td style="color:#4ade80;font-weight:600">+195.25%</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:98%"></div></div>
+          <div class="range-labels"><span>$83.22</span><span style="color:#f97316">$254.54</span><span>$254.93</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$192.62</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $150.00 — $250.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">10.25M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$13.10B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +11.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$2.89B</p>
+        <p class="card-sub">Cash: $4.96B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+11.80%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">61.40%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">41.20%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">35.70%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">71.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">50.4x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">25.4x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">5.7x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$6.15B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$4.96B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <h3>Company Overview</h3>
+        <p>KLA Corporation is the world's dominant semiconductor process control and yield management company, supplying inspection and metrology equipment that detects nanometer-scale defects during chip fabrication. As a category-defining <strong>Enabler</strong>, KLA is deeply embedded in every major foundry's production line — TSMC, Samsung, Intel Foundry Services — and its criticality compounds as nodes shrink to 2nm and below, where defect economics make yield control more valuable per wafer than ever.</p>
+
+        <h3>Bull Case</h3>
+        <ul>
+          <li><strong>AI fab buildout drives a multi-year capex cycle:</strong> KLA's $13.10B TTM revenue grew 11.5% YoY and the cycle is accelerating — TSMC's $100B U.S. expansion and surging HBM capacity investment are equipment-intensive tailwinds that have structural multi-year duration, not cyclical duration.</li>
+          <li><strong>Monopoly-tier margins validate pricing power:</strong> Gross margin of 61.4%, operating margin of 41.2%, and net margin of 35.7% are sustained quarter after quarter, reflecting KLA's ~50-55% share in process control — customers have no viable alternative when qualifying a new process node.</li>
+          <li><strong>Free cash flow machine with clean balance sheet:</strong> $2.89B in FCF against $4.96B cash and $6.15B debt is manageable; the company consistently returns capital via buybacks and dividends while reinvesting in next-generation EUV-compatible inspection platforms.</li>
+          <li><strong>Contrarian angle on Extreme Fear (F&amp;G: 20):</strong> Advanced-node foundry capex is driven by decade-long roadmaps, not quarterly sentiment. Macro fear historically creates better entry points in semiconductor equipment leaders, not thesis-breaking events.</li>
+        </ul>
+
+        <h3>Bear Case</h3>
+        <ul>
+          <li><strong>Stock has dramatically outrun analyst consensus:</strong> At $254.54 — nearly at its 52-week high of $254.93 — the stock trades 32% above the analyst mean target of $192.62. Even the analyst high target of $250 is below the current price; the stock has priced in a scenario most models haven't yet modeled.</li>
+          <li><strong>Valuation leaves no margin for error:</strong> At 71.9x TTM P/E and 50.4x forward P/E (P/S 25.4x), any guidance miss, foundry capex delay, or macro-driven risk-off rotation could compress multiples sharply — a reversion to 50x forward PE alone implies ~30% downside from here.</li>
+          <li><strong>China export risk is a real and ongoing headwind:</strong> KLA historically derived ~25-30% of revenues from China; progressive U.S. export control tightening on advanced process equipment could materially impair a key revenue segment with limited near-term substitution.</li>
+        </ul>
+
+        <div class="verdict-box">
+          <p class="verdict-label">Verdict</p>
+          <p class="verdict-text">HOLD — Airtight Thesis, Stretched Valuation</p>
+          <p class="verdict-sub">KLA is an irreplaceable monopolist in semiconductor process control with a structurally improving revenue mix — but at $254.54 the stock has doubled YTD, trades above every analyst target, and is near a 52-week high during a period of Extreme Fear (F&amp;G: 20). The fundamental long-term case is compelling; the near-term entry is not. Time horizon: initiate or add on a 15-20% pullback, targeting 12-18 month hold through the AI fab cycle.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-14</span><a href="https://finance.yahoo.com/markets/stocks/articles/kla-klac-stock-split-strong-041245930.html" target="_blank" rel="noopener" class="news-link">KLA (KLAC) Stock After Split And Strong AI Outlook Is The Valuation Still Attractive ↗</a></li><li><span class="news-date">2026-06-13</span><a href="https://finance.yahoo.com/markets/stocks/articles/kla-corporation-amkor-teradyne-shares-002120400.html" target="_blank" rel="noopener" class="news-link">KLA Corporation, Amkor, and Teradyne Shares Skyrocket, What You Need To Know ↗</a></li><li><span class="news-date">2026-06-12</span><a href="https://finance.yahoo.com/markets/stocks/articles/kla-klac-stock-dips-while-220003057.html" target="_blank" rel="noopener" class="news-link">KLA (KLAC) Stock Dips While Market Gains: Key Facts ↗</a></li><li><span class="news-date">2026-06-12</span><a href="https://finance.yahoo.com/markets/stocks/articles/top-analyst-reports-costco-lam-204100714.html" target="_blank" rel="noopener" class="news-link">Top Analyst Reports for Costco, Lam Research & KLA ↗</a></li><li><span class="news-date">2026-06-12</span><a href="https://www.barchart.com/story/news/2447851/stocks-rally-on-hopes-for-a-near-term-us-iran-interim-peace-agreement" target="_blank" rel="noopener" class="news-link">Stocks Rally on Hopes for a Near-term US-Iran Interim Peace Agreement ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-15 01:30 UTC.
+  </div>
+
+</div>
+</body>
+</html>
