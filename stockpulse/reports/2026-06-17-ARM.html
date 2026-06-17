@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — ARM | 2026-06-17</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 10 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-17</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">ARM</span>
+      <span class="company-name">Arm Holdings plc</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$396.34</span>
+      <span class="day-change" style="color:#f87171">-3.93% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Chip Architecture</span>
+      <span class="tag">Technology</span>
+      &nbsp;Semiconductors
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$423.32B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">3.786</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">37 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#f87171;font-weight:600">-3.93%</td></tr><tr><td>5 Days</td><td style="color:#4ade80;font-weight:600">+28.92%</td></tr><tr><td>1 Month</td><td style="color:#4ade80;font-weight:600">+84.24%</td></tr><tr><td>3 Months</td><td style="color:#4ade80;font-weight:600">+211.32%</td></tr><tr><td>6 Months</td><td style="color:#4ade80;font-weight:600">+245.91%</td></tr><tr><td>YTD</td><td style="color:#4ade80;font-weight:600">+245.45%</td></tr><tr><td>1 Year</td><td style="color:#4ade80;font-weight:600">+173.87%</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:90%"></div></div>
+          <div class="range-labels"><span>$100.02</span><span style="color:#f97316">$396.34</span><span>$428.60</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$257.30</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $125.00 — $500.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">10.91M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$4.92B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +20.10%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$0.75B</p>
+        <p class="card-sub">Cash: $3.60B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+47.90%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">97.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">29.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">18.40%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">455.6x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">129.2x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">86.0x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">50.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$0.49B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$3.60B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <h3>What They Do</h3>
+      <p id="analysis-text">Arm Holdings doesn't make chips — it designs and licenses the CPU, GPU, and NPU intellectual property blueprints that power nearly every smartphone, Apple Silicon Mac, AWS Graviton server, and increasingly AI edge device on earth. As an <strong>AI Enabler</strong>, Arm sits at the deepest layer of the AI compute stack: every new chip generation built on Arm architecture triggers a royalty payment, giving the company a structurally defensible royalty stream that scales with the entire semiconductor industry's output.</p>
+
+      <h3>Bull Case</h3>
+      <ul>
+        <li><strong>Operating leverage is real:</strong> Revenue grew +20.1% YoY to $4.92B TTM, but earnings grew +47.9% — margins are expanding fast as the licensing model scales with near-zero marginal cost.</li>
+        <li><strong>Software-like economics at chip scale:</strong> 97.5% gross margin is extraordinary for a "semiconductor" company. Arm has almost no COGS — it ships IP, not silicon — making it one of the highest-quality royalty businesses in tech.</li>
+        <li><strong>AI chip proliferation is a direct tailwind:</strong> As AI moves to edge devices (phones, laptops, cars), every new Arm-based AI chip generates royalties. News this week confirmed "licensing momentum continues to power revenue growth" and spotlighted Arm among the 5 AI behemoths carving into the server CPU market.</li>
+        <li><strong>Balance sheet is clean:</strong> $3.6B cash vs $0.49B debt leaves Arm well-positioned to invest in next-gen CSS (Compute SubSystems) and defend its architecture moat across CPU, GPU, and NPU IP.</li>
+      </ul>
+
+      <h3>Bear Case</h3>
+      <ul>
+        <li><strong>Valuation has completely detached from fundamentals:</strong> At $396, ARM trades at 455x trailing earnings and 86x revenue — and crucially, <em>$139 above</em> the analyst consensus mean target of $257.30. The stock has priced in multiple years of future growth already.</li>
+        <li><strong>YTD +245% run leaves no margin of error:</strong> A beta of 3.79 means ARM will correct sharply in any risk-off event. Today's -3.93% on a broad market dip is a preview of what drawdowns look like. The Fear & Greed Index at 22 (Extreme Fear) signals the macro backdrop is hostile to high-multiple names.</li>
+        <li><strong>Royalty upside may be capped near-term:</strong> SoftBank controls ~90% of Arm's shares; overhang and any macro-driven selling could put sustained pressure on the float. At these multiples, any execution miss or guidance cut would be punished severely.</li>
+      </ul>
+
+      <div class="verdict-box">
+        <p class="verdict-label">Verdict</p>
+        <p class="verdict-text">HOLD — Exceptional business, extended price</p>
+        <p class="verdict-sub">ARM's IP licensing model is one of the cleanest AI picks in the semiconductor space, and the earnings trajectory (+47.9% YoY) justifies a premium. But at $396 — $139 above analyst consensus and up 245% YTD — the risk/reward for new buyers is poor. Current holders should ride the position; new capital should wait for a pullback toward the $260–$300 range before adding. Time horizon for re-entry thesis: 6–12 months.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-16</span><a href="https://finance.yahoo.com/markets/article/spacex-becomes-retails-biggest-ipo-trade-chart-of-the-day-100000991.html" target="_blank" rel="noopener" class="news-link">SpaceX becomes retail's biggest IPO trade: Chart of the Day ↗</a></li><li><span class="news-date">2026-06-16</span><a href="https://finance.yahoo.com/markets/stocks/articles/arm-holdings-licensing-momentum-continues-152000410.html" target="_blank" rel="noopener" class="news-link">Arm Holdings' Licensing Momentum Continues to Power Revenue Growth ↗</a></li><li><span class="news-date">2026-06-16</span><a href="https://www.barchart.com/story/news/2495519/stocks-supported-by-lower-crude-oil-prices-and-bond-yields" target="_blank" rel="noopener" class="news-link">Stocks Supported by Lower Crude Oil Prices and Bond Yields ↗</a></li><li><span class="news-date">2026-06-16</span><a href="https://finance.yahoo.com/technology/ai/articles/focus-5-ai-behemoths-carving-125200676.html" target="_blank" rel="noopener" class="news-link">Focus on 5 AI Behemoths Carving a Niche in the Server CPU Chip Market ↗</a></li><li><span class="news-date">2026-06-15</span><a href="https://www.barchart.com/story/news/2480274/stocks-settle-sharply-higher-as-us-iran-peace-deal-spurs-optimism" target="_blank" rel="noopener" class="news-link">Stocks Settle Sharply Higher as US-Iran Peace Deal Spurs Optimism ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-17 00:39 UTC.
+  </div>
+
+</div>
+</body>
+</html>
