@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — ANET | 2026-06-22</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 13 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-22</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">ANET</span>
+      <span class="company-name">Arista Networks, Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$169.67</span>
+      <span class="day-change" style="color:#4ade80">+2.87% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Data Centre Networking</span>
+      <span class="tag">Technology</span>
+      &nbsp;Computer Hardware
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$213.64B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.611</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#4ade8022;color:#4ade80;border:1px solid #4ade8044">STRONG BUY</span>
+        <span class="macro-sub">27 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+2.87%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:89%"></div></div>
+          <div class="range-labels"><span>$85.58</span><span style="color:#f97316">$169.67</span><span>$179.80</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$190.09</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $164.00 — $220.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">9.24M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$9.71B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +35.10%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$4.36B</p>
+        <p class="card-sub">Cash: $12.35B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+25.00%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">63.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">42.70%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">38.30%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">58.1x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">38.1x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">22.0x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">15.8x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">N/A</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$12.35B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <p style="color:#ccc;font-size:15px;line-height:1.7;margin-bottom:20px">
+          Arista Networks is the dominant provider of cloud networking infrastructure, best known for its EOS (Extensible Operating System) — a unified, programmable OS that runs across its entire hardware portfolio. As an <strong style="color:#f97316">AI Enabler</strong> in the Data Centre Networking space, Arista supplies the high-speed spine-and-leaf Ethernet fabric that hyperscalers (Microsoft, Meta) and large enterprises rely on to connect GPU clusters at 400G/800G speeds. It competes primarily with Cisco in enterprise and has become the reference architecture for AI infrastructure buildouts.
+        </p>
+
+        <p style="color:#f97316;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Bull Case</p>
+        <ul style="color:#ccc;font-size:14px;line-height:1.8;padding-left:20px;margin-bottom:20px">
+          <li><strong style="color:#eee">Exceptional growth + profitability combo:</strong> 35.1% YoY revenue growth to $9.71B TTM, while sustaining 63.5% gross margins and 42.7% operating margins — a combination rare even among elite software companies, let alone hardware vendors.</li>
+          <li><strong style="color:#eee">FCF fortress:</strong> $4.36B in free cash flow (45% FCF margin) and $12.35B in net cash with zero debt. The balance sheet is essentially a war chest that funds buybacks, R&amp;D, and insulates against any demand slowdown.</li>
+          <li><strong style="color:#eee">Multiple compressing into earnings:</strong> Forward P/E of 38.1x vs. trailing 58.1x signals earnings are growing faster than the stock — the business is rapidly growing into its premium valuation as EPS accelerates 25% YoY.</li>
+          <li><strong style="color:#eee">Strong analyst consensus:</strong> 27 analysts with a "Strong Buy" consensus and a mean target of $190.09 (+12% upside), with the high end at $220. Near-term momentum positive with a +2.87% day-of gain near 52-week highs.</li>
+        </ul>
+
+        <p style="color:#ef4444;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Bear Case</p>
+        <ul style="color:#ccc;font-size:14px;line-height:1.8;padding-left:20px;margin-bottom:20px">
+          <li><strong style="color:#eee">Nvidia competitive threat is real:</strong> Multiple headlines from June 18 confirm Nvidia has claimed the #1 spot in the $10B AI networking market, overtaking established players in data centre switching. If this gains traction, it could pressure Arista's fastest-growing segment and compress margins in AI-specific deployments.</li>
+          <li><strong style="color:#eee">Valuation leaves little room for error:</strong> At 22x P/S and 38x forward P/E, any guidance cut or growth deceleration — even from 35% to 20% — would likely trigger significant multiple compression. The stock already trades well above Wolfe Research's $175 target.</li>
+          <li><strong style="color:#eee">Hyperscaler customer concentration:</strong> Heavy reliance on a handful of large customers (Microsoft, Meta) means that any CapEx pause or vendor diversification decision has an outsized revenue impact with little advance warning.</li>
+        </ul>
+
+        <p style="color:#a78bfa;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Verdict</p>
+        <p style="color:#ccc;font-size:14px;line-height:1.7">
+          <span style="background:#1e1b4b;color:#a78bfa;font-weight:700;padding:2px 10px;border-radius:4px;font-size:13px;margin-right:8px">HOLD</span>
+          The fundamentals here are genuinely elite — 35% revenue growth, 43% operating margins, $12B net cash, no debt — but the Nvidia networking incursion is a credible competitive threat that has not yet shown up in earnings. At $169.67 (near 52-week high of $179.80) and above Wolfe's $175 target, risk/reward is balanced rather than compelling. Wait for Q3 guidance to clarify whether Nvidia is taking share in new AI cluster deployments before adding. Existing holders should sit tight; new buyers should look for a pullback toward $145–$155. <em style="color:#888">Time horizon: 6–12 months.</em>
+        </p>
+
+        <p style="color:#555;font-size:12px;margin-top:20px;font-style:italic">Not financial advice — for personal research only.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-19</span><a href="https://finance.yahoo.com/markets/stocks/articles/cisco-overvalued-7-01x-p-154600772.html" target="_blank" rel="noopener" class="news-link">Cisco is Overvalued at 7.01X P/S: Should You Still Buy the Stock? ↗</a></li><li><span class="news-date">2026-06-18</span><a href="https://finance.yahoo.com/markets/stocks/articles/wolfe-research-reaffirms-bullish-view-212158801.html" target="_blank" rel="noopener" class="news-link">Wolfe Research Reaffirms Bullish View on Arista Networks (ANET) With $175 Price Target ↗</a></li><li><span class="news-date">2026-06-18</span><a href="https://finance.yahoo.com/technology/articles/nvidia-overtakes-rivals-data-center-171707908.html" target="_blank" rel="noopener" class="news-link">Nvidia Overtakes Rivals in Data Center Switching Market ↗</a></li><li><span class="news-date">2026-06-18</span><a href="https://finance.yahoo.com/technology/ai/articles/nvidia-claims-no-1-spot-121540877.html" target="_blank" rel="noopener" class="news-link">Nvidia Claims No. 1 Spot in $10 Billion AI Networking Market ↗</a></li><li><span class="news-date">2026-06-18</span><a href="https://finance.yahoo.com/technology/articles/nvidia-takes-ethernet-switching-crown-121442408.html" target="_blank" rel="noopener" class="news-link">Nvidia Takes Ethernet Switching Crown ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-22 05:28 UTC.
+  </div>
+
+</div>
+</body>
+</html>
