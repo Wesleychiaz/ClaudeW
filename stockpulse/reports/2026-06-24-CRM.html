@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — CRM | 2026-06-24</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 15 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-24</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">CRM</span>
+      <span class="company-name">Salesforce, Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$153.42</span>
+      <span class="day-change" style="color:#4ade80">+2.20% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Enterprise Software</span>
+      <span class="tag">Technology</span>
+      &nbsp;Software - Application
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$125.65B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.151</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">52 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+2.20%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:5%"></div></div>
+          <div class="range-labels"><span>$146.32</span><span style="color:#f97316">$153.42</span><span>$276.80</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$251.53</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $160.00 — $475.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">14.98M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$42.83B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +13.30%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$16.55B</p>
+        <p class="card-sub">Cash: $11.84B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+52.20%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">77.60%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">21.80%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">18.70%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">17.8x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">9.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">2.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">3.7x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$42.55B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$11.84B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <p style="color:#ccc;font-size:15px;line-height:1.7;margin-bottom:16px">
+          Salesforce is the world's largest CRM platform, connecting sales, service, marketing, and commerce workflows for over 150,000 enterprise customers. It sits firmly in the <strong style="color:#f97316">AI Enabler</strong> category via <strong>Agentforce</strong> — its enterprise-grade AI agent platform that lets companies build, deploy, and manage autonomous AI agents on top of their CRM data. In a market increasingly oriented around agentic AI, Salesforce's proprietary customer data moat gives Agentforce a structural advantage over generic AI assistants.
+        </p>
+
+        <p style="color:#f97316;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Bull Case</p>
+        <ul style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:20px;padding-left:20px">
+          <li><strong style="color:#fff">~13% FCF yield at current prices</strong> — $16.55B in free cash flow against a $125.65B market cap is extraordinary for a 77.6%-gross-margin software business. This alone funds buybacks and debt reduction without sacrificing R&amp;D.</li>
+          <li><strong style="color:#fff">Deeply undervalued on a growth-adjusted basis</strong> — forward P/E of 9.9x alongside 52.2% YoY earnings growth implies a PEG ratio well below 0.2. The market appears to be pricing in permanent deceleration that the fundamentals don't yet support.</li>
+          <li><strong style="color:#fff">Agentforce is a credible AI pivot</strong> — unlike bolt-on AI features, Agentforce is built on Salesforce's proprietary Data Cloud, making it difficult for competitors to replicate. Enterprise AI agent adoption is in its early innings, and CRM is the most logical deployment surface.</li>
+          <li><strong style="color:#fff">52-analyst buy consensus with $251.53 mean target</strong> — that implies 64% upside from $153.42. Even the low-end target of $160 offers downside protection near current levels, with the high end at $475 reflecting Agentforce optionality.</li>
+        </ul>
+
+        <p style="color:#ef4444;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Bear Case</p>
+        <ul style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:20px;padding-left:20px">
+          <li><strong style="color:#fff">Persistent institutional selling</strong> — shares are down ~45% from the 52-week high of $276.80 and recently touched a new 52-week low of $146.32. That's not sentiment noise; it signals a structural re-rating. Until the selling exhausts itself, momentum works against the position.</li>
+          <li><strong style="color:#fff">$30.7B net debt constrains flexibility</strong> — with $42.55B in debt versus $11.84B cash, Salesforce has limited room for large acquisitions or capital returns if Agentforce adoption is slower than expected and requires incremental investment.</li>
+          <li><strong style="color:#fff">Microsoft is the wolf at the door</strong> — Copilot + Dynamics 365 gives Microsoft a bundled AI-native CRM alternative deeply integrated with Office, Teams, and Azure. Salesforce's pricing power in its core CRM market faces genuine competitive pressure for the first time in a decade.</li>
+        </ul>
+
+        <p style="color:#22c55e;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Verdict</p>
+        <p style="color:#ccc;font-size:14px;line-height:1.7">
+          <span style="background:#22c55e;color:#000;font-weight:800;padding:3px 10px;border-radius:4px;font-size:13px;margin-right:10px">BUY</span>
+          At 9.9x forward earnings, 52.2% earnings growth, and a 13% FCF yield, the valuation case is compelling even accounting for the debt load and competitive headwinds. The Extreme Fear macro reading (Fear &amp; Greed: 17) is amplifying the selloff beyond fundamentals — historically a setup for mean reversion in quality names. Agentforce is a genuine AI catalyst, not vaporware, and the 64% gap to analyst consensus suggests the market is deeply discounting its potential. <strong style="color:#fff">Suggested time horizon: 12–18 months.</strong> Key risk to monitor: Agentforce paid seat growth in Q2/Q3 2026 earnings calls.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-23</span><a href="https://finance.yahoo.com/markets/article/palantir-and-salesforce-put-softwares-rebound-on-trial-alphacheck-165851900.html" target="_blank" rel="noopener" class="news-link">Palantir and Salesforce put software's rebound on trial: AlphaCheck ↗</a></li><li><span class="news-date">2026-06-23</span><a href="https://finance.yahoo.com/markets/stocks/article/spacex-isnt-the-only-big-tech-stock-getting-crushed--check-out-the-destruction-in-salesforce-122756818.html" target="_blank" rel="noopener" class="news-link">SpaceX isn't the only Big Tech stock getting crushed — check out the destruction in Salesforce ↗</a></li><li><span class="news-date">2026-06-24</span><a href="https://www.fool.com/investing/2026/06/23/why-salesforce-stock-bumped-higher-on-a-lousy-tues/" target="_blank" rel="noopener" class="news-link">Why Salesforce Stock Bumped Higher on a Lousy Tuesday for the Market ↗</a></li><li><span class="news-date">2026-06-23</span><a href="https://finance.yahoo.com/markets/stocks/articles/subscription-revenues-partnerships-aid-docusign-174300989.html" target="_blank" rel="noopener" class="news-link">Subscription Revenues & Partnerships Aid Docusign Amid Low Liquidity ↗</a></li><li><span class="news-date">2026-06-23</span><a href="https://finance.yahoo.com/technology/ai/articles/anthropic-launches-claude-tag-research-170206065.html" target="_blank" rel="noopener" class="news-link">Anthropic launches Claude Tag in Slack with plans for wider rollout ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-24 01:18 UTC.
+  </div>
+
+</div>
+</body>
+</html>
