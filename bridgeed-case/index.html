@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BridgeED — Product Case Study · Wesley Chia</title>
+<meta name="description" content="BridgeED — a digital product strategy case study: the 'Third Pillar' of Singapore's EdTech ecosystem, connecting the home, the school and the student.">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f0f0f'/%3E%3Ctext x='6' y='23' font-family='Arial Black,Arial,sans-serif' font-size='20' font-weight='900' fill='%23ffffff'%3EW%3C/text%3E%3Ccircle cx='25.5' cy='21.5' r='3' fill='%23f97316'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0f0f0f; --carbon:#1a1a1a; --border:#2a2a2a;
+  --mist:#888888; --white:#ffffff; --spark:#f97316; --ember:#fb923c;
+  --maxw:1080px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--void);color:var(--white);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+::selection{background:rgba(249,115,22,.3);}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(18px,4vw,40px);background:rgba(15,15,15,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.mark{display:flex;align-items:baseline;font-weight:900;font-size:22px;letter-spacing:-.04em;}
+.mark .dot{width:6px;height:6px;background:var(--spark);border-radius:50%;margin-left:2px;align-self:flex-end;margin-bottom:3px;box-shadow:0 0 10px rgba(249,115,22,.7);}
+.nav-r{display:flex;gap:20px;align-items:center;font-size:13px;font-weight:500;}
+.nav-r a{color:var(--mist);transition:color .2s;}
+.nav-r a:hover{color:var(--white);}
+.nav-r a.live{color:var(--spark);}
+
+/* layout */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(18px,4vw,40px);}
+section{padding:clamp(48px,7vw,80px) 0;border-top:1px solid var(--border);}
+section:first-of-type{border-top:none;}
+.kicker{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--spark);font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.kicker::before{content:"";width:22px;height:1px;background:var(--spark);}
+.kicker .step{color:#555;font-weight:700;}
+h2{font-size:clamp(24px,3.6vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:18px;}
+h2 em{font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--ember),var(--spark));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.lead{color:#cfcfcf;font-size:clamp(15px,1.7vw,17px);line-height:1.7;max-width:680px;}
+.lead strong{color:#fff;font-weight:600;}
+p.body{color:var(--mist);font-size:15px;line-height:1.75;max-width:680px;margin-top:14px;}
+p.body strong{color:#ddd;}
+
+/* hero */
+.hero{padding-top:130px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:-160px;right:-120px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(249,115,22,.16),transparent 62%);pointer-events:none;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--mist);font-weight:600;border:1px solid var(--border);border-radius:999px;padding:6px 13px;margin-bottom:24px;}
+.eyebrow .d{width:6px;height:6px;border-radius:50%;background:var(--spark);box-shadow:0 0 8px var(--spark);}
+.hero h1{font-size:clamp(44px,8vw,86px);font-weight:900;letter-spacing:-.04em;line-height:1;margin-bottom:18px;}
+.hero h1 .ed{color:var(--spark);}
+.hero .tag{font-size:clamp(17px,2.4vw,24px);font-weight:600;color:#e8e8e8;letter-spacing:-.01em;max-width:760px;line-height:1.4;margin-bottom:14px;}
+.hero .tag em{font-style:italic;font-weight:400;color:var(--mist);}
+.hero .sub{color:var(--mist);font-size:15px;line-height:1.7;max-width:640px;}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;}
+.pill{font-size:11.5px;font-weight:600;color:#bbb;background:var(--carbon);border:1px solid var(--border);border-radius:999px;padding:6px 13px;}
+.pill.spark{color:var(--spark);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08);}
+
+/* meta strip */
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px 0;}
+.meta .m .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:#666;font-weight:700;margin-bottom:6px;}
+.meta .m .v{font-size:14px;color:#e6e6e6;font-weight:500;}
+@media(max-width:640px){.meta{grid-template-columns:repeat(2,1fr);}}
+
+/* contribution callout */
+.note{margin-top:26px;background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.22);border-radius:12px;padding:18px 20px;display:flex;gap:14px;align-items:flex-start;}
+.note .ic{flex-shrink:0;width:28px;height:28px;border-radius:7px;background:rgba(249,115,22,.16);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.note .t{font-size:14px;line-height:1.65;color:#d8d8d8;}
+.note .t b{color:#fff;}
+.note .t .edit{color:var(--spark);font-style:italic;}
+
+/* stat row */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px;}
+.statcard{background:var(--carbon);border:1px solid var(--border);border-radius:12px;padding:22px;}
+.statcard .n{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1;}
+.statcard .n span{color:var(--spark);}
+.statcard .d{font-size:13.5px;color:var(--mist);margin-top:10px;line-height:1.5;}
+@media(max-width:640px){.stats{grid-template-columns:1fr;}}
+
+/* framework gap visual */
+.fw{display:flex;flex-direction:column;gap:8px;margin-top:28px;max-width:520px;}
+.fw-row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:var(--carbon);font-size:14px;}
+.fw-row .lvl{font-weight:700;color:#fff;width:88px;flex-shrink:0;}
+.fw-row .ds{color:var(--mist);font-size:13px;}
+.fw-row.covered{opacity:.62;}
+.fw-row.covered .lvl::after{content:" ✓";color:#4ade80;}
+.fw-row.gap{border-color:var(--spark);background:rgba(249,115,22,.08);}
+.fw-row.gap .lvl{color:var(--spark);}
+.fw-row.gap .ds{color:#e8c9a8;}
+
+/* personas */
+.personas{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+.persona{background:var(--carbon);border:1px solid var(--border);border-radius:14px;padding:24px;}
+.persona .who{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--spark);font-weight:700;margin-bottom:6px;}
+.persona h3{font-size:19px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;}
+.persona .quote{font-size:15px;font-style:italic;color:#e2e2e2;line-height:1.6;border-left:2px solid var(--spark);padding-left:14px;margin-bottom:16px;}
+.persona ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.persona li{font-size:13.5px;color:var(--mist);line-height:1.5;padding-left:18px;position:relative;}
+.persona li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#444;}
+@media(max-width:680px){.personas{grid-template-columns:1fr;}}
+
+/* loop */
+.loop{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px;margin-bottom:30px;}
+.loop .node{font-size:14px;font-weight:700;color:#fff;background:var(--carbon);border:1px solid var(--border);border-radius:999px;padding:9px 18px;}
+.loop .node b{color:var(--spark);}
+.loop .arr{color:#555;font-size:16px;}
+
+/* wireframe grid */
+.screens{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+.screen{background:#faf9f5;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.screen img{width:100%;display:block;}
+.screen .cap{padding:12px 16px;background:var(--carbon);border-top:1px solid var(--border);font-size:13px;color:#cfcfcf;}
+.screen .cap b{color:#fff;}
+@media(max-width:680px){.screens{grid-template-columns:1fr;}}
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px;}
+.feat .f{background:var(--carbon);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.feat .f .ft{font-size:14px;font-weight:700;margin-bottom:7px;}
+.feat .f .fd{font-size:13px;color:var(--mist);line-height:1.55;}
+@media(max-width:680px){.feat{grid-template-columns:1fr;}}
+
+/* positioning table */
+.tbl{margin-top:8px;overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px;}
+th,td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--border);}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:#777;font-weight:700;background:#151515;}
+td:first-child,th:first-child{font-weight:700;color:#fff;}
+tr:last-child td{border-bottom:none;}
+tr.us{background:rgba(249,115,22,.07);}
+tr.us td:first-child{color:var(--spark);}
+tr.us td{color:#f0e0d2;}
+.badge-mo{font-size:10px;font-weight:700;color:var(--spark);background:rgba(249,115,22,.14);border:1px solid rgba(249,115,22,.3);border-radius:5px;padding:2px 7px;white-space:nowrap;}
+
+/* KPI grid */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px;}
+.kpi{background:var(--carbon);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.kpi .n{font-size:30px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1;}
+.kpi .n span{color:var(--spark);}
+.kpi .d{font-size:13px;color:var(--mist);margin-top:9px;line-height:1.5;}
+@media(max-width:680px){.kpis{grid-template-columns:1fr;}}
+
+/* bet + risks */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+.panel{background:var(--carbon);border:1px solid var(--border);border-radius:14px;padding:24px;}
+.panel h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.panel h3 .dot{width:7px;height:7px;border-radius:50%;background:var(--spark);}
+.panel .row{padding:11px 0;border-top:1px solid var(--border);font-size:13.5px;color:var(--mist);line-height:1.55;}
+.panel .row:first-of-type{border-top:none;}
+.panel .row b{color:#fff;display:block;margin-bottom:3px;font-weight:600;font-size:13.5px;}
+@media(max-width:680px){.cols{grid-template-columns:1fr;}}
+
+/* closing */
+.closing{text-align:center;padding:clamp(60px,9vw,100px) 0;}
+.closing h2{font-size:clamp(26px,4.4vw,46px);max-width:820px;margin:0 auto 26px;}
+.cta{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:12px 22px;border-radius:8px;transition:transform .2s,background .2s,border-color .2s,color .2s;}
+.btn:hover{transform:translateY(-2px);}
+.btn-p{background:var(--spark);color:#0f0f0f;}
+.btn-p:hover{background:var(--ember);}
+.btn-g{border:1px solid var(--border);color:var(--mist);}
+.btn-g:hover{border-color:var(--spark);color:#fff;}
+
+footer{border-top:1px solid var(--border);padding:30px 0;}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+footer span{font-size:12.5px;color:#555;}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);}
+.reveal.in{opacity:1;transform:none;}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../" class="mark" aria-label="Back to portfolio">W<span class="dot"></span></a>
+  <div class="nav-r">
+    <a href="../">← Portfolio</a>
+    <a href="../BridgeED/" target="_blank" class="live">Live wireframe ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><span class="d"></span>Case study · Digital product strategy</span>
+    <h1>Bridge<span class="ed">ED</span></h1>
+    <p class="tag">The <strong>“Third Pillar”</strong> of Singapore’s EdTech — connecting the home, the school &amp; <em>the student.</em></p>
+    <p class="sub">An automated parental-reinforcement platform that syncs with the Student Learning Space (SLS) and turns each week’s lessons into a 1-minute action a parent can actually take — at near-zero cost to the teacher.</p>
+
+    <div class="pills">
+      <span class="pill spark">0→1 Product Strategy</span>
+      <span class="pill">EdTech · MOE / GovTech</span>
+      <span class="pill">G2C public service</span>
+      <span class="pill">AI-assisted</span>
+    </div>
+
+    <div class="meta">
+      <div class="m"><div class="k">Context</div><div class="v">Team project (Team 3)</div></div>
+      <div class="m"><div class="k">Domain</div><div class="v">Home–school learning</div></div>
+      <div class="m"><div class="k">Status</div><div class="v">Strategy + wireframes</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- 1. THE GAP -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">01</span> The gap</div>
+    <h2>There’s an <em>information blackout</em> between the classroom and the home.</h2>
+    <p class="lead">SLS gives students a world-class place to learn. Parents Gateway handles admin. But <strong>no one serves the parent as a learning partner</strong> — so families can’t see what’s being taught, or how to help.</p>
+
+    <div class="stats">
+      <div class="statcard"><div class="n">60<span>%</span></div><div class="d">of parents feel “blind” to their child’s day-to-day school learning.</div></div>
+      <div class="statcard"><div class="n">10+<span>hrs</span></div><div class="d">a week teachers spend on manual parent updates across WhatsApp, ClassDojo, SLS &amp; PG.</div></div>
+    </div>
+
+    <p class="body"><strong>And MOE’s own AI roadmap reinforces the gap.</strong> The AI features now in SLS — Adaptive Learning, Teaching Assistants, Feedback Assistants — map to MOE’s “AI in Education” framework, which has exactly three levels. None of them is the home.</p>
+
+    <div class="fw">
+      <div class="fw-row covered"><span class="lvl">System</span><span class="ds">Rules &amp; recommendation logic</span></div>
+      <div class="fw-row covered"><span class="lvl">Teacher</span><span class="ds">Copilots automate prep &amp; analysis</span></div>
+      <div class="fw-row covered"><span class="lvl">Student</span><span class="ds">Adaptive pathways &amp; feedback</span></div>
+      <div class="fw-row gap"><span class="lvl">Parent</span><span class="ds">Unaddressed — the layer BridgeED owns</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. WHO HURTS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">02</span> Who hurts</div>
+    <h2>A two-sided problem.</h2>
+    <p class="lead">The same gap frustrates the parent who wants to help and overloads the teacher who can’t add more work.</p>
+    <div class="personas" style="margin-top:28px;">
+      <div class="persona">
+        <div class="who">Parent · “Priya”</div>
+        <h3>The concerned parent</h3>
+        <div class="quote">“I feel like a stranger to my son’s education. I ask how school was — he says ‘ok lor’. Then his results come back poor.”</div>
+        <ul>
+          <li>The “I don’t know / ok” barrier when asking about school</li>
+          <li>Finds out the child has struggled for weeks only at test time</li>
+          <li>Unsure how to support meaningfully — or what was even covered</li>
+        </ul>
+      </div>
+      <div class="persona">
+        <div class="who">Teacher · “Tan”</div>
+        <h3>The overburdened teacher</h3>
+        <div class="quote">“I want to focus on teaching — not spend my evenings updating anxious parents across five different apps.”</div>
+        <ul>
+          <li>10+ hrs/week on manual reporting → “app fatigue” &amp; burnout</li>
+          <li>Constant “noisy” communication and parent pressure</li>
+          <li>Manual parent-comms is simply unsustainable at class scale</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. THE WEDGE -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">03</span> The insight</div>
+    <h2>Deliver parent value at <em>near-zero teacher cost.</em></h2>
+    <p class="lead">BridgeED is the <strong>“Third Pillar”</strong> of the MOE EdTech stack. The wedge: it rides on data that already exists in SLS and uses AI to translate it — so parents get structured, bite-sized actions <strong>without adding to the teacher’s load.</strong></p>
+    <p class="body"><strong>Product vision:</strong> an integrated education ecosystem where schools and families work in harmony to nurture every child’s potential — replacing “noisy” communication with structured learning.</p>
+  </div>
+</section>
+
+<!-- 4. THE PRODUCT -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">04</span> The product</div>
+    <h2>One weekly loop. Four screens.</h2>
+    <p class="lead">A parent absorbs the week in a minute; a teacher publishes it in under five. The loop is the product.</p>
+    <div class="loop" style="margin-top:24px;">
+      <span class="node"><b>1.</b> This Week</span><span class="arr">→</span>
+      <span class="node"><b>2.</b> Snapshot</span><span class="arr">→</span>
+      <span class="node"><b>3.</b> Playbook</span><span class="arr">→</span>
+      <span class="node"><b>4.</b> Progress</span>
+    </div>
+
+    <div class="screens">
+      <div class="screen"><img src="img/screen-thisweek.jpg" alt="This Week screen wireframe" loading="lazy"><div class="cap"><b>This Week</b> — what your child learned, in one glance</div></div>
+      <div class="screen"><img src="img/screen-snapshot.jpg" alt="Snapshot screen wireframe" loading="lazy"><div class="cap"><b>Snapshot</b> — the 1-minute curriculum summary</div></div>
+      <div class="screen"><img src="img/screen-playbook.jpg" alt="Playbook screen wireframe" loading="lazy"><div class="cap"><b>Playbook</b> — a 5-min real-world activity (e.g. fractions over “Pizza Night”)</div></div>
+      <div class="screen"><img src="img/screen-progress.jpg" alt="Progress screen wireframe" loading="lazy"><div class="cap"><b>Progress</b> — streaks &amp; concepts covered, “am I supporting my child?”</div></div>
+    </div>
+
+    <div class="feat">
+      <div class="f"><div class="ft">Curriculum Snapshots</div><div class="fd">Complex syllabus goals → 1-minute, jargon-free summaries for busy parents.</div></div>
+      <div class="f"><div class="ft">Micro-Reinforcement Playbook</div><div class="fd">Low-effort, high-impact home activities tied to this week’s lesson.</div></div>
+      <div class="f"><div class="ft">Teacher: review &amp; push</div><div class="fd">Direct SLS sync auto-generates snapshots — teacher just approves. &lt;5 min/week.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. WHY IT WINS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">05</span> Why it wins</div>
+    <h2>It fills the open quadrant.</h2>
+    <p class="lead">BridgeED doesn’t compete with the existing tools — it occupies the gap they leave: the <strong>parent, as a learning partner</strong>, at the lowest teacher cost of any option.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Tool</th><th>Primary user</th><th>Teacher load</th><th>Home action</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Parents Gateway</td><td>Parents (admin)</td><td>Low</td><td>Sign forms</td><td>MOE official</td></tr>
+          <tr><td>ClassDojo</td><td>Teachers (engagement)</td><td>High (10+ hrs)</td><td>View photos</td><td>Unofficial</td></tr>
+          <tr><td>SLS</td><td>Students (study)</td><td>Medium</td><td>Practice questions</td><td>MOE official</td></tr>
+          <tr class="us"><td>BridgeED</td><td>Parents (learning)</td><td>Ultra-low (&lt;5 min)</td><td>Micro-playbooks</td><td><span class="badge-mo">Third Pillar</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 6. HOW WE'D KNOW -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">06</span> How we’d know it worked</div>
+    <h2>Outcomes, not vanity.</h2>
+    <p class="lead">Success is measured on both sides of the bridge — parent empowerment and teacher time reclaimed — plus the downstream learning signal.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="n">70<span>%</span></div><div class="d">of parents as weekly active users, completing ≥1 playbook a month.</div></div>
+      <div class="kpi"><div class="n">75<span>%</span></div><div class="d">cut in teacher reporting time — from ~8 hrs/week to under 2.5.</div></div>
+      <div class="kpi"><div class="n">+25<span>%</span></div><div class="d">lift in SLS module completion, driven by home reinforcement.</div></div>
+      <div class="kpi"><div class="n">40<span>%</span></div><div class="d">fewer “status update” queries from parents to teachers.</div></div>
+      <div class="kpi"><div class="n">30<span>%</span></div><div class="d">of parents report reduced reliance on external tuition.</div></div>
+      <div class="kpi"><div class="n">&lt;5<span>min</span></div><div class="d">for a teacher to publish the weekly snapshot to a class.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. THE BET & RISKS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="step">07</span> The bet &amp; the risks</div>
+    <h2>Start small. Earn the right to scale.</h2>
+    <p class="lead">A focused pilot to validate the dual-impact model before going wide — and an honest read on what could break it.</p>
+    <div class="cols" style="margin-top:24px;">
+      <div class="panel">
+        <h3><span class="dot"></span>The MVP bet</h3>
+        <div class="row"><b>12-week pilot · Primary 3 Math</b>5 schools · 10 teachers · ~300 students &amp; parents.</div>
+        <div class="row"><b>Why P3?</b>The anxiety inflection point — Science enters, math gets harder, GEP transition. Families need alignment most here.</div>
+        <div class="row"><b>Why a SAP + neighbourhood mix?</b>To prove BridgeED works as a social leveler, not just for the already-advantaged.</div>
+        <div class="row"><b>Then:</b> Pilot → Growth (30 schools) → Scale (all 180 primary schools).</div>
+      </div>
+      <div class="panel">
+        <h3><span class="dot"></span>Risks I’d address head-on</h3>
+        <div class="row"><b>“Won’t MOE just build this?”</b>BridgeED proves the parent-reinforcement model and is designed to plug into SLS — as a pilot, partner, or pattern MOE adopts.</div>
+        <div class="row"><b>AI accuracy</b>Snapshots must be pedagogically correct → human-in-the-loop: teachers rate &amp; approve every output.</div>
+        <div class="row"><b>Parent drop-off</b>“Time-poverty” kills habit apps → catch-up playbooks + light gamification to lower the barrier.</div>
+        <div class="row"><b>Sustainability</b>TCOO cost-recovery (~$1.50/student/mo) → self-funding by Year 2, surplus to an R&amp;D sinking fund.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="closing">
+  <div class="wrap">
+    <h2>BridgeED is the missing link — turning <em>‘home’</em> from a source of anxiety into a second site for learning.</h2>
+    <div class="cta">
+      <a href="../BridgeED/" target="_blank" class="btn btn-p">See the live wireframes →</a>
+      <a href="../" class="btn btn-g">← Back to portfolio</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="mark" style="font-size:18px;">W<span class="dot" style="width:5px;height:5px;"></span></span>
+    <span>Wesley Chia · BridgeED is a team project · Case study built with Claude</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in'));return;
+  }
+  document.querySelectorAll('section .wrap > *, .hero .wrap > *').forEach(el=>el.classList.add('reveal'));
+  const io=new IntersectionObserver((ents)=>{
+    ents.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.06,rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>
