@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — ADBE | 2026-06-26</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 17 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-26</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">ADBE</span>
+      <span class="company-name">Adobe Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$193.41</span>
+      <span class="day-change" style="color:#f87171">-1.60% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Creative Software</span>
+      <span class="tag">Technology</span>
+      &nbsp;Software - Application
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$76.88B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.404</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#fbbf2422;color:#fbbf24;border:1px solid #fbbf2444">HOLD</span>
+        <span class="macro-sub">32 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#f87171;font-weight:600">-1.60%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:2%"></div></div>
+          <div class="range-labels"><span>$190.12</span><span style="color:#f97316">$193.41</span><span>$392.58</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$282.27</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $190.00 — $460.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">6.11M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$25.20B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +12.70%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$9.22B</p>
+        <p class="card-sub">Cash: $5.63B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+7.90%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">89.40%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">35.30%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">28.70%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">11.1x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">7.0x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">3.1x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">6.7x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$7.08B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$5.63B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text" style="color:#ccc;font-size:14px;line-height:1.75">
+
+        <p style="margin-bottom:12px">Adobe Inc. is the world's dominant creative software platform — home to Photoshop, Illustrator, Premiere Pro, Acrobat, and the Experience Cloud for enterprise marketing. In the AI ecosystem it sits firmly in the <strong style="color:#f5a623">Enabler</strong> category: it is embedding generative AI directly into professional workflows through <em>Firefly</em>, its proprietary image, video, and vector generation engine trained on commercially licensed content. The strategy is augmentation over replacement — keeping enterprise creative teams (and their legal teams) compliant while accelerating output.</p>
+
+        <p style="color:#f5a623;font-weight:700;margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:0.05em">Bull Case</p>
+        <ul style="margin:0 0 16px 0;padding-left:20px">
+          <li style="margin-bottom:8px"><strong>Historically cheap valuation for a software franchise.</strong> At $193.41, ADBE trades at a forward P/E of <strong>7.0×</strong> and just <strong>3.1× revenue</strong> — deeply compressed for a business posting 89.4% gross margins and generating <strong>$9.22B in annual free cash flow</strong> (roughly a 12% FCF yield on an $76.88B market cap). The market is pricing in disruption that hasn't materialised in the financials.</li>
+          <li style="margin-bottom:8px"><strong>Topaz Labs acquisition accelerates Firefly.</strong> Adobe just acquired Topaz Labs (announced June 25, 2026), a specialist in AI-powered image enhancement and video upscaling widely regarded as best-in-class. This directly bolsters Firefly's video capabilities and closes a quality gap versus competitors — a targeted, competency-filling M&A move rather than a defensive reaction.</li>
+          <li style="margin-bottom:8px"><strong>Revenue compounding at scale.</strong> $25.2B in TTM revenue is growing at <strong>12.7% YoY</strong> with an operating margin of <strong>35.3%</strong> — proof that Firefly investment hasn't eroded profitability. Earnings are growing at 7.9% YoY despite the AI narrative headwinds.</li>
+          <li style="margin-bottom:8px"><strong>Analyst consensus and contrarian signals align.</strong> 32 analysts carry a mean price target of <strong>$282.27</strong> (~46% above today's price), with a bull case of $460. Michael Burry adding to his ADBE position in the same week the stock sits near its 52-week low is a notable contrarian data point.</li>
+        </ul>
+
+        <p style="color:#e05c5c;font-weight:700;margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:0.05em">Bear Case</p>
+        <ul style="margin:0 0 16px 0;padding-left:20px">
+          <li style="margin-bottom:8px"><strong>Sitting $3 above a 52-week low in Extreme Fear conditions.</strong> At $193.41 versus a 52-week low of $190.12, and with the Fear &amp; Greed index at <strong>13 (Extreme Fear)</strong>, macro risk could push ADBE below technical support before any fundamental re-rating. Near-term downside is real.</li>
+          <li style="margin-bottom:8px"><strong>AI disruption narrative is sticky.</strong> The market assigns a ~40% discount to Adobe versus historical software comps because Midjourney, DALL-E, and open-source image models are credible creative AI alternatives. Even if enterprise adoption of third-party tools proves slower than feared, multiple compression may persist until Adobe demonstrates clear Firefly monetisation metrics.</li>
+          <li style="margin-bottom:8px"><strong>Experience Cloud macro exposure.</strong> CMO budgets contract in risk-off environments, and Adobe's marketing cloud competes in a crowded enterprise SaaS space. The CMO's own comments on the shift to AI-driven search suggest the analytics TAM could fragment — a headwind for the highest-growth segment.</li>
+        </ul>
+
+        <p style="color:#f5a623;font-weight:700;margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:0.05em">Verdict</p>
+        <p style="margin:0"><span style="background:#1a3a1a;color:#5dbb5d;padding:2px 10px;border-radius:4px;font-weight:700;margin-right:8px">BUY</span> At 7× forward earnings and a ~12% FCF yield with 12.7% revenue growth, Adobe's risk/reward at current levels is compelling for a long-term investor comfortable with near-term volatility. The Topaz Labs acquisition is precisely the kind of strategic bolt-on that strengthens the Firefly moat while the stock sits near multiyear lows. <strong>Suggested horizon: 12–18 months.</strong> The catalyst will be clearer Firefly monetisation metrics in upcoming earnings — that is when the valuation gap vs. peers is most likely to close.</p>
+
+        <p style="color:#666;font-size:12px;margin-top:16px;font-style:italic">Not financial advice — for personal research only.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-26</span><a href="https://stocktwits.com/news-articles/markets/equity/michael-burry-buys-long-dated-microsoft-calls-adds-jd-adobe-trims-palantir-short/cZ1cdmdR7Xs" target="_blank" rel="noopener" class="news-link">Michael Burry Buys Long-Dated Microsoft Calls, Adds To JD And Adobe — Trims Palantir Short ↗</a></li><li><span class="news-date">2026-06-26</span><a href="https://www.fool.com/coverage/better-buy/2026/06/25/adobe-vs-datadog-which-technology-stock-is-a-better-buy-in-2026/" target="_blank" rel="noopener" class="news-link">Adobe vs. Datadog: Which Technology Stock Is a Better Buy in 2026? ↗</a></li><li><span class="news-date">2026-06-25</span><a href="https://www.investors.com/news/adobe-stock-powerhouse-why-it-depends-on-your-investing-style/?src=A00220&yptr=yahoo" target="_blank" rel="noopener" class="news-link">Is Adobe Stock A Powerhouse Or A Pass? Why It Depends On Your Investing Style. ↗</a></li><li><span class="news-date">2026-06-25</span><a href="https://www.barchart.com/story/news/3417/adbe-stock-alert-adobe-doubles-down-on-ai-with-topaz-labs-acquisition" target="_blank" rel="noopener" class="news-link">ADBE Stock Alert: Adobe Doubles Down on AI With Topaz Labs Acquisition ↗</a></li><li><span class="news-date">2026-06-25</span><a href="https://finance.yahoo.com/technology/ai/articles/adobe-buys-topaz-labs-boost-184728733.html" target="_blank" rel="noopener" class="news-link">Adobe Buys Topaz Labs to Boost Firefly ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-26 08:34 UTC.
+  </div>
+
+</div>
+</body>
+</html>
