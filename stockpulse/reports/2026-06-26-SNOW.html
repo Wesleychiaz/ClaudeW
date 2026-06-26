@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — SNOW | 2026-06-26</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 16 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-26</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">SNOW</span>
+      <span class="company-name">Snowflake Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$227.06</span>
+      <span class="day-change" style="color:#4ade80">+0.49% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Enabler</span>
+      <span class="tag">Data Platform</span>
+      <span class="tag">Technology</span>
+      &nbsp;Software - Application
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$78.70B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.355</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#4ade8022;color:#4ade80;border:1px solid #4ade8044">STRONG BUY</span>
+        <span class="macro-sub">48 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+0.49%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:65%"></div></div>
+          <div class="range-labels"><span>$118.30</span><span style="color:#f97316">$227.06</span><span>$284.99</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$292.53</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $110.00 — $500.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">8.64M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$5.03B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +33.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$1.74B</p>
+        <p class="card-sub">Cash: $2.95B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#888">N/A</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">67.10%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">-22.20%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">-23.80%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">N/Ax</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">84.5x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">15.6x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">40.6x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$2.77B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$2.95B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <h3>Company Overview</h3>
+      <p id="analysis-text">Snowflake is the dominant cloud-native data platform, enabling enterprises to consolidate, share, and query massive datasets across AWS, Azure, and GCP without managing infrastructure. As an AI Enabler, it sits upstream of the AI stack — before models can be trained or queried against enterprise data, that data must live somewhere governed and accessible, which is exactly what Snowflake's AI Data Cloud provides. CEO Sridhar Ramaswamy (former Google SVP of Ads) has aggressively repositioned the platform around AI workloads, with Cortex AI allowing customers to run LLMs and vector search directly on their Snowflake data.</p>
+
+      <h3>Bull Case</h3>
+      <ul>
+        <li><strong>33.5% revenue growth at scale</strong> — generating $5.03B TTM while still compounding at 33.5% YoY is exceptional for a $78.7B company. Most software peers at this revenue scale are growing at 10–20%.</li>
+        <li><strong>Real free cash flow of $1.74B</strong> — despite GAAP losses (-23.8% net margin), Snowflake generates $1.74B in FCF, reflecting the SaaS model's strong cash conversion once stock-based comp is stripped out. Net cash position is nearly neutral ($2.95B cash vs. $2.77B debt).</li>
+        <li><strong>Gross margins of 67.1% provide operating leverage runway</strong> — at scale, as S&M and R&D moderate, operating margins should inflect positive. The market is pricing in this path via 84.5x forward P/E.</li>
+        <li><strong>48 analysts at Strong Buy, mean target $292.53 (+29% upside)</strong> — current price of $227.06 sits 65% of the 52-week range, offering a potentially attractive entry relative to the $284.99 high, with consensus well above current price. AI Data Cloud momentum is a recurring bull narrative in recent weeks.</li>
+      </ul>
+
+      <h3>Bear Case</h3>
+      <ul>
+        <li><strong>Extreme Fear macro backdrop (F&G: 13) creates near-term risk</strong> — SNOW's beta of 1.355 means it will amplify broader market drawdowns. In a risk-off environment, high-multiple growth names are first to be de-rated. Downside scenario to the 52w low of $118.30 represents a -48% move from here.</li>
+        <li><strong>Valuation leaves little room for error at 15.6x P/S and 84.5x forward P/E</strong> — any deceleration below 30% revenue growth or a CFO miss could trigger sharp multiple compression. The $500 analyst high vs. $110 low shows the market is deeply divided on the terminal value story.</li>
+        <li><strong>Competitive pressure from hyperscalers intensifying</strong> — AWS Redshift, Google BigQuery, and Databricks are all competing directly for the data lake/warehouse workload. Microsoft Fabric bundles data platform capabilities into the M365 stack, reducing Snowflake's land-and-expand in existing MSFT enterprise accounts.</li>
+      </ul>
+
+      <div class="verdict-box">
+        <p class="verdict-label">Verdict</p>
+        <p class="verdict-text">HOLD — Accumulate on Weakness</p>
+        <p class="verdict-sub">Snowflake's fundamentals are compelling (33.5% growth, $1.74B FCF, 67% gross margins), but the 84.5x forward P/E and extreme-fear macro environment justify patience rather than urgency. The mean analyst target of $292.53 implies ~29% upside, but the current Fear &amp; Greed score of 13 suggests dips are likely before that plays out. Best entry would be a pullback toward the $180–200 range if macro deteriorates. Time horizon: 12–18 months.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-26</span><a href="https://finance.yahoo.com/energy/articles/7-trillion-ai-boom-running-000000304.html" target="_blank" rel="noopener" class="news-link">The $7 Trillion AI Boom Is Running Out of Power ↗</a></li><li><span class="news-date">2026-06-25</span><a href="https://finance.yahoo.com/small-business/articles/tech-multi-trillion-dollar-opportunity-171340113.html" target="_blank" rel="noopener" class="news-link">Tech’s Multi-Trillion-Dollar Opportunity: Pax8 CFO Craig Foster, Live from Pax8 Beyond 2026 ↗</a></li><li><span class="news-date">2026-06-25</span><a href="https://finance.yahoo.com/technology/articles/oracles-contract-backlog-swells-long-135900639.html" target="_blank" rel="noopener" class="news-link">Oracle's Contract Backlog Swells: Is Long-Term Revenue Growth Secured? ↗</a></li><li><span class="news-date">2026-06-24</span><a href="https://247wallst.com/investing/2026/06/24/will-snowflake-reach-300-this-year/" target="_blank" rel="noopener" class="news-link">Will Snowflake Reach $300 This Year? ↗</a></li><li><span class="news-date">2026-06-24</span><a href="https://finance.yahoo.com/markets/stocks/articles/burke-wealth-management-thoughts-impact-130347708.html" target="_blank" rel="noopener" class="news-link">Burke Wealth Management’s Thoughts on the Impact of AI on Snowflake (SNOW) ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-26 08:30 UTC.
+  </div>
+
+</div>
+</body>
+</html>
