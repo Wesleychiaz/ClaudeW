@@ -204,6 +204,36 @@ nav.scrolled{
   .about-photo{max-width:380px;margin:0 auto;width:100%;}
 }
 
+/* ---------- case studies ---------- */
+.cases{display:flex;flex-direction:column;gap:20px;margin-top:8px;}
+.case{display:grid;grid-template-columns:0.92fr 1.08fr;background:var(--carbon);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+.case:hover{border-color:rgba(249,115,22,.4);box-shadow:0 20px 50px -20px rgba(0,0,0,.7);}
+.case-media{position:relative;overflow:hidden;background:#111;border-right:1px solid var(--border);min-height:300px;}
+.case-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;}
+.case-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,15,15,.1) 30%,rgba(15,15,15,.82));}
+.case-media .meta{position:absolute;left:24px;right:24px;bottom:22px;z-index:2;}
+.case-media .meta h3{font-size:23px;font-weight:800;letter-spacing:-.02em;margin:10px 0 4px;}
+.case-tag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--spark);background:rgba(249,115,22,.14);border:1px solid rgba(249,115,22,.32);border-radius:999px;padding:4px 10px;}
+.case-visit{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:12.5px;font-weight:600;color:#bbb;transition:color .25s;}
+.case-visit .arrow{transition:transform .25s;}
+.case:hover .case-visit{color:var(--spark);}
+.case:hover .case-visit .arrow{transform:translateX(4px);}
+.case-body{padding:28px 30px;display:flex;flex-direction:column;gap:15px;}
+.case-row{display:grid;grid-template-columns:124px 1fr;gap:16px;align-items:start;}
+.case-row .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:#666;font-weight:700;padding-top:3px;}
+.case-row .v{font-size:14.5px;color:#cbcbcb;line-height:1.62;}
+.case-row .v strong{color:#fff;font-weight:600;}
+.case-row.outcome{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.18);border-radius:10px;padding:12px 14px;margin:2px 0;}
+.case-row.outcome .k{color:var(--spark);}
+.case-row.outcome .v{color:#fff;font-weight:500;}
+@media(max-width:780px){
+  .case{grid-template-columns:1fr;}
+  .case-media{min-height:0;aspect-ratio:16/10;border-right:none;border-bottom:1px solid var(--border);}
+  .case-body{padding:22px;}
+  .case-row{grid-template-columns:1fr;gap:5px;}
+  .case-row .k{padding-top:0;}
+}
+
 /* ---------- work / filter ---------- */
 .work-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:40px;}
 .filters{display:flex;gap:8px;flex-wrap:wrap;}
@@ -326,11 +356,60 @@ footer{position:relative;z-index:2;border-top:1px solid var(--border);}
       <p class="reveal">Most of these projects started as something in my own life: a knee surgery, a mortgage decision, helping people I love learn something new. So I built a tool for it — with Claude as my pair, shipping fast and keeping it personal.</p>
       <p class="reveal">I care about making AI feel <strong>useful and human</strong>, not hype-y. If it doesn't make a real day a little better, it doesn't ship.</p>
       <div class="stats reveal">
-        <div class="stat"><div class="num">15<span>+</span></div><div class="lbl">Live projects</div></div>
-        <div class="stat"><div class="num">4</div><div class="lbl">Domains explored</div></div>
+        <div class="stat"><div class="num">15<span>+</span></div><div class="lbl">Products shipped 0→1</div></div>
+        <div class="stat"><div class="num">4</div><div class="lbl">Problem spaces</div></div>
         <div class="stat"><div class="num">100<span>%</span></div><div class="lbl">Built with Claude</div></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ============ CASE STUDIES ============ -->
+<section class="section" id="cases">
+  <div class="kicker reveal">Case studies</div>
+  <h2 class="section-title reveal">A closer look at how I work.</h2>
+  <p class="section-lead reveal">Two projects, taken from problem to shipped product — the thinking, the trade-offs, and what I'd take into the next build.</p>
+
+  <div class="cases" style="margin-top:40px;">
+
+    <!-- StockPulse -->
+    <div class="case reveal">
+      <div class="case-media">
+        <img src="thumbs/stockpulse.jpg" alt="StockPulse" loading="lazy">
+        <div class="meta">
+          <span class="case-tag">0→1 · Automated pipeline</span>
+          <h3>StockPulse</h3>
+          <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" target="_blank" rel="noopener" class="case-visit">Visit the live product <span class="arrow">→</span></a>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="case-row"><div class="k">Problem</div><div class="v">The AI stock ecosystem moves fast, but my research didn't compound — notes were scattered and nothing was repeatable, so I kept re-learning the same companies.</div></div>
+        <div class="case-row"><div class="k">Who it's for</div><div class="v">Long-term investors who want signal over noise across the AI ecosystem — starting with me.</div></div>
+        <div class="case-row"><div class="k">What I shipped</div><div class="v">An <strong>automated pipeline</strong> (fetch → analyse → publish) that produces one deep-dive report every weekday across a <strong>25-stock</strong> AI watchlist, plus a macro dashboard and a searchable archive. One company, one day — by design.</div></div>
+        <div class="case-row outcome"><div class="k">Outcome</div><div class="v"><strong>17 reports auto-published in the first ~3 weeks</strong> at a reliable weekday cadence — with effectively zero manual work per report.</div></div>
+        <div class="case-row"><div class="k">What I learned</div><div class="v">Cadence beats depth: a system that ships a little every day compounds faster than the occasional big research push. Tight constraints — one stock, one day — were what made it actually shippable.</div></div>
+      </div>
+    </div>
+
+    <!-- Whealth -->
+    <div class="case reveal">
+      <div class="case-media">
+        <img src="thumbs/whealth.jpg" alt="Whealth" loading="lazy">
+        <div class="meta">
+          <span class="case-tag">0→1 · Personal product</span>
+          <h3>Whealth</h3>
+          <a href="https://wesleychiaz.github.io/ClaudeW/whealth/" target="_blank" rel="noopener" class="case-visit">Visit the live product <span class="arrow">→</span></a>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="case-row"><div class="k">Problem</div><div class="v">Recovering from ACL &amp; meniscus surgery, generic fitness plans didn't fit my reality — and motivation fades fast without a dead-simple system to follow.</div></div>
+        <div class="case-row"><div class="k">Who it's for</div><div class="v">Me, rebuilding in recovery — and anyone restarting healthy habits after a setback.</div></div>
+        <div class="case-row"><div class="k">What I shipped</div><div class="v">A focused tracker built on one idea: <strong>one metric, one habit, every day.</strong> A clear protocol, a simple progress view, and an honest-story log to stay accountable.</div></div>
+        <div class="case-row outcome"><div class="k">Outcome</div><div class="v">Turned a daunting recovery into a single daily action I actually keep showing up for.</div></div>
+        <div class="case-row"><div class="k">What I learned</div><div class="v">Cutting scope to a single metric removed the friction that kills most habit apps — focus was the feature, not a limitation.</div></div>
+      </div>
+    </div>
+
   </div>
 </section>
 
