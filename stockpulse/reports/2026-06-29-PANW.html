@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — PANW | 2026-06-29</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 18 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-06-29</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">PANW</span>
+      <span class="company-name">Palo Alto Networks, Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$304.20</span>
+      <span class="day-change" style="color:#4ade80">+3.79% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Adopter</span>
+      <span class="tag">Cybersecurity</span>
+      <span class="tag">Technology</span>
+      &nbsp;Software - Infrastructure
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$247.92B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">0.942</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">49 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+3.79%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:98%"></div></div>
+          <div class="range-labels"><span>$139.57</span><span style="color:#f97316">$304.20</span><span>$306.24</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$309.31</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $162.34 — $375.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">8.27M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$10.61B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +31.10%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$3.58B</p>
+        <p class="card-sub">Cash: $3.11B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#888">N/A</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">72.00%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">-2.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">7.90%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">262.2x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">73.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">23.4x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">8.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$2.13B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$3.11B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <p style="margin:0 0 16px;line-height:1.7;color:var(--text)">
+          <strong>Palo Alto Networks (PANW)</strong> is the world's largest pure-play cybersecurity company, providing an integrated platform spanning network security (NGFW), cloud-native application protection (CNAPP), and secure access service edge (SASE via Prisma Access). As an <strong>AI Adopter</strong>, PANW embeds AI/ML deeply into its Cortex product suite — including Cortex XDR for autonomous threat detection, Cortex XSIAM for AI-driven SOC operations, and Prisma AIRS to secure customers' AI deployments. The company's "platformization" strategy is aggressively consolidating fragmented security spend onto a single vendor — a durable structural tailwind.
+        </p>
+
+        <p style="margin:0 0 8px;font-weight:600;color:#4ade80;font-size:15px">Bull Case</p>
+        <ul style="margin:0 0 20px;padding-left:20px;line-height:1.8;color:var(--text)">
+          <li><strong>Exceptional revenue growth at scale:</strong> $10.61B TTM revenue growing at 31.1% YoY is rare at this size — demonstrating that platformization is winning wallet share, not just consolidating it.</li>
+          <li><strong>FCF machine despite GAAP losses:</strong> Free cash flow of $3.58B (34% FCF margin on revenue) proves the unit economics are sound; GAAP losses are primarily driven by $2B+ in stock-based compensation, not cash burn.</li>
+          <li><strong>72% gross margins create operating leverage runway:</strong> As R&D and S&M scale slows relative to revenue, operating margins (currently -2.5% GAAP) should expand meaningfully — a path to 20%+ GAAP operating margins is credible by FY2028.</li>
+          <li><strong>Favourable macro for cybersecurity spend:</strong> UBS projects the security & safety market reaching $1.19T by 2029. AI proliferation is expanding attack surfaces, making security spend increasingly non-discretionary — PANW is well-positioned as customers cut point solutions.</li>
+          <li><strong>Strong price momentum near 52-week high:</strong> Trading at $304.20 vs. a 52-week low of $139.57 (+118%), with the stock reclaiming its prior all-time high range. Technical breakout supported by 49 analyst BUY ratings.</li>
+        </ul>
+
+        <p style="margin:0 0 8px;font-weight:600;color:#f87171;font-size:15px">Bear Case</p>
+        <ul style="margin:0 0 20px;padding-left:20px;line-height:1.8;color:var(--text)">
+          <li><strong>Valuation priced for perfection:</strong> At 73.9x forward P/E and 23.4x P/S on a $247.9B market cap, any revenue guidance miss or slowing ARR growth will be punished harshly. The 70% YTD rally has pulled forward significant forward returns.</li>
+          <li><strong>Mean analyst target offers minimal upside:</strong> Consensus mean price target of $309.31 is only 1.7% above the current price of $304.20 — the easy money has been made by those who bought the dip.</li>
+          <li><strong>Macro fear headwind:</strong> Fear & Greed Index sits at 12 (Extreme Fear), and high-multiple growth stocks historically correct hardest in risk-off environments. A broad market drawdown could compress PANW's multiple before the earnings story catches up.</li>
+        </ul>
+
+        <p style="margin:0 0 8px;font-weight:600;color:#facc15;font-size:15px">Verdict</p>
+        <p style="margin:0;padding:12px 16px;background:rgba(250,204,21,0.08);border-left:3px solid #facc15;border-radius:4px;line-height:1.7;color:var(--text)">
+          <strong>HOLD</strong> — Palo Alto Networks is one of the highest-quality businesses in the cybersecurity sector, with best-in-class FCF generation and a credible platform consolidation story. However, at $304 with a 73.9x forward P/E and consensus targets implying only ~2% upside, new entry here offers poor risk/reward. Existing holders should hold; new buyers should target a pullback into the <strong>$265–280 range</strong> (roughly 10–13% below current levels) for a better margin of safety. <em>Suggested time horizon: 12–18 months.</em>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-06-27</span><a href="https://www.trefis.com/articles/603814/the-real-risk-inside-cisco-stock/2026-06-26" target="_blank" rel="noopener" class="news-link">The Real Risk Inside Cisco Stock ↗</a></li><li><span class="news-date">2026-06-27</span><a href="https://www.trefis.com/articles/604729/the-old-school-signal-that-lit-up-palo-alto-networks-stock/2026-06-26" target="_blank" rel="noopener" class="news-link">The Old-School Signal That Lit Up Palo Alto Networks Stock ↗</a></li><li><span class="news-date">2026-06-27</span><a href="https://finance.yahoo.com/markets/stocks/articles/palo-alto-networks-panw-stock-001623706.html" target="_blank" rel="noopener" class="news-link">Palo Alto Networks (PANW) Stock After 70% YTD Rally Is The Price Still Reasonable ↗</a></li><li><span class="news-date">2026-06-26</span><a href="https://finance.yahoo.com/technology/ai/articles/ubs-sees-security-safety-market-235620526.html" target="_blank" rel="noopener" class="news-link">UBS sees security and safety market at $1.19tn by 2029, led by cybersecurity ↗</a></li><li><span class="news-date">2026-06-26</span><a href="https://www.investors.com/research/swing-trading/rotation-continues-as-security-software-stocks-make-comeback/?src=A00220&yptr=yahoo" target="_blank" rel="noopener" class="news-link">Rotation Continues As Security Software Stocks Make Comeback ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-06-29 02:32 UTC.
+  </div>
+
+</div>
+</body>
+</html>
