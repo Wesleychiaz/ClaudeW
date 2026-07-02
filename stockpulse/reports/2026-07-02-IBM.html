@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — IBM | 2026-07-02</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 20 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-07-02</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">IBM</span>
+      <span class="company-name">International Business Machines Corporation</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$286.25</span>
+      <span class="day-change" style="color:#4ade80">+1.79% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Adopter</span>
+      <span class="tag">Enterprise AI</span>
+      <span class="tag">Technology</span>
+      &nbsp;Information Technology Services
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$269.04B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">0.665</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">21 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#4ade80;font-weight:600">+1.79%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:62%"></div></div>
+          <div class="range-labels"><span>$212.34</span><span style="color:#f97316">$286.25</span><span>$332.46</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$293.89</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $195.00 — $390.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">8.73M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$68.91B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +9.50%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$13.08B</p>
+        <p class="card-sub">Cash: $11.78B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+14.20%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">58.40%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">13.80%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">15.60%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">25.3x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">21.3x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">3.9x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">8.2x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">$69.80B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$11.78B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <p style="margin:0 0 16px;line-height:1.7;color:#e0e0e0;">
+          International Business Machines Corporation (IBM) is a 115-year-old technology giant that has successfully repositioned itself as an <strong>Enterprise AI Adopter and platform provider</strong>. Operating through four segments — Software, Consulting, Infrastructure, and Financing — IBM's strategy centres on WatsonX (its enterprise AI and data platform) and hybrid cloud architecture built on Red Hat OpenShift. In the AI ecosystem, IBM sits squarely as an <strong>Adopter</strong>: it embeds AI into existing enterprise workflows and sells consulting services to help Fortune 500 companies navigate AI transformation, rather than building foundational models or AI chips.
+        </p>
+
+        <p style="margin:0 0 10px;font-weight:700;color:#f5a623;font-size:15px;">🟢 Bull Case</p>
+        <ul style="margin:0 0 20px;padding-left:20px;line-height:1.8;color:#e0e0e0;">
+          <li><strong>Accelerating earnings leverage:</strong> Revenue grew 9.5% YoY to $68.91B TTM while earnings grew faster at 14.2% YoY — a clear signal of margin expansion as the higher-margin Software segment (58.4% gross margin) gains share within the mix.</li>
+          <li><strong>Exceptional free cash flow engine:</strong> $13.08B in FCF represents a ~4.9% FCF yield on the $269B market cap — unusually strong for a tech company and sufficient to sustain both the $6B+ annual dividend and ongoing debt reduction.</li>
+          <li><strong>Defensive characteristics in Extreme Fear:</strong> With a beta of just 0.665 and IBM trading at $286.25 — 14% off its 52-week high of $332.46 — the stock offers relative downside protection during market stress (Fear & Greed at 19, Extreme Fear). A low-beta AI exposure is rare.</li>
+          <li><strong>Forward multiple compression path:</strong> At Forward P/E of 21.3x vs. TTM P/E of 25.3x, the consensus already embeds continued earnings growth. If WatsonX consulting revenue accelerates in H2 2026, there is room for multiple re-expansion toward the analyst high target of $390.</li>
+        </ul>
+
+        <p style="margin:0 0 10px;font-weight:700;color:#e05c5c;font-size:15px;">🔴 Bear Case</p>
+        <ul style="margin:0 0 20px;padding-left:20px;line-height:1.8;color:#e0e0e0;">
+          <li><strong>Leveraged balance sheet is a structural overhang:</strong> With $69.8B in debt against only $11.78B cash, IBM carries ~$58B in net debt. Rising rates or a credit market shock would squeeze refinancing costs and limit capital allocation flexibility.</li>
+          <li><strong>Analyst target implies near-zero near-term upside:</strong> The mean analyst target of $293.89 is just 2.7% above today's close of $286.25. With 21 analysts at consensus "Buy," much of the optimism may already be priced in — the easy gains likely came with the move from $212 to $286.</li>
+          <li><strong>Enterprise AI competition intensifying:</strong> Microsoft Copilot (bundled into M365), Google Vertex AI, and Salesforce Agentforce all compete directly for IBM's enterprise AI consulting wallet. If enterprises consolidate AI spend on single-vendor ecosystems, IBM's multi-cloud neutral positioning could become a disadvantage.</li>
+        </ul>
+
+        <p style="margin:0 0 10px;font-weight:700;color:#4fc3f7;font-size:15px;">⚖️ Verdict: <span style="font-size:16px;">HOLD</span></p>
+        <p style="margin:0;line-height:1.7;color:#e0e0e0;">
+          IBM's enterprise AI transformation story is credible and the FCF generation is among the best in enterprise tech — but the near-term risk/reward looks balanced at $286. Consensus targets offer less than 3% upside, the debt load is material, and competition for enterprise AI budgets is intensifying. IBM is a solid defensive holding for a long-term AI portfolio, but aggressive accumulation at current levels requires a catalyst (a strong WatsonX revenue print or debt paydown milestone). <strong>Suggested time horizon: 18–24 months for thesis to develop.</strong> Not financial advice — for personal research only.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-07-01</span><a href="https://www.trefis.com/articles/605376/the-one-number-that-explains-oracle-stocks-entire-upside-case/2026-07-01" target="_blank" rel="noopener" class="news-link">The One Number That Explains Oracle Stock's Entire Upside Case ↗</a></li><li><span class="news-date">2026-07-01</span><a href="https://finance.yahoo.com/technology/articles/ibm-ibm-picks-stagwell-rework-221423344.html" target="_blank" rel="noopener" class="news-link">IBM (IBM) Picks Stagwell To Rework Its Global Brand Playbook ↗</a></li><li><span class="news-date">2026-07-01</span><a href="https://finance.yahoo.com/technology/ai/articles/now-benefits-enterprise-ai-adoption-163400560.html" target="_blank" rel="noopener" class="news-link">NOW Benefits From Enterprise AI Adoption: Buy, Sell, or Hold the Stock? ↗</a></li><li><span class="news-date">2026-07-01</span><a href="https://finance.yahoo.com/markets/stocks/articles/ibm-ibm-beat-estimates-again-161002375.html" target="_blank" rel="noopener" class="news-link">Will IBM (IBM) Beat Estimates Again in Its Next Earnings Report? ↗</a></li><li><span class="news-date">2026-07-01</span><a href="https://qz.com/companies-rehiring-workers-ai-layoffs-automation-070126" target="_blank" rel="noopener" class="news-link">Companies rehire workers laid off for AI as automation falls short ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-07-02 05:33 UTC.
+  </div>
+
+</div>
+</body>
+</html>
