@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockPulse — ISRG | 2026-07-13</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f0f0f;color:#fff;font-family:'Inter',system-ui,sans-serif;line-height:1.6;padding:0 0 60px}
+  a{color:#f97316;text-decoration:none}
+  a:hover{color:#fb923c}
+  .topbar{background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:16px}
+  .w-mark{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+  .w-mark span{color:#f97316}
+  .back{font-size:13px;color:#888}
+  .back:hover{color:#fff}
+  .report-num{font-size:12px;color:#555;border:1px solid #2a2a2a;border-radius:999px;padding:3px 10px}
+  .container{max-width:860px;margin:0 auto;padding:40px 24px 0}
+  .header{margin-bottom:32px}
+  .ticker-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .ticker{font-size:42px;font-weight:900;letter-spacing:-0.03em}
+  .company-name{font-size:16px;color:#888}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .price{font-size:32px;font-weight:700}
+  .day-change{font-size:16px;font-weight:500}
+  .meta-row{font-size:13px;color:#555;margin-top:4px}
+  .section{margin-top:32px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:18px}
+  .card-label{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+  .card-value{font-size:22px;font-weight:700}
+  .card-sub{font-size:12px;color:#555;margin-top:3px}
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:9px 12px;font-size:13px;border-bottom:1px solid #2a2a2a;text-align:left}
+  th{color:#888;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.08em}
+  td:last-child,th:last-child{text-align:right}
+  .macro-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+  .macro-item{display:flex;flex-direction:column;gap:4px}
+  .macro-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.08em}
+  .macro-value{font-size:20px;font-weight:700}
+  .macro-sub{font-size:12px;color:#555}
+  .rec-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.06em}
+  .range-bar{background:#2a2a2a;border-radius:999px;height:6px;position:relative;margin:8px 0}
+  .range-fill{background:#f97316;border-radius:999px;height:6px;position:absolute;left:0}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#555}
+  .news-list{list-style:none;display:flex;flex-direction:column;gap:0}
+  .news-list li{font-size:13px;color:#ccc;border-bottom:1px solid #222;padding:10px 0;line-height:1.5;display:flex;gap:16px;align-items:baseline}
+  .news-list li:last-child{border-bottom:none}
+  .news-date{font-size:11px;color:#555;flex-shrink:0;width:80px}
+  .news-link{color:#ccc;text-decoration:none;transition:color 0.15s}
+  .news-link:hover{color:#f97316}
+  .disclaimer{margin-top:48px;padding:16px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;font-size:12px;color:#555;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 10px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;margin-right:6px}
+  .analysis-section h3{font-size:13px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px}
+  .analysis-section p{font-size:14px;color:#ccc;line-height:1.7;margin-bottom:12px}
+  .analysis-section ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .analysis-section ul li{font-size:14px;color:#ccc;line-height:1.6;padding-left:14px;position:relative}
+  .analysis-section ul li::before{content:"→";position:absolute;left:0;color:#f97316;font-size:12px}
+  .verdict-box{background:#0f0f0f;border:1px solid #f97316;border-radius:8px;padding:16px 20px;margin-top:12px}
+  .verdict-label{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .verdict-text{font-size:15px;font-weight:600;color:#fff}
+  .verdict-sub{font-size:13px;color:#888;margin-top:4px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}.ticker{font-size:32px}.price{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="w-mark">W<span>.</span></span>
+    <a href="https://wesleychiaz.github.io/ClaudeW/stockpulse/" class="back">StockPulse</a>
+    <span class="report-num">Report 23 of 25</span>
+  </div>
+  <span style="font-size:12px;color:#555">2026-07-13</span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="ticker-row">
+      <span class="ticker">ISRG</span>
+      <span class="company-name">Intuitive Surgical, Inc.</span>
+    </div>
+    <div class="price-row">
+      <span class="price">$406.78</span>
+      <span class="day-change" style="color:#f87171">-1.16% today</span>
+    </div>
+    <div class="meta-row">
+      <span class="tag">Adopter</span>
+      <span class="tag">Medical Devices</span>
+      <span class="tag">Healthcare</span>
+      &nbsp;Medical Instruments & Supplies
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section">
+    <p class="section-title">Market Snapshot</p>
+    <div class="macro-bar">
+      <div class="macro-item">
+        <span class="macro-label">Market Cap</span>
+        <span class="macro-value">$144.07B</span>
+        <span class="macro-sub">USD</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Beta</span>
+        <span class="macro-value">1.46</span>
+        <span class="macro-sub">vs S&P 500</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-label">Analyst Consensus</span>
+        <span class="rec-badge" style="background:#86efac22;color:#86efac;border:1px solid #86efac44">BUY</span>
+        <span class="macro-sub">30 analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PERFORMANCE -->
+  <div class="section">
+    <p class="section-title">Price Performance</p>
+    <div class="grid-2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Period</th><th>Return</th></tr></thead>
+          <tbody><tr><td>1 Day</td><td style="color:#f87171;font-weight:600">-1.16%</td></tr><tr><td>5 Days</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Month</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>3 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>6 Months</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>YTD</td><td style="color:#888;font-weight:600">N/A</td></tr><tr><td>1 Year</td><td style="color:#888;font-weight:600">N/A</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="card-label">52-Week Range</p>
+        <div style="margin-top:8px">
+          <div class="range-bar"><div class="range-fill" style="width:5%"></div></div>
+          <div class="range-labels"><span>$396.68</span><span style="color:#f97316">$406.78</span><span>$603.88</span></div>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Analyst Price Target</p>
+          <p style="font-size:22px;font-weight:600;margin-top:4px">$561.84</p>
+          <p style="font-size:12px;color:#555;margin-top:4px">Range: $366.00 — $750.00</p>
+        </div>
+        <div style="margin-top:24px">
+          <p class="card-label">Avg Daily Volume</p>
+          <p style="font-size:18px;font-weight:600;margin-top:4px">2.45M shares</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section">
+    <p class="section-title">Financials (TTM)</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">Revenue</p>
+        <p class="card-value">$10.58B</p>
+        <p class="card-sub" style="color:#4ade80">YoY +23.00%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Free Cash Flow</p>
+        <p class="card-value">$2.25B</p>
+        <p class="card-sub">Cash: $4.52B</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Earnings Growth</p>
+        <p class="card-value" style="color:#4ade80">+18.80%</p>
+        <p class="card-sub">YoY</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <p class="card-label">Gross Margin</p>
+        <p class="card-value">66.30%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Operating Margin</p>
+        <p class="card-value">30.90%</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Net Margin</p>
+        <p class="card-value">28.20%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="section">
+    <p class="section-title">Valuation</p>
+    <div class="grid-3">
+      <div class="card">
+        <p class="card-label">P/E (TTM)</p>
+        <p class="card-value">49.5x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Forward P/E</p>
+        <p class="card-value">34.5x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/S Ratio</p>
+        <p class="card-value">13.6x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">P/B Ratio</p>
+        <p class="card-value">8.2x</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Total Debt</p>
+        <p class="card-value">N/A</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Cash on Hand</p>
+        <p class="card-value">$4.52B</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS SECTION -->
+  <div class="section" id="analysis">
+    <p class="section-title">AI Analysis</p>
+    <div class="card analysis-section" style="padding:24px" id="analysis-content">
+      <div id="analysis-text">
+        <p>Intuitive Surgical is the dominant maker of the da Vinci robotic surgical system and the newer Ion endoluminal platform, making it an <strong>Adopter</strong> that embeds AI-assisted vision, instrument control, and data analytics into minimally invasive surgery. Its razor-and-blade model (system placements followed by recurring instrument and service revenue) gives it a durable, high-margin installed base that competitors have struggled to dislodge.
+
+        <h3>Bull Case</h3>
+        <ul>
+          <li>TTM revenue of $10.58B grew 23.0% YoY with earnings growth of 18.8%, a rare combination of scale and continued double-digit growth for a $144B medical device company.</li>
+          <li>Best-in-class profitability: 66.3% gross margin, 30.9% operating margin, and 28.2% net margin reflect the pricing power of its recurring instrument/service revenue stream.</li>
+          <li>Consensus among 30 analysts is a BUY with a mean target of $561.84 (38% above the current $406.78) and a high target of $750, implying meaningful upside if the growth trajectory holds.</li>
+          <li>The stock trades near its 52-week low of $396.68 (vs. a $603.88 high), roughly 33% off its peak, offering a more attractive entry point into a structurally strong compounder.</li>
+        </ul>
+
+        <h3>Bear Case</h3>
+        <ul>
+          <li>Valuation remains rich in absolute terms (49.5x trailing P/E, 13.6x sales, 8.2x book), leaving little room for error if growth decelerates even modestly.</li>
+          <li>Recent headlines reference recall news and questions over whether the stock is "fairly valued" following it — device recalls can pressure near-term sentiment and invite regulatory scrutiny even when the underlying franchise is intact.</li>
+          <li>A beta of 1.46 makes ISRG more volatile than the broader market, and the stock sits at a 52-week low with Q2 earnings due next week, adding binary event risk in the very near term.</li>
+        </ul>
+
+        <div class="verdict-box">
+          <p class="verdict-label">Verdict</p>
+          <p class="verdict-text">BUY</p>
+          <p class="verdict-sub">Durable 23% revenue growth, best-in-class margins, and a pullback to near 52-week lows outweigh near-term recall headlines and premium valuation; suggested horizon: 12-24 months, ideally accumulating around upcoming Q2 earnings volatility.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section">
+    <p class="section-title">Recent Headlines</p>
+    <div class="card" style="padding:20px 24px">
+      <ul class="news-list"><li><span class="news-date">2026-07-11</span><a href="https://finance.yahoo.com/markets/stocks/articles/intuitive-surgical-isrg-stock-looks-071010382.html" target="_blank" rel="noopener" class="news-link">Intuitive Surgical (ISRG) Stock Looks Close To Fair Value Today ↗</a></li><li><span class="news-date">2026-07-11</span><a href="https://finance.yahoo.com/markets/stocks/articles/intuitive-surgical-isrg-fairly-valued-021024995.html" target="_blank" rel="noopener" class="news-link">Is Intuitive Surgical (ISRG) Fairly Valued On Its Recall News? ↗</a></li><li><span class="news-date">2026-07-10</span><a href="https://finance.yahoo.com/markets/stocks/articles/intuitive-surgical-inc-isrg-stock-215002373.html" target="_blank" rel="noopener" class="news-link">Intuitive Surgical, Inc. (ISRG) Stock Sinks As Market Gains: What You Should Know ↗</a></li><li><span class="news-date">2026-07-10</span><a href="https://finance.yahoo.com/markets/stocks/articles/isrg-report-q2-results-next-181000609.html" target="_blank" rel="noopener" class="news-link">ISRG to Report Q2 Results Next Week: Should You Buy the Stock Now? ↗</a></li><li><span class="news-date">2026-07-10</span><a href="https://finance.yahoo.com/markets/stocks/articles/intuitive-surgical-isrg-one-medtech-135426362.html" target="_blank" rel="noopener" class="news-link">Is Intuitive Surgical (ISRG) One Of MedTech’s Best AI Stock To Buy? ↗</a></li></ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This report is generated automatically for personal research purposes only.
+    It does not constitute financial advice. Past performance is not indicative of future results.
+    Always do your own due diligence before making investment decisions.
+    Data sourced from Yahoo Finance and public APIs. Generated 2026-07-13 01:04 UTC.
+  </div>
+
+</div>
+</body>
+</html>
