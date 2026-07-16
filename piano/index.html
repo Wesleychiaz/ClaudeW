@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Piano Practice — W.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  :root{
+    --void:#0f0f0f; --carbon:#1a1a1a; --border:#2a2a2a;
+    --mist:#888888; --white:#ffffff; --spark:#f97316; --ember:#fb923c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--void); color:var(--white);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:24px 16px 60px;
+  }
+  a.back{
+    align-self:flex-start; color:var(--mist); text-decoration:none; font-size:13px;
+    margin-bottom:18px; letter-spacing:.02em;
+  }
+  a.back:hover{ color:var(--spark); }
+  header{ text-align:center; margin-bottom:22px; }
+  header h1{ font-size:26px; font-weight:900; margin:0 0 6px; }
+  header h1 span{ color:var(--spark); }
+  header p{ color:var(--mist); font-size:13px; margin:0; max-width:560px; }
+
+  .panel{
+    background:var(--carbon); border:1px solid var(--border); border-radius:8px;
+    padding:16px; width:100%; max-width:920px;
+  }
+
+  .controls{
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+    margin-bottom:16px;
+  }
+  .controls label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--mist); margin-right:6px; }
+  select, .btn{
+    background:var(--void); color:var(--white); border:1px solid var(--border);
+    border-radius:6px; padding:8px 12px; font-family:inherit; font-size:13px;
+    cursor:pointer;
+  }
+  select:hover, .btn:hover{ border-color:var(--spark); }
+  .btn.primary{ background:var(--spark); color:var(--void); border-color:var(--spark); font-weight:700; }
+  .btn.primary:hover{ background:var(--ember); }
+  .controls .spacer{ flex:1; }
+  input[type=range]{ accent-color:var(--spark); width:100px; }
+  .tempo-val{ font-size:12px; color:var(--mist); width:38px; display:inline-block; text-align:right; }
+
+  canvas{ display:block; width:100%; height:auto; border-radius:6px; background:#111; touch-action:none; }
+
+  .note-caption{
+    margin-top:14px; font-size:12px; color:var(--mist); line-height:1.6;
+  }
+  .note-caption strong{ color:var(--white); }
+
+  footer{ margin-top:22px; font-size:12px; color:var(--mist); }
+</style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&larr; Back to W.</a>
+
+<header>
+  <h1>Piano <span>Practice</span></h1>
+  <p>Pick a song, watch it fall, then try it yourself — click the keys or use your computer keyboard (A&nbsp;W&nbsp;S&nbsp;E&nbsp;D&nbsp;F&nbsp;T&nbsp;G&nbsp;Y&nbsp;H&nbsp;U&nbsp;J&nbsp;K).</p>
+</header>
+
+<div class="panel">
+  <div class="controls">
+    <div>
+      <label for="song-select">Song</label>
+      <select id="song-select"></select>
+    </div>
+    <button class="btn primary" id="play-btn">&#9654; Play</button>
+    <button class="btn" id="restart-btn">&#8634; Restart</button>
+    <div class="spacer"></div>
+    <div>
+      <label for="tempo">Tempo</label>
+      <input type="range" id="tempo" min="0.5" max="1.5" step="0.1" value="1">
+      <span class="tempo-val" id="tempo-val">1.0x</span>
+    </div>
+  </div>
+
+  <canvas id="stage" width="900" height="550"></canvas>
+
+  <div class="note-caption" id="song-note"></div>
+</div>
+
+<footer>Built with Claude · <a href="../index.html" style="color:var(--mist)">wesleychiaz.github.io/ClaudeW</a></footer>
+
+<script>
+(() => {
+  // ---------- Note / MIDI helpers ----------
+  const NOTE_INDEX = {C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11};
+  function noteToMidi(name){
+    const m = name.match(/^([A-G]#?)(\d)$/);
+    const [, letter, oct] = m;
+    return (parseInt(oct,10)+1)*12 + NOTE_INDEX[letter];
+  }
+  function midiToFreq(midi){ return 440 * Math.pow(2,(midi-69)/12); }
+
+  // ---------- Keyboard layout (C4 -> C6) ----------
+  const WHITE_LETTERS = ['C','D','E','F','G','A','B'];
+  const BLACK_AFTER = new Set(['C','D','F','G','A']); // no black key after E or B
+
+  const whiteKeys = []; // {name, letter, octave}
+  const blackKeys = []; // {name, letter, octave, afterWhiteIndex}
+  [4,5].forEach(oct => {
+    WHITE_LETTERS.forEach(letter => {
+      whiteKeys.push({ name: letter+oct, letter, octave: oct });
+      if (BLACK_AFTER.has(letter)) {
+        blackKeys.push({ name: letter+'#'+oct, letter: letter+'#', octave: oct, afterWhiteIndex: whiteKeys.length-1 });
+      }
+    });
+  });
+  whiteKeys.push({ name:'C6', letter:'C', octave:6 }); // top C, no black key after
+
+  const CANVAS_W = 900, CANVAS_H = 550, KEYBOARD_H = 140, HIT_Y = CANVAS_H - KEYBOARD_H;
+  const WHITE_W = CANVAS_W / whiteKeys.length;
+  const BLACK_W = WHITE_W * 0.62;
+  const BLACK_H = KEYBOARD_H * 0.62;
+
+  const whiteIndexByName = {};
+  whiteKeys.forEach((k,i) => whiteIndexByName[k.name] = i);
+
+  function keyRect(noteName){
+    const black = blackKeys.find(k => k.name === noteName);
+    if (black) {
+      const x = (black.afterWhiteIndex+1)*WHITE_W - BLACK_W/2;
+      return { x, w: BLACK_W, h: BLACK_H, top: HIT_Y, isBlack: true };
+    }
+    const i = whiteIndexByName[noteName];
+    return { x: i*WHITE_W, w: WHITE_W, h: KEYBOARD_H, top: HIT_Y, isBlack: false };
+  }
+
+  // ---------- Audio ----------
+  let audioCtx = null;
+  function ctx(){ if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+  const activeVoices = {}; // noteName -> {osc, gain}
+
+  function noteOn(noteName){
+    const ac = ctx();
+    if (activeVoices[noteName]) return;
+    const midi = noteToMidi(noteName);
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = midiToFreq(midi);
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(0.28, ac.currentTime + 0.015);
+    gain.gain.linearRampToValueAtTime(0.16, ac.currentTime + 0.25);
+    osc.connect(gain).connect(ac.destination);
+    osc.start();
+    activeVoices[noteName] = { osc, gain };
+    highlightKey(noteName, true);
+  }
+  function noteOff(noteName){
+    const v = activeVoices[noteName];
+    if (!v) return;
+    const ac = ctx();
+    v.gain.gain.cancelScheduledValues(ac.currentTime);
+    v.gain.gain.setValueAtTime(v.gain.gain.value, ac.currentTime);
+    v.gain.gain.linearRampToValueAtTime(0, ac.currentTime + 0.12);
+    v.osc.stop(ac.currentTime + 0.14);
+    delete activeVoices[noteName];
+    highlightKey(noteName, false);
+  }
+
+  const heldByPointer = {}; // pointerId -> noteName
+  const activeKeys = new Set(); // visually highlighted (playback or manual)
+  function highlightKey(name, on){ if (on) activeKeys.add(name); else activeKeys.delete(name); }
+
+  // ---------- Songs ----------
+  // Beats are in quarter-note units. Public-domain melodies are transcribed in full.
+  // The Jay Chou entries are short verse/intro hooks sourced from published jianpu
+  // (numbered notation) and staff-notation sheets, simplified to one octave register
+  // and transposed to an easy key — they're a simplified fan arrangement for practice,
+  // not a certified note-perfect transcription, so trust your ear over the app if
+  // something sounds off.
+  const SONGS = [
+    {
+      id: 'twinkle', title: 'Twinkle Twinkle Little Star', bpm: 100,
+      notes: [
+        ['C4',0,1],['C4',1,1],['G4',2,1],['G4',3,1],['A4',4,1],['A4',5,1],['G4',6,2],
+        ['F4',8,1],['F4',9,1],['E4',10,1],['E4',11,1],['D4',12,1],['D4',13,1],['C4',14,2],
+      ]
+    },
+    {
+      id: 'ode', title: 'Ode to Joy (Beethoven)', bpm: 110,
+      notes: [
+        ['E4',0,1],['E4',1,1],['F4',2,1],['G4',3,1],
+        ['G4',4,1],['F4',5,1],['E4',6,1],['D4',7,1],
+        ['C4',8,1],['C4',9,1],['D4',10,1],['E4',11,1],
+        ['E4',12,1.5],['D4',13.5,0.5],['D4',14,2],
+      ]
+    },
+    {
+      id: 'furelise', title: 'Für Elise — opening (Beethoven)', bpm: 120,
+      notes: [
+        ['E5',0,0.5],['D#5',0.5,0.5],['E5',1,0.5],['D#5',1.5,0.5],['E5',2,0.5],
+        ['B4',2.5,0.5],['D5',3,0.5],['C5',3.5,0.5],['A4',4,2],
+      ]
+    },
+    {
+      id: 'qingtian', title: '晴天 (Sunny Day) — Jay Chou, verse hook', bpm: 67,
+      notes: [
+        ['G4',0,1],['G4',1,1],['C4',2,1],['C4',3,1],['D4',4,1],['E4',5,1],
+        ['G4',6,1],['G4',7,1],['C4',8,1],['C4',9,1],['D4',10,1],['E4',11,1],
+      ]
+    },
+    {
+      id: 'daoxiang', title: '稻香 (Rice Field) — Jay Chou, verse hook', bpm: 92,
+      notes: [
+        ['C4',0,1],['A3',1,1],['C4',2,1],
+        ['C4',4,1],['C4',5,1],['D4',6,1],['D4',7,1],['D4',8,1],['D5',9,1],['E5',10,1],['C4',11,1],
+      ]
+    },
+    {
+      id: 'anjing', title: '安静 (Quiet) — Jay Chou, intro hook', bpm: 72,
+      notes: [
+        ['F4',0,1],['A4',1,1],['F4',2,1],['A4',3,1],['F4',4,1],['A4',5,1],['F4',6,2],
+      ]
+    },
+  ];
+
+  // ---------- State ----------
+  let currentSong = SONGS[0];
+  let playStart = 0;     // performance.now() at t=0, adjusted for tempo
+  let elapsedAtPause = 0;
+  let playing = false;
+  let rafId = null;
+  const SCROLL_PX_PER_SEC = 130;
+
+  function secPerBeat(song){ return 60 / song.bpm; }
+  function songDurationSec(song){
+    if (!song.notes.length) return 0;
+    let end = 0;
+    song.notes.forEach(([,start,dur]) => { end = Math.max(end, (start+dur) * secPerBeat(song)); });
+    return end + 0.6;
+  }
+  function currentTimeSec(){
+    if (!playing) return elapsedAtPause;
+    return elapsedAtPause + (performance.now() - playStart)/1000 * getTempo();
+  }
+  function getTempo(){ return parseFloat(document.getElementById('tempo').value); }
+
+  // ---------- UI wiring ----------
+  const select = document.getElementById('song-select');
+  SONGS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id; opt.textContent = s.title;
+    select.appendChild(opt);
+  });
+  select.addEventListener('change', () => loadSong(select.value));
+
+  function loadSong(id){
+    currentSong = SONGS.find(s => s.id === id);
+    stopPlayback();
+    elapsedAtPause = 0;
+    const noteEl = document.getElementById('song-note');
+    if (!currentSong.notes.length) {
+      noteEl.innerHTML = '<strong>No note data yet.</strong> This entry is a placeholder — tell me the notes (from a tutorial or sheet you\'re following) and I\'ll wire them in.';
+    } else {
+      noteEl.innerHTML = `<strong>${currentSong.title}</strong> · ${currentSong.notes.length} notes · ${currentSong.bpm} BPM`;
+    }
+    triggeredKeys.clear();
+    render();
+  }
+
+  document.getElementById('tempo').addEventListener('input', (e) => {
+    document.getElementById('tempo-val').textContent = parseFloat(e.target.value).toFixed(1)+'x';
+  });
+
+  const playBtn = document.getElementById('play-btn');
+  playBtn.addEventListener('click', () => { playing ? pausePlayback() : startPlayback(); });
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    stopPlayback(); elapsedAtPause = 0; triggeredKeys.clear(); render();
+  });
+
+  function startPlayback(){
+    if (!currentSong.notes.length) return;
+    if (ctx().state === 'suspended') ctx().resume();
+    playing = true; playStart = performance.now();
+    playBtn.innerHTML = '&#10074;&#10074; Pause';
+    tick();
+  }
+  function pausePlayback(){
+    elapsedAtPause = currentTimeSec();
+    playing = false;
+    playBtn.innerHTML = '&#9654; Play';
+    if (rafId) cancelAnimationFrame(rafId);
+  }
+  function stopPlayback(){
+    playing = false;
+    playBtn.innerHTML = '&#9654; Play';
+    if (rafId) cancelAnimationFrame(rafId);
+    Object.keys(activeVoices).forEach(noteOff);
+  }
+
+  const triggeredKeys = new Set(); // "noteIndex" already sounded this pass, avoid re-trigger every frame
+
+  function tick(){
+    const t = currentTimeSec();
+    const spb = secPerBeat(currentSong);
+    currentSong.notes.forEach((n, i) => {
+      const [name, startBeat, durBeat] = n;
+      const startSec = startBeat*spb, durSec = durBeat*spb;
+      const key = i+'';
+      if (t >= startSec && t < startSec+durSec){
+        if (!triggeredKeys.has(key)){ triggeredKeys.add(key); noteOn(name); }
+      } else if (triggeredKeys.has(key) && t >= startSec+durSec){
+        triggeredKeys.delete(key); noteOff(name);
+      } else if (t < startSec && triggeredKeys.has(key)){
+        triggeredKeys.delete(key); noteOff(name); // rewound
+      }
+    });
+    render();
+    if (t > songDurationSec(currentSong)){
+      stopPlayback(); elapsedAtPause = 0; triggeredKeys.clear();
+      return;
+    }
+    if (playing) rafId = requestAnimationFrame(tick);
+  }
+
+  // ---------- Rendering ----------
+  const canvas = document.getElementById('stage');
+  const g = canvas.getContext('2d');
+
+  function render(){
+    g.clearRect(0,0,CANVAS_W,CANVAS_H);
+
+    // falling area background
+    g.fillStyle = '#111111';
+    g.fillRect(0,0,CANVAS_W,HIT_Y);
+
+    // lane guide lines (white key boundaries)
+    g.strokeStyle = 'rgba(255,255,255,0.05)';
+    whiteKeys.forEach((k,i) => {
+      g.beginPath(); g.moveTo(i*WHITE_W,0); g.lineTo(i*WHITE_W,HIT_Y); g.stroke();
+    });
+
+    // hit line
+    g.strokeStyle = '#f97316';
+    g.lineWidth = 2;
+    g.beginPath(); g.moveTo(0,HIT_Y); g.lineTo(CANVAS_W,HIT_Y); g.stroke();
+    g.lineWidth = 1;
+
+    // falling notes
+    const t = currentTimeSec();
+    const spb = secPerBeat(currentSong);
+    currentSong.notes.forEach(([name, startBeat, durBeat]) => {
+      const startSec = startBeat*spb, durSec = durBeat*spb;
+      const yBottom = HIT_Y - (startSec - t) * SCROLL_PX_PER_SEC;
+      const h = Math.max(durSec * SCROLL_PX_PER_SEC, 14);
+      const yTop = yBottom - h;
+      if (yBottom < -20 || yTop > HIT_Y+20) return;
+      const r = keyRect(name);
+      const grad = g.createLinearGradient(0,yTop,0,yBottom);
+      grad.addColorStop(0,'#fb923c');
+      grad.addColorStop(1,'#f97316');
+      g.fillStyle = grad;
+      roundRect(g, r.x+2, yTop, r.w-4, Math.min(h, yBottom-yTop), 4);
+      g.fill();
+      if (h > 16){
+        g.fillStyle = '#0f0f0f';
+        g.font = '700 12px Inter, sans-serif';
+        g.textAlign = 'center';
+        g.fillText(name.replace(/\d/,''), r.x + r.w/2, Math.min(yBottom,HIT_Y) - 6);
+      }
+    });
+
+    // keyboard — white keys first
+    whiteKeys.forEach(k => {
+      const r = keyRect(k.name);
+      const on = activeKeys.has(k.name);
+      g.fillStyle = on ? '#fbd3ab' : '#e9e9e9';
+      g.strokeStyle = '#0f0f0f';
+      g.fillRect(r.x, r.top, r.w, r.h);
+      g.strokeRect(r.x, r.top, r.w, r.h);
+      g.fillStyle = '#333';
+      g.font = '600 11px Inter, sans-serif';
+      g.textAlign = 'center';
+      g.fillText(k.letter, r.x + r.w/2, r.top + r.h - 10);
+    });
+    // black keys on top
+    blackKeys.forEach(k => {
+      const r = keyRect(k.name);
+      const on = activeKeys.has(k.name);
+      g.fillStyle = on ? '#f97316' : '#1a1a1a';
+      g.fillRect(r.x, r.top, r.w, r.h);
+    });
+  }
+
+  function roundRect(ctx2d, x, y, w, h, radius){
+    const rad = Math.min(radius, w/2, h/2);
+    ctx2d.beginPath();
+    ctx2d.moveTo(x+rad,y);
+    ctx2d.arcTo(x+w,y,x+w,y+h,rad);
+    ctx2d.arcTo(x+w,y+h,x,y+h,rad);
+    ctx2d.arcTo(x,y+h,x,y,rad);
+    ctx2d.arcTo(x,y,x+w,y,rad);
+    ctx2d.closePath();
+  }
+
+  // ---------- Pointer interaction on keyboard ----------
+  function canvasNoteAt(px, py){
+    if (py < HIT_Y) return null;
+    // check black keys first (they sit on top)
+    for (const k of blackKeys){
+      const r = keyRect(k.name);
+      if (px >= r.x && px <= r.x+r.w && py >= r.top && py <= r.top+r.h) return k.name;
+    }
+    for (const k of whiteKeys){
+      const r = keyRect(k.name);
+      if (px >= r.x && px <= r.x+r.w) return k.name;
+    }
+    return null;
+  }
+  function toCanvasCoords(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (clientX-rect.left) * (CANVAS_W/rect.width),
+      y: (clientY-rect.top) * (CANVAS_H/rect.height),
+    };
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    if (ctx().state === 'suspended') ctx().resume();
+    const {x,y} = toCanvasCoords(e.clientX, e.clientY);
+    const name = canvasNoteAt(x,y);
+    if (name){ heldByPointer[e.pointerId] = name; noteOn(name); canvas.setPointerCapture(e.pointerId); }
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    const name = heldByPointer[e.pointerId];
+    if (name){ noteOff(name); delete heldByPointer[e.pointerId]; }
+  });
+  canvas.addEventListener('pointercancel', (e) => {
+    const name = heldByPointer[e.pointerId];
+    if (name){ noteOff(name); delete heldByPointer[e.pointerId]; }
+  });
+
+  // ---------- Computer keyboard mapping (one octave, C4–C5) ----------
+  const KEY_MAP = {
+    a:'C4', w:'C#4', s:'D4', e:'D#4', d:'E4', f:'F4', t:'F#4',
+    g:'G4', y:'G#4', h:'A4', u:'A#4', j:'B4', k:'C5'
+  };
+  const heldByComputerKey = new Set();
+  window.addEventListener('keydown', (e) => {
+    const name = KEY_MAP[e.key.toLowerCase()];
+    if (!name || heldByComputerKey.has(e.key)) return;
+    if (ctx().state === 'suspended') ctx().resume();
+    heldByComputerKey.add(e.key);
+    noteOn(name);
+  });
+  window.addEventListener('keyup', (e) => {
+    const name = KEY_MAP[e.key.toLowerCase()];
+    if (!name) return;
+    heldByComputerKey.delete(e.key);
+    noteOff(name);
+  });
+
+  // ---------- Idle render loop (so key highlights / hover show even when paused) ----------
+  function idleLoop(){ if (!playing) render(); requestAnimationFrame(idleLoop); }
+  idleLoop();
+
+  // ---------- Init ----------
+  loadSong(SONGS[0].id);
+})();
+</script>
+</body>
+</html>
