@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indonesian for Beginners</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f5f0;
+  --card-bg: #ffffff;
+  --alt-bg: #f5f5f0;
+  --border: #e8e6df;
+  --border-strong: #d3d1c7;
+  --text: #1a1a18;
+  --muted: #6b6a65;
+  --accent: #C8102E;
+  --accent-bg: #FBE7E9;
+  --correct-bg: #E1F5EE;
+  --correct-text: #0F6E56;
+  --wrong-bg: #FCEBEB;
+  --wrong-text: #A32D2D;
+  --hover: #f1efe8;
+}
+html[data-theme="dark"] {
+  --bg: #121212;
+  --card-bg: #1c1c1a;
+  --alt-bg: #232320;
+  --border: #302f2b;
+  --border-strong: #46453e;
+  --text: #f0efe9;
+  --muted: #9b9a92;
+  --accent: #ff7a6e;
+  --accent-bg: #3a2220;
+  --correct-bg: #123528;
+  --correct-text: #4ade80;
+  --wrong-bg: #3a1616;
+  --wrong-text: #f87171;
+  --hover: #26251f;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.2s, color 0.2s; }
+.container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+.hero { background: var(--card-bg); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center; border: 1px solid var(--border); position: relative; }
+.hero h1 { font-size: 26px; font-weight: 500; color: var(--text); margin-top: 8px; }
+.hero p { font-size: 14px; color: var(--muted); margin-top: 6px; }
+.theme-toggle { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--alt-bg); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.theme-toggle:hover { background: var(--hover); }
+.tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border-strong); font-size: 13px; cursor: pointer; background: transparent; color: var(--muted); transition: all 0.15s; }
+.tab:hover { background: var(--hover); }
+.tab.active { background: var(--card-bg); color: var(--text); font-weight: 500; border-color: var(--border-strong); }
+.section { display: none; }
+.section.active { display: block; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.card-title { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+.card-desc { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+
+.sound-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-bottom: 4px; }
+.sound-card { background: var(--alt-bg); border-radius: 8px; padding: 10px 8px; text-align: center; border: 1px solid var(--border); }
+.sound-char { font-size: 22px; color: var(--text); font-weight: 500; display: block; }
+.sound-note { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.sound-row { padding: 9px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.sound-row:last-child { border-bottom: none; }
+.sound-row .sr-letter { font-size: 16px; font-weight: 500; color: var(--accent); min-width: 34px; }
+.sound-row .sr-ex { font-size: 14px; color: var(--text); min-width: 90px; }
+.sound-row .sr-note { font-size: 12px; color: var(--muted); }
+
+.word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 8px; }
+.word-card { background: var(--alt-bg); border-radius: 8px; padding: 10px; border: 1px solid var(--border); }
+.word-id { font-size: 15px; color: var(--text); font-weight: 500; }
+.word-en { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.cat-header { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 1.2rem 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+.phrase-row { padding: 9px 0; border-bottom: 1px solid var(--border); }
+.phrase-row:last-child { border-bottom: none; }
+.phrase-id { font-size: 15px; color: var(--text); font-weight: 500; }
+.phrase-en { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.num-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 8px; }
+.num-card { background: var(--alt-bg); border-radius: 8px; padding: 10px; text-align: center; border: 1px solid var(--border); }
+.num-num { font-size: 22px; color: var(--accent); font-weight: 500; }
+.num-id { font-size: 14px; color: var(--text); font-weight: 500; margin-top: 3px; }
+
+.grammar-example { background: var(--alt-bg); border-radius: 8px; padding: 10px 12px; border: 1px solid var(--border); margin-top: 6px; }
+.ge-id { font-size: 14px; color: var(--text); font-weight: 500; }
+.ge-gloss { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 2px; }
+.ge-en { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.pron-table { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.pron-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.pron-row:last-child { border-bottom: none; }
+.pron-row .p-id { color: var(--text); font-weight: 500; min-width: 130px; }
+.pron-row .p-en { color: var(--muted); }
+
+.quiz-box { background: var(--alt-bg); border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--border); }
+.quiz-q { font-size: 26px; font-weight: 500; color: var(--text); margin: 0.5rem 0 1rem; word-break: break-word; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quiz-opt { padding: 10px 8px; border-radius: 8px; border: 1px solid var(--border-strong); cursor: pointer; font-size: 12px; background: var(--card-bg); color: var(--text); transition: all 0.15s; text-align: center; }
+.quiz-opt:hover { border-color: var(--border-strong); background: var(--hover); }
+.quiz-opt.correct { background: var(--correct-bg); color: var(--correct-text); border-color: var(--correct-text); }
+.quiz-opt.wrong { background: var(--wrong-bg); color: var(--wrong-text); border-color: var(--wrong-text); }
+.score-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 14px; border-radius: 20px; background: var(--accent-bg); color: var(--accent); margin-bottom: 1rem; font-weight: 500; }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-strong); font-size: 11px; cursor: pointer; background: transparent; color: var(--muted); transition: all 0.15s; }
+.filter-btn:hover { background: var(--hover); }
+.filter-btn.active { background: var(--hover); color: var(--text); font-weight: 500; border-color: var(--border-strong); }
+.search-box { width: 100%; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--border-strong); font-size: 13px; background: var(--card-bg); color: var(--text); margin-bottom: 12px; outline: none; transition: border-color 0.15s; }
+.search-box:focus { border-color: var(--border-strong); }
+.quiz-hint { font-size: 13px; color: var(--muted); margin-bottom: 12px; min-height: 20px; }
+.btn { padding: 8px 20px; border-radius: 8px; border: 1px solid var(--border-strong); cursor: pointer; font-size: 13px; transition: all 0.15s; background: var(--card-bg); color: var(--text); }
+.btn:hover { background: var(--hover); }
+.btn-primary { background: var(--hover); color: var(--text); font-weight: 500; }
+footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 2rem; padding: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle dark mode">🌙</button>
+  <div style="font-size:36px;">🇮🇩</div>
+  <h1>Indonesian for Beginners</h1>
+  <p>English &nbsp;·&nbsp; Bahasa Indonesia</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('pronunciation')">Pronunciation</button>
+  <button class="tab" onclick="switchTab('vocab')">Vocabulary (100)</button>
+  <button class="tab" onclick="switchTab('phrases')">Phrases (100)</button>
+  <button class="tab" onclick="switchTab('numbers')">Numbers</button>
+  <button class="tab" onclick="switchTab('grammar')">Grammar Basics</button>
+  <button class="tab" onclick="switchTab('quiz')">Quiz</button>
+</div>
+
+<!-- PRONUNCIATION -->
+<div id="tab-pronunciation" class="section active">
+  <div class="card">
+    <div class="card-title">Vowels</div>
+    <p class="card-desc">Indonesian spelling is almost fully phonetic — once you know the sounds below, you can read almost any word correctly.</p>
+    <div class="sound-grid" id="vowel-grid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Tricky Consonants &amp; Combinations</div>
+    <p class="card-desc">Most consonants sound like English. These are the ones that don't.</p>
+    <div id="consonant-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Stress &amp; Rhythm</div>
+    <p class="card-desc">Indonesian has no tones. Stress is light and usually falls on the second-to-last syllable, e.g. <strong>se‑KO‑lah</strong> (school). Every letter is pronounced — there are no silent letters except a soft final "h".</p>
+  </div>
+</div>
+
+<!-- VOCAB -->
+<div id="tab-vocab" class="section">
+  <input class="search-box" type="text" placeholder="Search vocabulary... (e.g. water, air)" oninput="filterVocab(this.value)" id="vocab-search">
+  <div class="filter-row" id="vocab-filters"></div>
+  <div id="vocab-container"></div>
+</div>
+
+<!-- PHRASES -->
+<div id="tab-phrases" class="section">
+  <input class="search-box" type="text" placeholder="Search phrases... (e.g. thank you, terima kasih)" oninput="filterPhrases(this.value)" id="phrase-search">
+  <div class="filter-row" id="phrase-filters"></div>
+  <div id="phrase-container"></div>
+</div>
+
+<!-- NUMBERS -->
+<div id="tab-numbers" class="section">
+  <div class="card">
+    <div class="card-title">Numbers — Angka</div>
+    <div class="num-grid" id="num-grid"></div>
+  </div>
+</div>
+
+<!-- GRAMMAR -->
+<div id="tab-grammar" class="section">
+  <div class="card">
+    <div class="card-title">Word Order: Subject + Verb + Object</div>
+    <p class="card-desc">Same basic order as English, so building simple sentences is intuitive.</p>
+    <div class="grammar-example"><div class="ge-id">Saya makan nasi.</div><div class="ge-gloss">I eat rice</div><div class="ge-en">I eat rice.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">No Verb Conjugation</div>
+    <p class="card-desc">Verbs never change for person or number — one form covers "I eat", "she eats", "they eat", etc.</p>
+    <div class="grammar-example"><div class="ge-id">Saya makan. / Dia makan. / Mereka makan.</div><div class="ge-en">I eat. / He or she eats. / They eat.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Tense Comes From Words, Not Endings</div>
+    <p class="card-desc">There's no past/present/future conjugation either — add a time word instead: <strong>sudah</strong> (already), <strong>sedang</strong> (currently), <strong>akan</strong> (will), <strong>belum</strong> (not yet).</p>
+    <div class="grammar-example"><div class="ge-id">Saya sudah makan.</div><div class="ge-en">I already ate.</div></div>
+    <div class="grammar-example"><div class="ge-id">Saya sedang makan.</div><div class="ge-en">I am eating.</div></div>
+    <div class="grammar-example"><div class="ge-id">Saya akan makan.</div><div class="ge-en">I will eat.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Plurals by Reduplication</div>
+    <p class="card-desc">Repeat the noun to make it plural, or just pair it with a number — the noun itself never changes.</p>
+    <div class="grammar-example"><div class="ge-id">buku → buku-buku / dua buku</div><div class="ge-en">book → books / two books</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Adjectives Come After the Noun</div>
+    <p class="card-desc">The opposite order from English.</p>
+    <div class="grammar-example"><div class="ge-id">rumah besar</div><div class="ge-gloss">house big</div><div class="ge-en">big house</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">No Articles</div>
+    <p class="card-desc">There's no word for "a", "an", or "the" — context tells you which is meant.</p>
+    <div class="grammar-example"><div class="ge-id">Saya punya buku.</div><div class="ge-en">I have a book. / I have the book.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Pronouns</div>
+    <div class="pron-table" id="pronoun-table"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Question Words</div>
+    <div class="pron-table" id="question-table"></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="tab-quiz" class="section">
+  <div class="score-badge">⭐ Score: <span id="score">0</span> / <span id="total">0</span></div>
+  <div class="quiz-box">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:6px;" id="quiz-type">What does this mean?</div>
+    <div class="quiz-q" id="quiz-q">Halo</div>
+    <div class="quiz-hint" id="quiz-hint"></div>
+    <div class="quiz-options" id="quiz-opts"></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;">
+    <button class="btn btn-primary" onclick="nextQ()">Next question →</button>
+    <button class="btn" onclick="resetQuiz()">Reset</button>
+  </div>
+</div>
+
+<footer>Made with ❤️ using Claude AI &nbsp;·&nbsp; Indonesian for Beginners</footer>
+
+</div>
+
+<script>
+const vocabData = {
+  "People & Family": [
+    {id:"Ibu", en:"Mother"},
+    {id:"Ayah", en:"Father"},
+    {id:"Kakak Perempuan", en:"Older sister"},
+    {id:"Kakak Laki-laki", en:"Older brother"},
+    {id:"Adik Perempuan", en:"Younger sister"},
+    {id:"Adik Laki-laki", en:"Younger brother"},
+    {id:"Anak", en:"Child"},
+    {id:"Bayi", en:"Baby"},
+    {id:"Teman", en:"Friend"},
+    {id:"Keluarga", en:"Family"},
+    {id:"Suami", en:"Husband"},
+    {id:"Istri", en:"Wife"}
+  ],
+  "Food & Drink": [
+    {id:"Air", en:"Water"},
+    {id:"Nasi", en:"Rice"},
+    {id:"Makanan", en:"Food"},
+    {id:"Ayam", en:"Chicken"},
+    {id:"Ikan", en:"Fish"},
+    {id:"Daging", en:"Meat"},
+    {id:"Sayur", en:"Vegetable"},
+    {id:"Buah", en:"Fruit"},
+    {id:"Telur", en:"Egg"},
+    {id:"Kopi", en:"Coffee"},
+    {id:"Teh", en:"Tea"},
+    {id:"Gula", en:"Sugar"},
+    {id:"Garam", en:"Salt"},
+    {id:"Pedas", en:"Spicy"},
+    {id:"Enak", en:"Delicious"}
+  ],
+  "Home & Daily Life": [
+    {id:"Rumah", en:"House"},
+    {id:"Kamar", en:"Room"},
+    {id:"Pintu", en:"Door"},
+    {id:"Jendela", en:"Window"},
+    {id:"Meja", en:"Table"},
+    {id:"Kursi", en:"Chair"},
+    {id:"Tempat Tidur", en:"Bed"},
+    {id:"Kamar Mandi", en:"Bathroom"},
+    {id:"Dapur", en:"Kitchen"},
+    {id:"Baju", en:"Clothes"},
+    {id:"Buku", en:"Book"},
+    {id:"Uang", en:"Money"},
+    {id:"Kunci", en:"Key"},
+    {id:"Telepon", en:"Telephone"}
+  ],
+  "Body & Health": [
+    {id:"Kepala", en:"Head"},
+    {id:"Mata", en:"Eye"},
+    {id:"Tangan", en:"Hand"},
+    {id:"Kaki", en:"Foot / Leg"},
+    {id:"Perut", en:"Stomach"},
+    {id:"Sakit", en:"Sick / Pain"},
+    {id:"Obat", en:"Medicine"},
+    {id:"Rumah Sakit", en:"Hospital"},
+    {id:"Dokter", en:"Doctor"},
+    {id:"Capek", en:"Tired"}
+  ],
+  "Time & Weather": [
+    {id:"Hari Ini", en:"Today"},
+    {id:"Besok", en:"Tomorrow"},
+    {id:"Kemarin", en:"Yesterday"},
+    {id:"Pagi", en:"Morning"},
+    {id:"Siang", en:"Midday / Afternoon"},
+    {id:"Malam", en:"Night"},
+    {id:"Minggu", en:"Week"},
+    {id:"Bulan", en:"Month"},
+    {id:"Tahun", en:"Year"},
+    {id:"Panas", en:"Hot"},
+    {id:"Dingin", en:"Cold"},
+    {id:"Hujan", en:"Rain"},
+    {id:"Matahari", en:"Sun"}
+  ],
+  "Transport & Places": [
+    {id:"Mobil", en:"Car"},
+    {id:"Motor", en:"Motorcycle"},
+    {id:"Bis", en:"Bus"},
+    {id:"Pesawat", en:"Airplane"},
+    {id:"Kereta", en:"Train"},
+    {id:"Jalan", en:"Road / Street"},
+    {id:"Pasar", en:"Market"},
+    {id:"Sekolah", en:"School"},
+    {id:"Kantor", en:"Office"},
+    {id:"Bandara", en:"Airport"},
+    {id:"Stasiun", en:"Station"},
+    {id:"Kota", en:"City"},
+    {id:"Desa", en:"Village"},
+    {id:"Toko", en:"Shop / Store"}
+  ],
+  "Work & Study": [
+    {id:"Kerja", en:"Work"},
+    {id:"Belajar", en:"Study"},
+    {id:"Guru", en:"Teacher"},
+    {id:"Murid", en:"Student"},
+    {id:"Pena", en:"Pen"},
+    {id:"Kertas", en:"Paper"},
+    {id:"Komputer", en:"Computer"},
+    {id:"Rapat", en:"Meeting"},
+    {id:"Gaji", en:"Salary"},
+    {id:"Pekerjaan", en:"Job"},
+    {id:"Tugas", en:"Task / Assignment"},
+    {id:"Laptop", en:"Laptop"}
+  ],
+  "Nature & Animals": [
+    {id:"Pohon", en:"Tree"},
+    {id:"Bunga", en:"Flower"},
+    {id:"Gunung", en:"Mountain"},
+    {id:"Laut", en:"Sea"},
+    {id:"Sungai", en:"River"},
+    {id:"Anjing", en:"Dog"},
+    {id:"Kucing", en:"Cat"},
+    {id:"Burung", en:"Bird"},
+    {id:"Pantai", en:"Beach"},
+    {id:"Langit", en:"Sky"}
+  ]
+};
+
+const phrasesData = {
+  "Greetings": [
+    {id:"Halo", en:"Hello"},
+    {id:"Selamat Pagi", en:"Good morning"},
+    {id:"Selamat Siang", en:"Good afternoon"},
+    {id:"Selamat Sore", en:"Good evening (early)"},
+    {id:"Selamat Malam", en:"Good night"},
+    {id:"Selamat Tinggal", en:"Goodbye"},
+    {id:"Sampai Jumpa", en:"See you later"},
+    {id:"Apa Kabar?", en:"How are you?"},
+    {id:"Baik, Terima Kasih", en:"Fine, thank you"},
+    {id:"Siapa Nama Kamu?", en:"What's your name?"},
+    {id:"Nama Saya...", en:"My name is..."},
+    {id:"Senang Bertemu Denganmu", en:"Nice to meet you"}
+  ],
+  "Polite Expressions": [
+    {id:"Terima Kasih", en:"Thank you"},
+    {id:"Sama-sama", en:"You're welcome"},
+    {id:"Maaf", en:"Sorry"},
+    {id:"Permisi", en:"Excuse me"},
+    {id:"Tidak Apa-apa", en:"It's okay"},
+    {id:"Tolong", en:"Please"},
+    {id:"Ya", en:"Yes"},
+    {id:"Tidak", en:"No"},
+    {id:"Silakan", en:"Please, go ahead"},
+    {id:"Boleh Saya...?", en:"May I...?"},
+    {id:"Tunggu Sebentar", en:"Wait a moment"},
+    {id:"Dengan Senang Hati", en:"With pleasure"}
+  ],
+  "Asking for Help": [
+    {id:"Saya Tidak Mengerti", en:"I don't understand"},
+    {id:"Tolong Ulangi", en:"Please repeat that"},
+    {id:"Tolong Bicara Pelan-pelan", en:"Please speak slowly"},
+    {id:"Saya Tidak Bisa Bahasa Indonesia", en:"I can't speak Indonesian"},
+    {id:"Apakah Kamu Bisa Bahasa Inggris?", en:"Do you speak English?"},
+    {id:"Tolong Bantu Saya", en:"Please help me"},
+    {id:"Di Mana Itu?", en:"Where is it?"},
+    {id:"Bagaimana Caranya?", en:"How do I do this?"},
+    {id:"Apa Artinya Ini?", en:"What does this mean?"},
+    {id:"Bisa Tolong Tulis Itu?", en:"Can you write that down?"},
+    {id:"Tolong Panggil Ambulans", en:"Please call an ambulance"},
+    {id:"Saya Butuh Bantuan", en:"I need help"},
+    {id:"Bolehkah Saya Bertanya?", en:"May I ask a question?"}
+  ],
+  "Shopping": [
+    {id:"Berapa Harganya?", en:"How much is it?"},
+    {id:"Itu Mahal", en:"That's expensive"},
+    {id:"Itu Murah", en:"That's cheap"},
+    {id:"Saya Mau Ini", en:"I'll take this one"},
+    {id:"Ada Yang Lain?", en:"Do you have other ones?"},
+    {id:"Boleh Saya Coba?", en:"Can I try it on?"},
+    {id:"Tolong Kasih Tas", en:"Please give me a bag"},
+    {id:"Bisa Bayar Pakai Kartu?", en:"Can I pay by card?"},
+    {id:"Tolong Kasih Struk", en:"Please give me a receipt"},
+    {id:"Bisa Dikembalikan?", en:"Can I return this?"},
+    {id:"Ada Diskon?", en:"Is there a discount?"},
+    {id:"Saya Cuma Lihat-lihat", en:"I'm just looking"}
+  ],
+  "At Home": [
+    {id:"Tolong Bersihkan", en:"Please clean"},
+    {id:"Tolong Cuci Baju", en:"Please do the laundry"},
+    {id:"Tolong Masak", en:"Please cook"},
+    {id:"Tolong Jaga Anak", en:"Please watch the children"},
+    {id:"Tolong Buang Sampah", en:"Please take out the trash"},
+    {id:"Tolong Buka Jendela", en:"Please open the window"},
+    {id:"Tolong Tutup Pintu", en:"Please close the door"},
+    {id:"Tolong Matikan Lampu", en:"Please turn off the light"},
+    {id:"Tolong Nyalakan Lampu", en:"Please turn on the light"},
+    {id:"Kamu Bisa Istirahat Hari Ini", en:"You can rest today"},
+    {id:"Terima Kasih, Bagus Sekali", en:"Thank you, well done"},
+    {id:"Hati-hati Ya", en:"Please be careful"},
+    {id:"Terima Kasih Atas Kerja Kerasnya", en:"Thank you for your hard work"}
+  ],
+  "Food & Eating": [
+    {id:"Selamat Makan", en:"Enjoy your meal"},
+    {id:"Terima Kasih Atas Makanannya", en:"Thank you for the meal"},
+    {id:"Enak Sekali!", en:"Delicious!"},
+    {id:"Saya Lapar", en:"I'm hungry"},
+    {id:"Saya Kenyang", en:"I'm full"},
+    {id:"Tolong Kasih Air", en:"Please give me water"},
+    {id:"Saya Alergi", en:"I have allergies"},
+    {id:"Saya Tidak Suka Pedas", en:"I don't like spicy food"},
+    {id:"Apa Rekomendasinya?", en:"What do you recommend?"},
+    {id:"Minta Bon", en:"Bill please"},
+    {id:"Saya Mau Pesan", en:"I'd like to order"},
+    {id:"Ini Enak Sekali", en:"This is very delicious"}
+  ],
+  "Feelings & Emotions": [
+    {id:"Senang", en:"Happy"},
+    {id:"Sedih", en:"Sad"},
+    {id:"Saya Capek", en:"I'm tired"},
+    {id:"Saya Ngantuk", en:"I'm sleepy"},
+    {id:"Kamu Baik-baik Saja?", en:"Are you okay?"},
+    {id:"Jangan Khawatir", en:"Don't worry"},
+    {id:"Tadi Seru", en:"That was fun"},
+    {id:"Saya Kaget", en:"I was surprised"},
+    {id:"Kesepian", en:"Lonely"},
+    {id:"Saya Akan Berusaha Sebaik Mungkin", en:"I'll do my best"},
+    {id:"Saya Marah", en:"I'm angry"},
+    {id:"Saya Takut", en:"I'm scared"},
+    {id:"Saya Rindu Kamu", en:"I miss you"}
+  ],
+  "Travel & Emergency": [
+    {id:"Di Mana Toilet?", en:"Where is the toilet?"},
+    {id:"Tolong!", en:"Help!"},
+    {id:"Saya Tersesat", en:"I'm lost"},
+    {id:"Tolong Panggil Polisi", en:"Please call the police"},
+    {id:"Ada Rumah Sakit Di Dekat Sini?", en:"Is there a hospital nearby?"},
+    {id:"Saya Sakit", en:"I'm sick"},
+    {id:"Berapa Lama Perjalanannya?", en:"How long is the trip?"},
+    {id:"Ke Bandara, Tolong", en:"To the airport, please"},
+    {id:"Kapan Berangkat?", en:"When does it depart?"},
+    {id:"Ini Tempat Duduk Saya", en:"This is my seat"},
+    {id:"Tolong Antar Saya Ke Sini", en:"Please take me here"},
+    {id:"Hati-hati Di Jalan", en:"Be careful on the road"},
+    {id:"Saya Kehilangan Paspor Saya", en:"I lost my passport"}
+  ]
+};
+
+const numbersData = [
+  {num:0, id:"Nol"},
+  {num:1, id:"Satu"},
+  {num:2, id:"Dua"},
+  {num:3, id:"Tiga"},
+  {num:4, id:"Empat"},
+  {num:5, id:"Lima"},
+  {num:6, id:"Enam"},
+  {num:7, id:"Tujuh"},
+  {num:8, id:"Delapan"},
+  {num:9, id:"Sembilan"},
+  {num:10, id:"Sepuluh"},
+  {num:11, id:"Sebelas"},
+  {num:20, id:"Dua Puluh"},
+  {num:30, id:"Tiga Puluh"},
+  {num:100, id:"Seratus"},
+  {num:1000, id:"Seribu"},
+  {num:10000, id:"Sepuluh Ribu"}
+];
+
+const vowelsData = [
+  {ch:"a", note:"like 'a' in father"},
+  {ch:"e", note:"usually a soft 'uh' (schwa)"},
+  {ch:"i", note:"like 'ee' in see"},
+  {ch:"o", note:"like 'o' in go"},
+  {ch:"u", note:"like 'oo' in moon"}
+];
+
+const consonantsData = [
+  {letter:"c", ex:"cinta (love)", note:"always like 'ch' in chair"},
+  {letter:"g", ex:"gula (sugar)", note:"always hard, like 'g' in go"},
+  {letter:"h", ex:"rumah (house)", note:"soft, sometimes barely heard at the end of a word"},
+  {letter:"j", ex:"jalan (street)", note:"like 'j' in jam"},
+  {letter:"ng", ex:"ngengat (moth)", note:"one sound, like 'ng' in singer"},
+  {letter:"ny", ex:"nyata (real)", note:"one sound, like 'ny' in canyon"},
+  {letter:"r", ex:"rumah (house)", note:"rolled / trilled with the tongue"},
+  {letter:"sy", ex:"syarat (condition)", note:"like 'sh' in shoe"},
+  {letter:"kh", ex:"khusus (special)", note:"a breathy 'k', like Scottish 'loch'"}
+];
+
+const pronounsData = [
+  {id:"saya", en:"I (neutral / formal)"},
+  {id:"aku", en:"I (informal / close friends)"},
+  {id:"kamu", en:"you (informal)"},
+  {id:"Anda", en:"you (formal / polite)"},
+  {id:"dia", en:"he / she"},
+  {id:"kami", en:"we (excluding listener)"},
+  {id:"kita", en:"we (including listener)"},
+  {id:"mereka", en:"they"}
+];
+
+const questionsData = [
+  {id:"apa", en:"what"},
+  {id:"siapa", en:"who"},
+  {id:"di mana", en:"where"},
+  {id:"kapan", en:"when"},
+  {id:"kenapa / mengapa", en:"why"},
+  {id:"bagaimana", en:"how"},
+  {id:"berapa", en:"how much / how many"}
+];
+
+function buildVocab() {
+  const filters = document.getElementById('vocab-filters');
+  const container = document.getElementById('vocab-container');
+  const cats = Object.keys(vocabData);
+  filters.innerHTML = '<button class="filter-btn active" onclick="filterVocab(\'\', this)">All</button>' +
+    cats.map(c => `<button class="filter-btn" onclick="filterVocab('${c}', this)">${c}</button>`).join('');
+  let html = '';
+  cats.forEach(cat => {
+    html += `<div class="cat-header vocab-cat" data-cat="${cat}">${cat}</div><div class="word-grid" id="vg-${cat.replace(/\s/g,'_')}">`;
+    vocabData[cat].forEach(v => {
+      html += `<div class="word-card" data-en="${v.en.toLowerCase()}" data-id="${v.id.toLowerCase()}" data-cat="${cat}">
+        <div class="word-id">${v.id}</div><div class="word-en">${v.en}</div></div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function filterVocab(query, btn) {
+  if (btn) {
+    document.querySelectorAll('#vocab-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('vocab-search').value = '';
+  }
+  const isCat = Object.keys(vocabData).includes(query);
+  const q = query.toLowerCase();
+  document.querySelectorAll('.word-card').forEach(card => {
+    const matchCat = !query || !isCat || card.dataset.cat === query;
+    const matchSearch = !query || isCat || card.dataset.en.includes(q) || card.dataset.id.includes(q);
+    card.style.display = (matchCat && matchSearch) ? '' : 'none';
+  });
+  document.querySelectorAll('.vocab-cat').forEach(header => {
+    const grid = header.nextElementSibling;
+    const visible = grid ? grid.querySelectorAll('.word-card:not([style*="none"])').length : 0;
+    header.style.display = visible === 0 ? 'none' : '';
+    if (grid) grid.style.display = visible === 0 ? 'none' : '';
+  });
+}
+
+function buildPhrases() {
+  const filters = document.getElementById('phrase-filters');
+  const container = document.getElementById('phrase-container');
+  const cats = Object.keys(phrasesData);
+  filters.innerHTML = '<button class="filter-btn active" onclick="filterPhrases(\'\', this)">All</button>' +
+    cats.map(c => `<button class="filter-btn" onclick="filterPhrases('${c}', this)">${c}</button>`).join('');
+  let html = '';
+  cats.forEach(cat => {
+    html += `<div class="card"><div class="card-title">${cat}</div>`;
+    phrasesData[cat].forEach(p => {
+      html += `<div class="phrase-row" data-cat="${cat}" data-en="${p.en.toLowerCase()}" data-id="${p.id.toLowerCase()}">
+        <div class="phrase-id">${p.id}</div><div class="phrase-en">${p.en}</div></div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function filterPhrases(query, btn) {
+  if (btn) {
+    document.querySelectorAll('#phrase-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('phrase-search').value = '';
+  }
+  const isCat = Object.keys(phrasesData).includes(query);
+  const q = query.toLowerCase();
+  document.querySelectorAll('.phrase-row').forEach(row => {
+    const matchCat = !query || !isCat || row.dataset.cat === query;
+    const matchSearch = !query || isCat || row.dataset.en.includes(q) || row.dataset.id.includes(q);
+    row.style.display = (matchCat && matchSearch) ? '' : 'none';
+  });
+  document.querySelectorAll('#phrase-container .card').forEach(card => {
+    const visible = card.querySelectorAll('.phrase-row:not([style*="none"])').length;
+    card.style.display = visible === 0 ? 'none' : '';
+  });
+}
+
+function buildNumbers() {
+  const grid = document.getElementById('num-grid');
+  grid.innerHTML = numbersData.map(n =>
+    `<div class="num-card"><div class="num-num">${n.num.toLocaleString()}</div><div class="num-id">${n.id}</div></div>`
+  ).join('');
+}
+
+function buildPronunciation() {
+  document.getElementById('vowel-grid').innerHTML = vowelsData.map(v =>
+    `<div class="sound-card"><span class="sound-char">${v.ch}</span><span class="sound-note">${v.note}</span></div>`
+  ).join('');
+  document.getElementById('consonant-list').innerHTML = consonantsData.map(c =>
+    `<div class="sound-row"><span class="sr-letter">${c.letter}</span><span class="sr-ex">${c.ex}</span><span class="sr-note">${c.note}</span></div>`
+  ).join('');
+}
+
+function buildGrammarTables() {
+  document.getElementById('pronoun-table').innerHTML = pronounsData.map(p =>
+    `<div class="pron-row"><span class="p-id">${p.id}</span><span class="p-en">${p.en}</span></div>`
+  ).join('');
+  document.getElementById('question-table').innerHTML = questionsData.map(q =>
+    `<div class="pron-row"><span class="p-id">${q.id}</span><span class="p-en">${q.en}</span></div>`
+  ).join('');
+}
+
+function switchTab(name) {
+  const names = ['pronunciation','vocab','phrases','numbers','grammar','quiz'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'quiz' && !quizReady) { quizReady = true; nextQ(); }
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('id-theme', isDark ? 'light' : 'dark');
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('id-theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+
+const allVocab = Object.values(vocabData).flat();
+const allPhrases = Object.values(phrasesData).flat();
+const quizPool = [
+  ...allVocab.slice(0,30).map(v => ({q:v.id, a:v.en, type:'Word', pool:allVocab.slice(0,30).map(x=>x.en)})),
+  ...allPhrases.slice(0,20).map(p => ({q:p.id, a:p.en, type:'Phrase', pool:allPhrases.slice(0,20).map(x=>x.en)})),
+  ...numbersData.map(n => ({q:String(n.num), a:n.id, type:'Number', pool:numbersData.map(x=>x.id)}))
+];
+
+let cur=0, score=0, total=0, answered=false, quizReady=false;
+let pool2 = [...quizPool].sort(()=>Math.random()-0.5);
+
+function nextQ() {
+  if (cur >= pool2.length) { pool2=[...quizPool].sort(()=>Math.random()-0.5); cur=0; }
+  const q = pool2[cur++];
+  answered = false;
+  document.getElementById('quiz-type').textContent = q.type === 'Number' ? 'What is this number in Indonesian?' : `What does this ${q.type.toLowerCase()} mean?`;
+  document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-hint').textContent = '';
+  const wrong = [...q.pool].filter(o=>o!==q.a).sort(()=>Math.random()-0.5).slice(0,3);
+  const opts = [q.a,...wrong].sort(()=>Math.random()-0.5);
+  document.getElementById('quiz-opts').innerHTML = opts.map(o =>
+    `<button class="quiz-opt" onclick="checkAns(this,'${o.replace(/'/g,"\\'")}','${q.a.replace(/'/g,"\\'")}')">${o}</button>`
+  ).join('');
+}
+
+function checkAns(btn, chosen, correct) {
+  if (answered) return;
+  answered = true; total++;
+  if (chosen === correct) {
+    btn.classList.add('correct'); score++;
+    document.getElementById('quiz-hint').textContent = '✓ Benar! Correct!';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-opt').forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    document.getElementById('quiz-hint').textContent = 'Answer: ' + correct;
+  }
+  document.getElementById('score').textContent = score;
+  document.getElementById('total').textContent = total;
+}
+
+function resetQuiz() {
+  score=0; total=0; cur=0;
+  pool2=[...quizPool].sort(()=>Math.random()-0.5);
+  document.getElementById('score').textContent=0;
+  document.getElementById('total').textContent=0;
+  nextQ();
+}
+
+document.getElementById('theme-btn').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+buildVocab();
+buildPhrases();
+buildNumbers();
+buildPronunciation();
+buildGrammarTables();
+</script>
+</body>
+</html>
