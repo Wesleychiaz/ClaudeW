@@ -24,7 +24,7 @@
   /* ═══════════════ Design tokens ═══════════════ */
   :root {
     --sky:#38BDF8; --sun:#FFC53D; --coral:#FF7A59; --teal:#14B8A6;
-    --grass:#34D399; --pink:#FF6FB5; --grape:#7C5CFF;
+    --grass:#34D399; --pink:#FF6FB5; --grape:#7C5CFF; --rose:#F43F5E;
     --ink:#20223A; --ink-soft:#5A5E80; --card:#FFFFFF;
     --radius:28px;
     --shadow-sm:0 4px 14px rgba(40,30,90,.10);
@@ -79,7 +79,8 @@
   .pill.done { background:#E6FAF1; color:#0E9F6E; }
   .card.sky .glow{background:var(--sky)} .card.sun .glow{background:var(--sun)} .card.coral .glow{background:var(--coral)}
   .card.teal .glow{background:var(--teal)} .card.grass .glow{background:var(--grass)} .card.pink .glow{background:var(--pink)}
-  .card.grape .glow{background:var(--grape)} .card.rainbow .glow{background:conic-gradient(from 0deg,var(--coral),var(--sun),var(--grass),var(--sky),var(--grape),var(--coral));opacity:.3}
+  .card.grape .glow{background:var(--grape)} .card.rose .glow{background:var(--rose)}
+  .card.rainbow .glow{background:conic-gradient(from 0deg,var(--coral),var(--sun),var(--grass),var(--sky),var(--grape),var(--coral));opacity:.3}
 
   .home-foot { margin-top:26px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center; align-items:center; }
   .ghost-btn { background:rgba(255,255,255,.7); border:1px solid rgba(124,92,255,.2); color:var(--grape); font-weight:800; font-size:.95rem; padding:12px 22px; border-radius:100px; cursor:pointer; box-shadow:var(--shadow-sm); transition:transform .2s var(--ease); }
@@ -97,6 +98,7 @@
   .badge { display:inline-flex; align-items:center; gap:7px; padding:7px 16px; border-radius:100px; margin-bottom:16px; font-size:.78rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
   .badge.listen{background:#E6F4FF;color:#0277BD} .badge.say{background:#E6FAF1;color:#0E9F6E}
   .badge.choose{background:#FFF6E0;color:#C77700} .badge.talk{background:#F3ECFF;color:#6D3BD6}
+  .badge.clueGuess{background:#FFE9EE;color:#BE123C} .badge.clueGive{background:#FFE9EE;color:#BE123C}
   .instruction { font-size:clamp(1.1rem,3.6vw,1.45rem); font-weight:800; line-height:1.35; margin-bottom:18px; }
   .phoneme { display:inline-flex; flex-direction:column; align-items:center; background:linear-gradient(135deg,#F3ECFF,#FFF0F8); border:2px dashed rgba(124,92,255,.4); border-radius:22px; padding:12px 28px; margin:4px auto 18px; }
   .phoneme small { font-size:.7rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--grape); margin-bottom:2px; }
@@ -114,6 +116,7 @@
   .speak-btn.coral{background:linear-gradient(135deg,var(--coral),#E0512F);box-shadow:0 8px 20px rgba(255,122,89,.4)}
   .speak-btn.teal{background:linear-gradient(135deg,var(--teal),#0E9488);box-shadow:0 8px 20px rgba(20,184,166,.4)}
   .speak-btn.pink{background:linear-gradient(135deg,var(--pink),#E0428C);box-shadow:0 8px 20px rgba(255,111,181,.4)}
+  .speak-btn.rose{background:linear-gradient(135deg,var(--rose),#BE123C);box-shadow:0 8px 20px rgba(244,63,94,.4)}
 
   .choices { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:18px 0 4px; }
   .choice { appearance:none; cursor:pointer; background:#fff; border:3px solid #ECE9F6; border-radius:22px; padding:16px 20px; min-width:118px; box-shadow:var(--shadow-sm); font-family:'Fredoka',cursive; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:4px; transition:transform .18s var(--ease),border-color .18s,background .18s; }
@@ -191,6 +194,34 @@
   .tipitem .th { font-weight:900; font-size:.98rem; display:flex; align-items:center; gap:8px; }
   .tipitem .tb { color:var(--ink-soft); font-weight:700; font-size:.92rem; line-height:1.5; margin-top:4px; }
 
+  /* ─────── Charades / Guess What I Am ─────── */
+  .mode-grid { display:grid; gap:16px; grid-template-columns:1fr; margin-top:4px; }
+  @media (min-width:560px){ .mode-grid { grid-template-columns:1fr 1fr; } }
+  .mode-card { cursor:pointer; text-align:center; border:3px solid #ECE9F6; border-radius:22px; padding:24px 18px; background:#fff; box-shadow:var(--shadow-sm); transition:transform .18s var(--ease),border-color .18s; }
+  .mode-card:active { transform:scale(.96); }
+  @media (hover:hover){ .mode-card:hover { transform:translateY(-4px); border-color:var(--rose); } }
+  .mode-card .me { font-size:2.9rem; }
+  .mode-card .mt { font-family:'Fredoka',cursive; font-weight:600; font-size:1.25rem; margin:8px 0 4px; }
+  .mode-card .md { font-size:.9rem; font-weight:700; color:var(--ink-soft); }
+
+  .clue-list { display:flex; flex-direction:column; gap:10px; margin:6px 0 14px; }
+  .clue { display:flex; align-items:center; gap:11px; text-align:left; background:linear-gradient(135deg,#FFF1F5,#F3ECFF); border:2px solid rgba(244,63,94,.22); border-radius:16px; padding:13px 16px; font-weight:800; color:#9F1239; font-size:1.02rem; }
+  .clue .cn { flex:none; width:26px; height:26px; border-radius:50%; background:var(--rose); color:#fff; display:grid; place-items:center; font-size:.85rem; }
+  .reveal { width:100%; }
+  .reveal .re { font-size:clamp(4rem,16vw,6rem); line-height:1; }
+  .reveal .rw { font-family:'Fredoka',cursive; font-weight:700; font-size:1.7rem; color:#0E9F6E; margin-top:4px; }
+
+  .secret { background:linear-gradient(135deg,#FFF1F5,#EEF4FF); border:2px dashed rgba(244,63,94,.4); border-radius:22px; padding:20px; margin:6px 0 14px; }
+  .secret .se { font-size:clamp(4.4rem,18vw,7rem); line-height:1; }
+  .secret .sw { font-family:'Fredoka',cursive; font-weight:600; font-size:1.35rem; color:var(--ink); margin-top:6px; }
+  .secret .shh { font-size:.78rem; font-weight:800; color:var(--rose); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+  .clue-count { font-weight:900; color:var(--rose); font-size:1.05rem; margin:8px 0 4px; }
+  .parent-controls { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px; }
+  .pc-btn { appearance:none; border:none; cursor:pointer; font-family:'Nunito'; font-weight:800; font-size:1rem; padding:14px 22px; border-radius:16px; transition:transform .18s var(--ease); }
+  .pc-btn:active { transform:scale(.95); }
+  .pc-again { background:#F0EDF8; color:var(--grape); }
+  .pc-got { color:#fff; background:linear-gradient(135deg,var(--grass),#0E9F6E); box-shadow:0 8px 18px rgba(52,211,153,.4); }
+
   /* confetti */
   .confetti { position:fixed; top:-24px; width:12px; height:12px; z-index:9999; pointer-events:none; will-change:transform; }
 
@@ -227,8 +258,8 @@
 
     <div class="stars-panel">
       <span class="label">⭐ Lessons completed</span>
-      <span class="stars" id="stars-display">☆☆☆☆☆☆☆☆</span>
-      <span class="label"><span class="count" id="stars-count">0</span> of 8</span>
+      <span class="stars" id="stars-display">☆☆☆☆☆☆☆☆☆</span>
+      <span class="label"><span class="count" id="stars-count">0</span> of <span id="stars-total">9</span></span>
     </div>
 
     <div class="lesson-grid" id="lesson-grid"></div>
@@ -462,6 +493,13 @@ const LESSONS = {
     ]}
 };
 
+/* Module 9 — 🎭 Guess What I Am! (custom two-mode flow, see startGuess) */
+LESSONS.guess = {
+  emoji:'🎭', title:'Guess What I Am!', color:'rose', desc:'Charades & clue words',
+  pill:'2 modes', custom:true,
+  doneMsg:'Amazing clues, Coen — you are a great explainer!'
+};
+
 /* Mix It Up! — random session across sounds + one language question */
 const MIX = {
   emoji:'🌈', title:'Mix It Up!', color:'rainbow', desc:'A little bit of everything',
@@ -481,7 +519,7 @@ function buildMixSteps(){
 }
 
 /* ─────────── Home ─────────── */
-const ORDER = ['s','k','ch','sh','prep','same','talk'];
+const ORDER = ['s','k','ch','sh','prep','same','talk','guess'];
 function lessonById(id){ return id==='mix' ? MIX : LESSONS[id]; }
 
 function buildHome(){
@@ -494,7 +532,7 @@ function cardHTML(id, l){
   const done = !!store.progress[id];
   return `<div class="card ${l.color}" onclick="startLesson('${id}')">
     <span class="glow"></span>
-    <span class="pill ${done?'done':''}" id="pill-${id}">${done?'✓ Done':'3 steps'}</span>
+    <span class="pill ${done?'done':''}" id="pill-${id}">${done?'✓ Done':(l.pill||'3 steps')}</span>
     <span class="emoji">${l.emoji}</span>
     <div class="name">${l.title}</div>
     <div class="desc">${l.desc}</div>
@@ -505,10 +543,14 @@ function updateStars(){
   const n = ids.filter(id => store.progress[id]).length;
   document.getElementById('stars-display').textContent = '⭐'.repeat(n) + '☆'.repeat(Math.max(0, ids.length - n));
   document.getElementById('stars-count').textContent = n;
+  document.getElementById('stars-total').textContent = ids.length;
 }
 
 /* ─────────── Flow ─────────── */
 let curId=null, steps=[], stepIndex=0, curStep=null, answered=false;
+let gClueShown=0, gClueCount=0;   // charades transient state
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -516,6 +558,7 @@ function showScreen(id){
   window.scrollTo(0,0);
 }
 function startLesson(id){
+  if (id==='guess'){ startGuess(); return; }   // custom two-mode flow
   curId = id; stepIndex = 0;
   steps = (id==='mix') ? buildMixSteps() : LESSONS[id].steps;
   document.getElementById('lesson-title').textContent = lessonById(id).emoji + ' ' + lessonById(id).title;
@@ -533,17 +576,19 @@ function renderStep(){
   card.innerHTML = renderStepHTML(curStep);
   if (!reduce){
     gsap.fromTo(card, {y:26,opacity:0}, {y:0,opacity:1,duration:.5,ease:'power3.out'});
-    gsap.fromTo(card.querySelectorAll('.choice,.speak-btn,.phoneme,.tip,.callout,.scene'),
+    gsap.fromTo(card.querySelectorAll('.choice,.speak-btn,.phoneme,.tip,.callout,.scene,.mode-card,.clue,.secret,.clue-count,.parent-controls'),
       {y:14,opacity:0}, {y:0,opacity:1,duration:.4,stagger:.05,delay:.1,ease:'power2.out'});
     // Safety: guarantee visibility even if the tab was backgrounded (rAF throttled)
     setTimeout(()=>gsap.set(card.querySelectorAll('*'), {clearProps:'opacity,transform'}), 1500);
   }
-  document.getElementById('next-btn').disabled = (curStep.type === 'choose');
+  const nb = document.getElementById('next-btn');
+  nb.style.display = '';   // restore if the mode-menu hid it
+  nb.disabled = ['choose','clueGuess','clueGive'].includes(curStep.type);
 }
 
 function renderStepHTML(step){
   let h = `<span class="badge ${step.type}">${badgeIcon(step.type)} ${step.badge}</span>`;
-  h += `<p class="instruction">${step.instruction}</p>`;
+  if (step.instruction) h += `<p class="instruction">${step.instruction}</p>`;
   if (step.phoneme) h += `<div class="phoneme"><small>Target sound</small><span class="p">${step.phoneme}</span></div>`;
   if (step.scene) h += sceneHTML(step.scene);
 
@@ -563,11 +608,33 @@ function renderStepHTML(step){
       `<button class="choice ${big?'big':''}" onclick="choose(this,${i})"><span class="ce">${e}</span><small>${label}</small></button>`
     ).join('') + `</div>`;
   }
+  if (step.type === 'clueGuess'){   // Mode 1: app gives clues, Coen guesses
+    gClueShown = 1;
+    h += `<p class="instruction">Listen to the clues, then tap what I am! 👂</p>`;
+    h += `<div class="clue-list" id="clue-list">${clueHTML(step.clues[0], 1)}</div>`;
+    if (step.clues.length > 1)
+      h += `<div class="btn-row"><button class="speak-btn rose" id="more-clue" onclick="revealClue()">🔎 Another clue</button></div>`;
+    h += `<div class="choices" id="guess-choices">` + step.options.map(([e,l],i) =>
+      `<button class="choice" onclick="guessPick(this,${i})"><span class="ce">${e}</span><small>${l}</small></button>`).join('') + `</div>`;
+    setTimeout(()=>speak(step.clues[0], 0.82), 320);   // auto-play first clue
+  }
+  if (step.type === 'clueGive'){    // Mode 2: Coen gives clues, parent guesses
+    gClueCount = 0;
+    h += `<p class="instruction">Shhh! Only YOU can see this. Give a grown-up clues! 🤫</p>`;
+    h += `<div class="secret"><div class="se">${step.emoji}</div><div class="sw">${step.word}</div><div class="shh">🤫 keep it secret</div></div>`;
+    h += `<div class="btn-col">` + CLUE_PROMPTS.map(([l,s]) => spk(l, s, 'rose')).join('') + `</div>`;
+    h += `<div class="clue-count" id="clue-count">Clues given: 0</div>`;
+    h += `<div class="parent-controls">
+      <button class="pc-btn pc-again" onclick="anotherClue()">🔁 Another clue!</button>
+      <button class="pc-btn pc-got" onclick="gotIt()">✅ I got it!</button></div>`;
+    h += `<div class="tip"><span class="tl">💡 Grown-up</span>Guess out loud! If Coen is stuck, model it: "It has wheels, you stand on it — a <b>skateboard</b>!"</div>`;
+  }
   if (step.callout) h += `<div class="callout"><span class="tl">${step.callout[0]}</span>${step.callout[1]}</div>`;
   if (step.tip) h += `<div class="tip"><span class="tl">${step.tip[0]}</span>${step.tip[1]}</div>`;
   return h;
 }
-const badgeIcon = t => ({listen:'👂',say:'🗣️',choose:'🎯',talk:'🖼️'})[t] || '⭐';
+const clueHTML = (text, n) => `<div class="clue"><span class="cn">${n}</span>${text}</div>`;
+const badgeIcon = t => ({listen:'👂',say:'🗣️',choose:'🎯',talk:'🖼️',clueGuess:'🎭',clueGive:'🗣️'})[t] || '⭐';
 
 function sceneHTML(s){
   if (s.pos){
@@ -605,6 +672,116 @@ function choose(btn, i){
 function nextStep(){
   if (stepIndex < steps.length-1){ stepIndex++; renderStep(); }
   else finishLesson();
+}
+
+/* ═══════════════════ 🎭 GUESS WHAT I AM! (Module 9) ═══════════════════ */
+// Mode 1 rounds — app gives clues, Coen taps the picture. 3 picked at random.
+const GUESS_ROUNDS = [
+  { answer:'crab',    clues:['It has eight legs.','It is red.','You find it at the beach.'],
+    options:[['🦀','crab',true],['🕷️','spider',false],['🐟','fish',false],['🐢','turtle',false]] },
+  { answer:'kite',    clues:['It flies high in the sky.','It has a long tail.','You hold it with a string.'],
+    options:[['🪁','kite',true],['🎈','balloon',false],['🐦','bird',false],['✈️','plane',false]] },
+  { answer:'snowman', clues:['It is cold and white.','It has a carrot for a nose.','You build it in winter.'],
+    options:[['⛄','snowman',true],['🎅','Santa',false],['🐧','penguin',false],['🍦','ice cream',false]] },
+  { answer:'spider',  clues:['It has eight legs.','It can spin a web.','It is a little creepy-crawly.'],
+    options:[['🕷️','spider',true],['🦀','crab',false],['🐝','bee',false],['🐛','caterpillar',false]] },
+  { answer:'volcano', clues:['It is a very big mountain.','It is super hot inside.','Red lava comes out of the top!'],
+    options:[['🌋','volcano',true],['⛰️','mountain',false],['🔥','fire',false],['🏝️','island',false]] },
+  { answer:'strawberry', clues:['It is a little fruit.','It is red with tiny seeds.','It is sweet and yummy.'],
+    options:[['🍓','strawberry',true],['🍎','apple',false],['🍅','tomato',false],['🍒','cherry',false]] },
+];
+// Mode 2 word bank — Coen gives clues, parent guesses. Familiar + stretch words.
+const GUESS_WORDS = [
+  ['🦀','crab'],['🪁','kite'],['🍴','fork'],['🔑','key'],['🕷️','spider'],['🍓','strawberry'],['🍿','popcorn'],['🛝','swing'],
+  ['🏖️','sandcastle'],['🔦','torchlight'],['⛄','snowman'],['🍄','mushroom'],['🛹','skateboard'],
+  ['🦨','skunk'],['🔍','magnifying glass'],['🔭','binoculars'],['🌋','volcano'],
+];
+// Prompt cards to help Coen form clues (Mode 2).
+const CLUE_PROMPTS = [
+  ['🎨 What colour is it?','What colour is it?'],
+  ['📏 Is it big or small?','Is it big or small?'],
+  ['🌍 Where do you find it?','Where do you find it?'],
+  ['⚙️ What does it do?','What does it do?'],
+  ['👆 Can you touch, eat or ride it?','Can you touch it, eat it, or ride it?'],
+];
+const GUESS_PRAISE_GUESS = ['Wow, you guessed it!','You listened so well, Coen!','Superstar guessing!'];
+const GUESS_PRAISE_CLUES = ['Amazing clues Coen! You are so descriptive!','Wow, I guessed it from your clues!','You are a great explainer!'];
+
+// Mode picker (shown when the 🎭 card is tapped)
+function startGuess(){
+  curId = 'guess'; stepIndex = 0;
+  document.getElementById('lesson-title').textContent = '🎭 Guess What I Am!';
+  showScreen('lesson');
+  document.getElementById('progress').style.width = '0%';
+  document.getElementById('counter').textContent = '—';
+  document.getElementById('next-btn').style.display = 'none';
+  const card = document.getElementById('step-card');
+  card.innerHTML = `
+    <span class="badge clueGuess">🎭 Two ways to play</span>
+    <p class="instruction">How do you want to play, Coen?</p>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="beginGuess(1)">
+        <div class="me">🕵️</div><div class="mt">I guess!</div>
+        <div class="md">Listen to the clues and tap what it is.</div>
+      </div>
+      <div class="mode-card" onclick="beginGuess(2)">
+        <div class="me">🗣️</div><div class="mt">I give clues!</div>
+        <div class="md">Only you can see it — tell a grown-up clues!</div>
+      </div>
+    </div>`;
+  if (!reduce) gsap.fromTo(card, {y:26,opacity:0}, {y:0,opacity:1,duration:.5,ease:'power3.out'});
+}
+function beginGuess(mode){
+  if (mode === 1)
+    steps = shuffle(GUESS_ROUNDS.slice()).slice(0,3).map(r => Object.assign({type:'clueGuess',badge:'Guess!'}, r));
+  else
+    steps = shuffle(GUESS_WORDS.slice()).slice(0,3).map(w => ({type:'clueGive',badge:'Your turn!',emoji:w[0],word:w[1]}));
+  stepIndex = 0;
+  renderStep();
+}
+// Mode 1 interactions
+function revealClue(){
+  const list = document.getElementById('clue-list');
+  if (!list || gClueShown >= curStep.clues.length) return;
+  const txt = curStep.clues[gClueShown];
+  list.insertAdjacentHTML('beforeend', clueHTML(txt, gClueShown + 1));
+  speak(txt, 0.82);
+  gClueShown++;
+  if (gClueShown >= curStep.clues.length){ const b = document.getElementById('more-clue'); if (b) b.remove(); }
+  if (!reduce) gsap.fromTo(list.lastElementChild, {y:10,opacity:0}, {y:0,opacity:1,duration:.35});
+}
+function guessPick(btn, i){
+  if (answered) return;
+  if (curStep.options[i][2]){
+    answered = true;
+    document.getElementById('next-btn').disabled = false;
+    const ans = curStep.options.find(o => o[2]);
+    const wrap = document.getElementById('guess-choices');
+    wrap.innerHTML = `<div class="reveal"><div class="re">${ans[0]}</div><div class="rw">${ans[1]}! 🎉</div></div>`;
+    if (!reduce) gsap.fromTo(wrap.firstChild, {scale:0,rotate:-15}, {scale:1,rotate:0,duration:.7,ease:'elastic.out(1,.5)'});
+    speak(pick(GUESS_PRAISE_GUESS) + ' It is a ' + ans[1] + '!', 0.86, 1.2);
+    burst(16);
+  } else {
+    btn.classList.add('wrong');
+    speak('Try again! Listen to the clues.', 0.86, 1.1);
+    setTimeout(()=>btn.classList.remove('wrong'), 550);
+  }
+}
+// Mode 2 interactions
+function anotherClue(){
+  gClueCount++;
+  const el = document.getElementById('clue-count'); if (el) el.textContent = 'Clues given: ' + gClueCount;
+  speak('Give me another clue!', 0.9, 1.15);
+}
+function gotIt(){
+  if (answered) return;
+  answered = true;
+  document.getElementById('next-btn').disabled = false;
+  const n = Math.max(1, gClueCount);
+  const el = document.getElementById('clue-count');
+  if (el) el.textContent = `🎉 You explained it in ${n} clue${n>1?'s':''}!`;
+  speak(pick(GUESS_PRAISE_CLUES), 0.86, 1.2);
+  burst(18);
 }
 
 function finishLesson(){
@@ -661,6 +838,7 @@ const TIPS = [
   ['🌊','"sh" shushing sound','Use the finger-to-lips "shhhh" gesture every time — the gesture cues the sound.'],
   ['📦','Prepositions','Play the treasure-hunt game: hide a toy and give clues using position words, then swap so Coen gives you the clues.'],
   ['🖼️','Picture talk','After every book or photo, ask all the questions: Who → What happened → How do they feel → Why.'],
+  ['🎭','Charades at home','Pick any object around the house. Give Coen clues using colour, size, where you find it, and what it does — then swap. When he gets stuck, model the words: "It has wheels. You stand on it. It\'s a skateboard!" Focus on less familiar words: skateboard, skunk, binoculars, volcano.'],
   ['🌈','General strategy','Use multi-modal learning — say the word, show a picture, and use a gesture together, all at once.']
 ];
 

@@ -1,5 +1,5 @@
 /* Coen's Sound Adventure — offline service worker */
-const CACHE = 'coen-sound-adventure-v2';
+const CACHE = 'coen-sound-adventure-v3';
 const ASSETS = [
   './',
   './index.html',
