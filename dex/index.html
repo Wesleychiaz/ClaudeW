@@ -381,6 +381,53 @@
     .ticket-detail-panel { display: none; background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 8px; padding: 16px 20px; margin: 0 0 8px 0; }
     .ticket-detail-panel.open { display: block; }
     .ticket-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+    /* CLICKABILITY AFFORDANCE — rows that navigate to more detail get a trailing arrow;
+       rows that expand in place get a caret that flips when open. */
+    .agency-row:not(.static), .device-row {
+      position: relative;
+      padding-right: 34px;
+    }
+    .agency-row:not(.static)::after, .device-row::after {
+      content: "›";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-300);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .agency-row:not(.static):hover::after, .device-row:hover::after {
+      color: var(--blue-600);
+      transform: translateY(-50%) translateX(2px);
+    }
+    .device-row { cursor: pointer; }
+
+    .alert-row.expandable, .ticket-row:not(.header):not(.static) {
+      position: relative;
+      padding-right: 34px;
+    }
+    .alert-row.expandable::after, .ticket-row:not(.header):not(.static)::after {
+      content: "⌄";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-300);
+      transition: color 0.15s, transform 0.2s;
+    }
+    .alert-row.expandable:hover::after, .ticket-row:not(.header):not(.static):hover::after {
+      color: var(--blue-600);
+    }
+    .alert-row.expandable:has(+ .alert-detail.open)::after,
+    .ticket-row:has(+ .ticket-detail-panel.open)::after {
+      transform: translateY(-50%) rotate(180deg);
+      color: var(--blue-600);
+    }
   </style>
 </head>
 <body>
@@ -564,7 +611,7 @@
   </div>
   <div class="alert-table">
     <div class="alert-table-header"><div>Severity</div><div>Alert</div><div>Product</div><div>Affected</div><div>Status</div><div>Action</div></div>
-    <div class="alert-row" onclick="toggleAlertDetail('detail1')">
+    <div class="alert-row expandable" onclick="toggleAlertDetail('detail1')">
       <div><span class="severity-badge critical">● Critical</span></div>
       <div><div class="alert-title-main">EPP cloud sync failure</div><div class="alert-title-sub">MHA, ICA, SPF, CNB · 43 min ago</div></div>
       <div><span class="product-tag">EPP</span></div>
@@ -599,7 +646,7 @@
         </div>
       </div>
     </div>
-    <div class="alert-row" onclick="toggleAlertDetail('detail2')">
+    <div class="alert-row expandable" onclick="toggleAlertDetail('detail2')">
       <div><span class="severity-badge critical">● Critical</span></div>
       <div><div class="alert-title-main">ZTNA tunnel intermittent drops</div><div class="alert-title-sub">MOE and statutory boards · 1h 12m ago</div></div>
       <div><span class="product-tag">ZTNA</span></div>
@@ -710,7 +757,7 @@
       <div class="agency-row" onclick="showDrilldown('HDB','3,100','99.1','high','ok','ok','ok','ok','ok')"><div class="agency-name">HDB</div><div class="agency-devices">3,100</div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><span class="compliance-pct high">99.1%</span></div></div>
       <div class="agency-row" onclick="showDrilldown('MTI Cluster','2,800','99.6','high','ok','ok','ok','ok','ok')"><div class="agency-name">MTI Cluster</div><div class="agency-devices">2,800</div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><span class="compliance-pct high">99.6%</span></div></div>
       <div class="agency-row" onclick="showDrilldown('MOM Cluster','5,400','96.2','high','ok','warn','ok','ok','ok')"><div class="agency-name">MOM Cluster</div><div class="agency-devices">5,400</div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status warn">~</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><div class="cell-status ok">✓</div></div><div><span class="compliance-pct high">96.2%</span></div></div>
-      <div class="agency-row" style="background:var(--gray-50);font-style:italic;cursor:default;"><div class="agency-name" style="color:var(--gray-500);">+ 110 more agencies</div><div class="agency-devices" style="color:var(--gray-500);">70,090</div><div></div><div></div><div></div><div></div><div></div><div><span class="compliance-pct high">98.1% avg</span></div></div>
+      <div class="agency-row static" style="background:var(--gray-50);font-style:italic;cursor:default;"><div class="agency-name" style="color:var(--gray-500);">+ 110 more agencies</div><div class="agency-devices" style="color:var(--gray-500);">70,090</div><div></div><div></div><div></div><div></div><div></div><div><span class="compliance-pct high">98.1% avg</span></div></div>
     </div>
   </div>
 
@@ -1041,7 +1088,7 @@
       <div style="font-size:12px;color:var(--gray-700);">ZTNA client v2.4.1 deployment failed on 2,108 devices due to group policy conflict. Manually resolved by EUSS L2 with vendor support. Devices now on v2.4.1.</div>
     </div>
 
-    <div class="ticket-row" style="background:var(--gray-50);">
+    <div class="ticket-row static" style="background:var(--gray-50);">
       <div class="ticket-num" style="color:var(--gray-500);">+ 31 more</div>
       <div style="color:var(--gray-500);font-style:italic;font-size:12px;">Older tickets — click to load full history</div>
       <div></div><div></div>
