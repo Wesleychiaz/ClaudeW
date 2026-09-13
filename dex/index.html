@@ -33,6 +33,10 @@
     .nav-item.active { background: var(--blue-50); color: var(--blue-900); border-left-color: var(--blue-900); }
     .nav-badge { margin-left: auto; background: var(--red-700); color: white; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
     .sidebar-footer { padding: 12px 20px; border-top: 1px solid var(--gray-100); font-size: 11px; color: var(--gray-500); }
+    .sidebar-docs { padding: 12px 20px; border-top: 1px solid var(--gray-100); display: flex; flex-direction: column; gap: 6px; }
+    .sidebar-docs .label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 2px; }
+    .sidebar-docs a { font-size: 12px; font-weight: 500; color: var(--blue-600); text-decoration: none; display: flex; align-items: center; gap: 5px; }
+    .sidebar-docs a:hover { text-decoration: underline; }
 
     /* HEADER */
     .header { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-300); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 99; }
@@ -480,6 +484,11 @@
       Campaigns
     </a>
   </nav>
+  <div class="sidebar-docs">
+    <div class="label">Reference Docs</div>
+    <a href="https://claude.ai/code/artifact/b18c1505-3699-4385-99ee-f417a0c67ec4" target="_blank" rel="noopener">↗ The DEX Loop (brief)</a>
+    <a href="https://claude.ai/code/artifact/2f5891c7-2862-430c-a749-a15d97b30e3b" target="_blank" rel="noopener">↗ Functional Requirements</a>
+  </div>
   <div class="sidebar-footer">Last sync: <span id="last-sync">just now</span></div>
 </aside>
 
