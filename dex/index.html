@@ -49,6 +49,7 @@
 
     /* MAIN */
     .main { margin-left: var(--sidebar-width); margin-top: var(--header-height); flex: 1; padding: 24px; }
+    #device-detail { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 24px; }
     .page { display: none; }
     .page.active { display: block; }
 
@@ -1272,6 +1273,7 @@
 <script>
   // Navigation
   function showPage(pageId) {
+    document.getElementById('device-detail').style.display = 'none';
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pageId).classList.add('active');
@@ -1361,6 +1363,7 @@
   };
 
   function renderDrilldown(name, devices, compliance, compClass) {
+    document.getElementById('device-detail').style.display = 'none';
     document.getElementById('endpoints-list').style.display='none';
     document.getElementById('agency-drilldown').style.display='block';
     document.getElementById('endpoint-breadcrumb').innerHTML = `<span class="breadcrumb-link" onclick="backToEndpoints()">Endpoints</span> <span style="color:var(--gray-300);">›</span> <span class="breadcrumb-current">${name}</span>`;
@@ -1391,6 +1394,7 @@
   }
 
   function backToEndpoints() {
+    document.getElementById('device-detail').style.display = 'none';
     document.getElementById('endpoints-list').style.display='block';
     document.getElementById('agency-drilldown').style.display='none';
     document.getElementById('endpoint-breadcrumb').innerHTML = '<span class="breadcrumb-current">Endpoints</span>';
