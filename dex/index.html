@@ -221,7 +221,7 @@
     /* REMEDIATION LOG */
     .log-table { background: var(--white); border: 1px solid var(--gray-300); border-radius: 10px; overflow: hidden; }
     .log-row { display: grid; grid-template-columns: 140px 1fr 100px 80px 100px; padding: 12px 20px; border-bottom: 1px solid var(--gray-100); align-items: center; font-size: 13px; }
-    .log-row.header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; }
+    .log-row.row-header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; }
     .log-time { color: var(--gray-500); font-size: 12px; }
     .log-action { font-weight: 500; color: var(--gray-900); }
     .log-action-sub { font-size: 11px; color: var(--gray-500); }
@@ -233,7 +233,7 @@
     .chart-container { position: relative; }
     .recurring-issues-table { background: var(--white); border: 1px solid var(--gray-300); border-radius: 10px; overflow: hidden; }
     .issue-row { display: grid; grid-template-columns: 1fr 100px 100px 120px; padding: 12px 20px; border-bottom: 1px solid var(--gray-100); align-items: center; font-size: 13px; }
-    .issue-row.header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
+    .issue-row.row-header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
     .issue-row:last-child { border-bottom: none; }
     .trend-arrow { font-size: 14px; font-weight: 700; }
     .trend-arrow.up { color: var(--red-700); }
@@ -306,7 +306,7 @@
     .preview-btn.secondary-btn { background: white; color: var(--gray-700); border: 1px solid var(--gray-300); }
     .campaign-history-table { background: var(--white); border: 1px solid var(--gray-300); border-radius: 10px; overflow: hidden; }
     .campaign-history-row { display: grid; grid-template-columns: 1fr 140px 80px 80px 80px 100px; padding: 12px 20px; border-bottom: 1px solid var(--gray-100); align-items: center; font-size: 13px; }
-    .campaign-history-row.header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
+    .campaign-history-row.row-header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
     .campaign-history-row:last-child { border-bottom: none; }
     .campaign-status-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
     .campaign-status-badge.sent { background: var(--green-100); color: var(--green-700); }
@@ -357,7 +357,7 @@
     .product-status-detail { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
     .event-log { background: var(--white); border: 1px solid var(--gray-300); border-radius: 10px; overflow: hidden; }
     .event-log-row { display: grid; grid-template-columns: 140px 80px 1fr; padding: 11px 20px; border-bottom: 1px solid var(--gray-100); align-items: center; font-size: 12px; }
-    .event-log-row.header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
+    .event-log-row.row-header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
     .event-log-row:last-child { border-bottom: none; }
     .event-type-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
     .event-type-badge.info { background: var(--blue-100); color: var(--blue-900); }
@@ -369,7 +369,7 @@
     .ticket-table { background: var(--white); border: 1px solid var(--gray-300); border-radius: 10px; overflow: hidden; }
     .ticket-row { display: grid; grid-template-columns: 120px 1fr 100px 120px 100px 100px 80px; padding: 13px 20px; border-bottom: 1px solid var(--gray-100); align-items: center; font-size: 13px; cursor: pointer; transition: background 0.1s; }
     .ticket-row:hover { background: var(--gray-50); }
-    .ticket-row.header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; cursor: default; }
+    .ticket-row.row-header { background: var(--gray-50); font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; cursor: default; }
     .ticket-row:last-child { border-bottom: none; }
     .ticket-num { font-weight: 700; color: var(--blue-900); font-size: 12px; }
     .ticket-desc-main { font-weight: 600; color: var(--gray-900); }
@@ -409,11 +409,11 @@
     }
     .device-row { cursor: pointer; }
 
-    .alert-row.expandable, .ticket-row:not(.header):not(.static) {
+    .alert-row.expandable, .ticket-row:not(.row-header):not(.static) {
       position: relative;
       padding-right: 34px;
     }
-    .alert-row.expandable::after, .ticket-row:not(.header):not(.static)::after {
+    .alert-row.expandable::after, .ticket-row:not(.row-header):not(.static)::after {
       content: "⌄";
       position: absolute;
       right: 16px;
@@ -424,7 +424,7 @@
       color: var(--gray-300);
       transition: color 0.15s, transform 0.2s;
     }
-    .alert-row.expandable:hover::after, .ticket-row:not(.header):not(.static):hover::after {
+    .alert-row.expandable:hover::after, .ticket-row:not(.row-header):not(.static):hover::after {
       color: var(--blue-600);
     }
     .alert-row.expandable:has(+ .alert-detail.open)::after,
@@ -735,7 +735,7 @@
   <div class="card">
     <div class="card-title">Top 5 Recurring Issues This Week</div>
     <div class="recurring-issues-table">
-      <div class="issue-row header"><div>Issue</div><div>Occurrences</div><div>Devices</div><div>Trend</div></div>
+      <div class="issue-row row-header"><div>Issue</div><div>Occurrences</div><div>Devices</div><div>Trend</div></div>
       <div class="issue-row"><div><strong>MDM compliance drift</strong><div style="font-size:11px;color:var(--gray-500);">Multiple agencies</div></div><div>14</div><div>8,240</div><div><span class="trend-arrow up">↑ Worsening</span></div></div>
       <div class="issue-row"><div><strong>ZTNA tunnel drops</strong><div style="font-size:11px;color:var(--gray-500);">MOE, MTI clusters</div></div><div>9</div><div>3,102</div><div><span class="trend-arrow up">↑ Worsening</span></div></div>
       <div class="issue-row"><div><strong>EPP sync failures</strong><div style="font-size:11px;color:var(--gray-500);">MHA cluster</div></div><div>7</div><div>1,890</div><div><span class="trend-arrow flat">→ Stable</span></div></div>
@@ -833,7 +833,7 @@
     <div class="metric-card"><div class="metric-label">Auto-fix success rate</div><div class="metric-value" style="color:var(--green-700);">82%</div><div class="metric-sub">23 of 28 resolved automatically</div></div>
   </div>
   <div class="log-table">
-    <div class="log-row header"><div>Time</div><div>Action</div><div>Product</div><div>Devices</div><div>Outcome</div></div>
+    <div class="log-row row-header"><div>Time</div><div>Action</div><div>Product</div><div>Devices</div><div>Outcome</div></div>
     <div class="log-row"><div class="log-time">09:57 SGT</div><div><div class="log-action">MDM policy re-push — compliance drift</div><div class="log-action-sub">WOG-wide · 2,109 devices</div></div><div><span class="product-tag">MDM</span></div><div>2,109</div><div><span class="outcome-badge auto">Auto-fixed</span></div></div>
     <div class="log-row"><div class="log-time">09:34 SGT</div><div><div class="log-action">ZTNA client restart — tunnel instability</div><div class="log-action-sub">MOE cluster · 312 devices</div></div><div><span class="product-tag">ZTNA</span></div><div>312</div><div><span class="outcome-badge auto">Auto-fixed</span></div></div>
     <div class="log-row"><div class="log-time">09:14 SGT</div><div><div class="log-action">EPP gateway config rollback — escalated</div><div class="log-action-sub">MHA cluster · 834 devices · Requires vendor</div></div><div><span class="product-tag">EPP</span></div><div>834</div><div><span class="outcome-badge escalated">Escalated</span></div></div>
@@ -931,7 +931,7 @@
       <div>
         <div style="font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:12px;">Recent Campaigns</div>
         <div class="campaign-history-table">
-          <div class="campaign-history-row header"><div>Campaign</div><div>Sent</div><div>Recipients</div><div>Opened</div><div>Responded</div><div>Status</div></div>
+          <div class="campaign-history-row row-header"><div>Campaign</div><div>Sent</div><div>Recipients</div><div>Opened</div><div>Responded</div><div>Status</div></div>
           <div class="campaign-history-row"><div><strong>Teams Degradation Notice</strong><div style="font-size:11px;color:var(--gray-500);">WOG-wide</div></div><div style="font-size:12px;color:var(--gray-500);">Today 08:10</div><div>120,000</div><div>84%</div><div>61%</div><div><span class="campaign-status-badge sent">Sent</span></div></div>
           <div class="campaign-history-row"><div><strong>OS Patch Reminder</strong><div style="font-size:11px;color:var(--gray-500);">WOG-wide</div></div><div style="font-size:12px;color:var(--gray-500);">Yesterday</div><div>4,203</div><div>91%</div><div>78%</div><div><span class="campaign-status-badge sent">Sent</span></div></div>
           <div class="campaign-history-row"><div><strong>RBI Latency Update</strong><div style="font-size:11px;color:var(--gray-500);">MOH cluster</div></div><div style="font-size:12px;color:var(--gray-500);">2 days ago</div><div>891</div><div>88%</div><div>72%</div><div><span class="campaign-status-badge sent">Sent</span></div></div>
@@ -970,7 +970,7 @@
   </div>
 
   <div class="ticket-table">
-    <div class="ticket-row header"><div>Ticket</div><div>Description</div><div>Product</div><div>Agency</div><div>Status</div><div>Resolution</div><div>Time</div></div>
+    <div class="ticket-row row-header"><div>Ticket</div><div>Description</div><div>Product</div><div>Agency</div><div>Status</div><div>Resolution</div><div>Time</div></div>
 
     <div class="ticket-row" onclick="toggleTicketDetail('td1')">
       <div class="ticket-num">INC0024847</div>
@@ -1148,7 +1148,7 @@
       <div class="card">
         <div class="card-title">Recent Events</div>
         <div class="event-log">
-          <div class="event-log-row header"><div>Time</div><div>Type</div><div>Event</div></div>
+          <div class="event-log-row row-header"><div>Time</div><div>Type</div><div>Event</div></div>
           <div id="dev-events"></div>
         </div>
       </div>
