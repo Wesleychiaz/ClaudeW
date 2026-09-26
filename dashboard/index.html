@@ -76,9 +76,8 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
     <h1>Morning Market Brief for Wesley</h1>
     <p class="sub" id="date-label"></p>
   </div>
-  <button id="refresh-btn" onclick="refreshAll()">Refresh Live Data</button>
 </header>
-<div id="status-bar">Ready.</div>
+<div id="status-bar">📸 Static snapshot — live market prices &amp; news are turned off on this public page to conserve API usage.</div>
 <nav>
   <button class="active" onclick="switchTab('overview',this)">Overview</button>
   <button onclick="switchTab('us',this)">US Tech</button>
@@ -110,7 +109,7 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
     <p class="hint">W Portfolio: ASTS, AMZN, CRWD, GOOG, MSFT, PLTR, ZS, NOW, QQQ</p>
     <div class="section-label">Live Prices</div>
     <div class="price-grid" id="us-prices"></div>
-    <div class="section-label">Latest News <span class="live-tag">(Live via Finnhub)</span></div>
+    <div class="section-label">Latest News <span class="live-tag">(live news off on public page)</span></div>
     <div id="us-news"></div>
   </div>
   <div id="tab-sg" class="tab-panel">
@@ -131,7 +130,7 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
     <p class="hint">KTOS, RKLB, OUST + S&amp;P 500 Top 10</p>
     <div class="section-label">Price Snapshot</div>
     <div class="watch-price-grid" id="watch-price-grid"></div>
-    <div class="section-label">Latest News <span class="live-tag">(Live via Finnhub)</span></div>
+    <div class="section-label">Latest News <span class="live-tag">(live news off on public page)</span></div>
     <div id="watch-list"></div>
   </div>
 </main>
@@ -139,8 +138,10 @@ footer{text-align:center;padding:16px 20px;font-size:11px;color:#475569;border-t
   SG stock prices are unavailable as this dashboard runs on free-tier APIs which do not support SGX data. To enable live SG prices, Wesley needs to upgrade to a paid data provider which he refuses.
 </footer>
 <script>
-var FINNHUB_KEY = "d86jmmpr01qgiu45ni4gd86jmmpr01qgiu45ni50";
-var TWELVE_KEY  = "a0d8abc1a6244ab9a97722d4e4b94ca1";
+// Live fetching is disabled on this public page. Keys intentionally removed.
+// (Rotate the old keys in your Finnhub/TwelveData dashboards — they were public.)
+var FINNHUB_KEY = "";
+var TWELVE_KEY  = "";
 
 var NEWS_DATA = {
   sentiment: {
@@ -498,7 +499,7 @@ function renderAll() {
     var n = liveData.usNews[i];
     unh += newsCardHtml(n.ticker, "#38bdf8", n.impact, n.headline, n.detail, n.url);
   }
-  ge("us-news").innerHTML = unh || "<div style='color:#64748b;font-size:13px;padding:10px'>No recent news found. Try refreshing.</div>";
+  ge("us-news").innerHTML = unh || "<div style='color:#64748b;font-size:13px;padding:10px'>Live news is off on this public snapshot.</div>";
 
   var snh = "";
   for (var i = 0; i < nd.sgNews.length; i++) {
@@ -513,7 +514,7 @@ function renderAll() {
     var n = liveData.cryptoNews[i];
     cnh += newsCardHtml(n.ticker, "#f59e0b", n.impact, n.headline, n.detail, n.url);
   }
-  ge("crypto-news").innerHTML = cnh || "<div style='color:#64748b;font-size:13px;padding:10px'>No crypto news found. Try refreshing.</div>";
+  ge("crypto-news").innerHTML = cnh || "<div style='color:#64748b;font-size:13px;padding:10px'>Live news is off on this public snapshot.</div>";
 
   var wpg = "";
   for (var i = 0; i < nd.watchlist.length; i++) {
@@ -563,7 +564,7 @@ function renderAll() {
       var it = cat.items[j];
       mg += "<div class='mini-row'><span style='color:" + iColor[it.impact] + ";font-weight:700'>" + iIcon[it.impact] + "</span><span><strong>" + it[cat.key] + "</strong> " + it.headline + "</span></div>";
     }
-    if (limit === 0) { mg += "<div style='font-size:11px;color:#475569'>Fetching...</div>"; }
+    if (limit === 0) { mg += "<div style='font-size:11px;color:#475569'>—</div>"; }
     mg += "</div>";
   }
   ge("mini-grid").innerHTML = mg;
@@ -571,6 +572,7 @@ function renderAll() {
 
 function refreshAll() {
   var btn = ge("refresh-btn");
+  if (!btn) { return; }  // Refresh button removed on the public page — live fetching disabled.
   btn.disabled = true;
   btn.textContent = "Refreshing...";
 
@@ -621,11 +623,11 @@ function refreshAll() {
 
 ge("date-label").textContent = new Date().toLocaleDateString("en-SG", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
 
+// Public page: render static content only. No live API calls (see refreshAll below, now unused).
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", function() { renderAll(); refreshAll(); });
+  document.addEventListener("DOMContentLoaded", function() { renderAll(); });
 } else {
   renderAll();
-  refreshAll();
 }
 </script>
 </body>
